@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useData } from '../store/DataContext';
 import NumericInput from '../components/NumericInput';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { useToast } from '../components/Toast';
 import { Clock, Pencil, Copy, Eye, X, Tag, ChevronDown, ChevronUp, Trash2, CalendarPlus } from 'lucide-react';
 import { fmtDate, fmtDayLabel, generateDateRange, dateSortValue } from '../utils/dates';
@@ -506,7 +507,11 @@ export default function ScheduleView() {
 
       {/* ── INLINE DELETE CONFIRM (M4: replaces window.confirm) ── */}
       {confirmId && (
-        <DeleteConfirm
+        <ConfirmDialog
+          title="Delete Booking?"
+          description="Are you sure you want to completely remove this booking? This action cannot be undone."
+          confirmLabel="Delete Booking"
+          tone="danger"
           onConfirm={handleDeleteConfirm}
           onCancel={() => setConfirmId(null)}
         />
