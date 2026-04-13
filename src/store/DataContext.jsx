@@ -1,0 +1,316 @@
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import {
+  collection,
+  onSnapshot,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  serverTimestamp,
+  writeBatch,
+  query,
+  orderBy,
+  limit,
+} from 'firebase/firestore';
+import { db } from '../firebase';
+import { todayLocalStr } from '../utils/dates';
+
+const DataContext = createContext();
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const initialServices = [
+  { id: '1', name: 'Basic Visit',              price: 200, defaultSub: 'up to 2 pets' },
+  { id: '2', name: 'Play & Visit',             price: 250, defaultSub: 'up to 2 pets' },
+  { id: '3', name: 'Twice-a-day Visit',        price: 350, defaultSub: 'up to 2 pets' },
+  { id: '4', name: 'Twice-a-day Play & Visit', price: 450, defaultSub: 'up to 2 pets' },
+];
+
+const COLLECTION_KEYS = ['bookings', 'clients', 'invoices', 'reminders', 'errands'];
+const BATCH_MAX = 450;
+
+const loadLocal = (key, fallbackValue) => {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallbackValue;
+  } catch {
+    return fallbackValue;
+  }
+};
+
+const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+
+// ── MOCK DATA FOR DEMO MODE ──────────────────────────────────────────────────
+const demoClients = [
+  { id: 'c1', name: 'Ate Maria', pets: [{ name: 'Buster' }, { name: 'Luna' }], address: 'BGC, Taguig', phone: '0917-000-0001' },
+  { id: 'c2', name: 'John Doe', pets: [{ name: 'Fluffy' }], address: 'Makati City', phone: '0917-000-0002' },
+  { id: 'c3', name: 'Sarah Smith', pets: [{ name: 'Max' }, { name: 'Bella' }], address: 'Quezon City', phone: '0917-000-0003' },
+];
+
+const demoBookings = [
+  { id: 'b1', clientId: 'c1', date: todayLocalStr(), startTime: '10:00', endTime: '11:00', price: 200, serviceId: '1' },
+  { id: 'b2', clientId: 'c2', date: todayLocalStr(), startTime: '14:00', endTime: '15:00', price: 250, serviceId: '2' },
+];
+
+const demoInvoices = [
+  { id: 'i1', clientId: 'c1', items: [{ id: 'i0', amount: 200, rate: 200, days: 1, name: 'Basic Visit' }], isPaid: false, summary: { finalTotal: 200 }, invoiceRef: 'INV-1001', createdAt: { toDate: () => new Date() } },
+];
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function DataProvider({ children }) {
+  const [bookings, setBookings] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  const [reminders, setReminders] = useState([]);
+  const [errands, setErrands] = useState([]);
+  const [services, setServicesState] = useState(() => loadLocal('kats_services', initialServices));
+  const [loading, setLoading] = useState(true);
+  const [syncStatus, setSyncStatus] = useState('connecting');
+
+  const listenerStateRef = useRef({});
+
+  useEffect(() => {
+    if (isDemo) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setClients(demoClients);
+      setBookings(demoBookings);
+      setInvoices(demoInvoices);
+      setReminders([{ id: 'r1', text: 'Give Buster his meds', done: false }]);
+      setErrands([{ id: 'e1', title: 'Buy cat food', amount: 500, clientId: 'c2', isBilled: false, date: todayLocalStr() }]);
+      setLoading(false);
+      setSyncStatus('online');
+      return;
+    }
+
+    listenerStateRef.current = Object.fromEntries(COLLECTION_KEYS.map((key) => [key, 'pending']));
+
+    const timeout = setTimeout(() => {
+      setLoading(false);
+      setSyncStatus('offline');
+    }, 8000);
+
+    const markListenerState = (key, state) => {
+      listenerStateRef.current[key] = state;
+      const allResolved = COLLECTION_KEYS.every((name) => listenerStateRef.current[name] !== 'pending');
+      const allHealthy = COLLECTION_KEYS.every((name) => listenerStateRef.current[name] === 'ok');
+
+      if (allResolved) {
+        clearTimeout(timeout);
+        setLoading(false);
+        setSyncStatus(window.navigator.onLine && allHealthy ? 'online' : 'offline');
+      } else if (window.navigator.onLine) {
+        setSyncStatus('connecting');
+      }
+    };
+
+    const handleSnapshot = (key, setter) => (snap) => {
+      setter(snap.docs.map((item) => ({ id: item.id, ...item.data() })));
+      markListenerState(key, 'ok');
+    };
+
+    const handleError = (key) => () => {
+      markListenerState(key, 'error');
+      setSyncStatus('offline');
+    };
+
+    const unsubBookings = onSnapshot(query(collection(db, 'bookings'), orderBy('createdAt', 'desc'), limit(500)), handleSnapshot('bookings', setBookings), handleError('bookings'));
+    const unsubClients = onSnapshot(collection(db, 'clients'), handleSnapshot('clients', setClients), handleError('clients'));
+    const unsubInvoices = onSnapshot(query(collection(db, 'invoices'), orderBy('createdAt', 'desc'), limit(300)), handleSnapshot('invoices', setInvoices), handleError('invoices'));
+    const unsubReminders = onSnapshot(collection(db, 'reminders'), handleSnapshot('reminders', setReminders), handleError('reminders'));
+    const unsubErrands = onSnapshot(collection(db, 'errands'), handleSnapshot('errands', setErrands), handleError('errands'));
+
+    const handleOnline = () => {
+      const allResolved = COLLECTION_KEYS.every((name) => listenerStateRef.current[name] !== 'pending');
+      const allHealthy = COLLECTION_KEYS.every((name) => listenerStateRef.current[name] === 'ok');
+      setSyncStatus(allResolved && allHealthy ? 'online' : 'connecting');
+    };
+
+    const handleOffline = () => setSyncStatus('offline');
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      clearTimeout(timeout);
+      unsubBookings();
+      unsubClients();
+      unsubInvoices();
+      unsubReminders();
+      unsubErrands();
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('kats_services', JSON.stringify(services));
+    } catch {
+      // Ignore quota errors
+    }
+  }, [services]);
+
+  const fakeId = () => Math.random().toString(36).substr(2, 9);
+  const _add = (setter) => (obj) => {
+    if (isDemo) return setter(p => [{ ...obj, id: fakeId(), createdAt: { toDate: () => new Date() } }, ...p]);
+  };
+  const _update = (setter) => (id, updates) => {
+    if (isDemo) return setter(p => p.map(item => item.id === id ? { ...item, ...updates } : item));
+  };
+  const _remove = (setter) => (id) => {
+    if (isDemo) return setter(p => p.filter(item => item.id !== id));
+  };
+
+  const addBooking = async (booking) => {
+    if (isDemo) return _add(setBookings)(booking);
+    const { id: _id, ...data } = booking;
+    await addDoc(collection(db, 'bookings'), { ...data, createdAt: serverTimestamp() });
+  };
+  const updateBooking = async (id, updates) => {
+    if (isDemo) return _update(setBookings)(id, updates);
+    const { id: _id, createdAt: _createdAt, ...safeData } = updates;
+    await updateDoc(doc(db, 'bookings', id), safeData);
+  };
+  const removeBooking = async (id) => {
+    if (isDemo) return _remove(setBookings)(id);
+    await deleteDoc(doc(db, 'bookings', id));
+  };
+
+  const addClient = async (client) => {
+    if (isDemo) return _add(setClients)(client);
+    const { id: _id, ...data } = client;
+    await addDoc(collection(db, 'clients'), { ...data, createdAt: serverTimestamp() });
+  };
+  const updateClient = async (id, updates) => {
+    if (isDemo) return _update(setClients)(id, updates);
+    const { id: _id, createdAt: _createdAt, ...safeData } = updates;
+    await updateDoc(doc(db, 'clients', id), safeData);
+  };
+  const removeClient = async (id) => {
+    if (isDemo) return _remove(setClients)(id);
+    await deleteDoc(doc(db, 'clients', id));
+  };
+
+  const addInvoice = async (invoice) => {
+    if (isDemo) return _add(setInvoices)(invoice);
+    const { id: _id, ...data } = invoice;
+    await addDoc(collection(db, 'invoices'), { ...data, createdAt: serverTimestamp() });
+  };
+  const updateInvoice = async (id, updates) => {
+    if (isDemo) return _update(setInvoices)(id, updates);
+    const { id: _id, createdAt: _createdAt, ...safeData } = updates;
+    await updateDoc(doc(db, 'invoices', id), safeData);
+  };
+  const removeInvoice = async (id) => {
+    if (isDemo) return _remove(setInvoices)(id);
+    await deleteDoc(doc(db, 'invoices', id));
+  };
+
+  const addReminder = async (text) => {
+    if (isDemo) return _add(setReminders)({ text, done: false });
+    await addDoc(collection(db, 'reminders'), { text, done: false, createdAt: serverTimestamp() });
+  };
+  const toggleReminder = async (id, current) => {
+    if (isDemo) return _update(setReminders)(id, { done: !current });
+    await updateDoc(doc(db, 'reminders', id), { done: !current });
+  };
+  const removeReminder = async (id) => {
+    if (isDemo) return _remove(setReminders)(id);
+    await deleteDoc(doc(db, 'reminders', id));
+  };
+
+  const addErrand = async (errand) => {
+    if (isDemo) return _add(setErrands)(errand);
+    const { id: _id, ...data } = errand;
+    await addDoc(collection(db, 'errands'), { ...data, createdAt: serverTimestamp() });
+  };
+  const updateErrand = async (id, data) => {
+    if (isDemo) return _update(setErrands)(id, data);
+    await updateDoc(doc(db, 'errands', id), data);
+  };
+  const deleteErrand = async (id) => {
+    if (isDemo) return _remove(setErrands)(id);
+    await deleteDoc(doc(db, 'errands', id));
+  };
+
+  const exportData = () => {
+    const data = { bookings, clients, services, invoices, reminders, exportedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Kat_CRM_Backup_${todayLocalStr()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  };
+
+  const commitDeletes = async (colName, existingItems = []) => {
+    if (isDemo) return;
+    const ids = existingItems.map((item) => item?.id).filter(Boolean);
+    if (!ids.length) return;
+    let batch = writeBatch(db);
+    let count = 0;
+    for (const id of ids) {
+       batch.delete(doc(db, colName, id));
+       count++;
+       if (count === BATCH_MAX) {
+         await batch.commit();
+         batch = writeBatch(db);
+         count = 0;
+       }
+    }
+    if (count > 0) await batch.commit();
+  };
+
+  const commitImports = async (colName, items = []) => {
+    if (isDemo) return;
+    if (!items.length) return;
+    let batch = writeBatch(db);
+    let count = 0;
+    for (const item of items) {
+      const { id, createdAt: _createdAt, ...rest } = item || {};
+      const targetRef = id ? doc(db, colName, id) : doc(collection(db, colName));
+      batch.set(targetRef, rest);
+      count++;
+      if (count === BATCH_MAX) {
+         await batch.commit();
+         batch = writeBatch(db);
+         count = 0;
+      }
+    }
+    if (count > 0) await batch.commit();
+  };
+
+  const importData = async (jsonData) => {
+    if (isDemo) {
+        alert("Import disabled in Demo Sandbox Mode.");
+        return;
+    }
+    const data = JSON.parse(jsonData);
+    const existingByCollection = { bookings, clients, invoices, reminders };
+    for (const colName of COLLECTION_KEYS) {
+      await commitDeletes(colName, existingByCollection[colName]);
+      await commitImports(colName, Array.isArray(data[colName]) ? data[colName] : []);
+    }
+    if (Array.isArray(data.services)) setServicesState(data.services);
+  };
+
+  return (
+    <DataContext.Provider value={{
+      bookings, addBooking, updateBooking, removeBooking,
+      clients, addClient, updateClient, removeClient,
+      invoices, addInvoice, updateInvoice, removeInvoice,
+      reminders, addReminder, toggleReminder, removeReminder,
+      errands, addErrand, updateErrand, deleteErrand,
+      services, setServices: setServicesState,
+      exportData, importData,
+      loading, syncStatus,
+    }}
+    >
+      {children}
+    </DataContext.Provider>
+  );
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useData = () => useContext(DataContext);

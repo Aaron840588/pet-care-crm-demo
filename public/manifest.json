@@ -1,0 +1,19 @@
+{
+  "name": "Kat's Pet-sitting CRM",
+  "short_name": "Kat's CRM",
+  "description": "Manage clients, bookings, invoices and keys for Kat's Pet-sitting business.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fcff63",
+  "theme_color": "#fcff63",
+  "orientation": "any",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
