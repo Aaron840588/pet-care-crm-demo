@@ -34,7 +34,9 @@ export default function EarningsView() {
   const monthlyData = last6.map(({ year, month, label }) => {
     const invs = getMonthInvoices(year, month);
     const total = invs.reduce((s, i) => s + (i.total || 0), 0);
-    const collected = invs.reduce((s, i) => s + (i.paid || 0), 0);
+    const paidOnly = invs.reduce((s, i) => s + (i.paid || 0), 0);
+    const tip = invs.reduce((s, i) => s + (i.tip || 0), 0);
+    const collected = paidOnly + tip;
     return { label, year, month, total, collected, count: invs.length };
   });
 
@@ -43,13 +45,17 @@ export default function EarningsView() {
   // Selected month detail
   const selInvoices = getMonthInvoices(selectedYear, selectedMonth);
   const selTotal = selInvoices.reduce((s, i) => s + (i.total || 0), 0);
-  const selCollected = selInvoices.reduce((s, i) => s + (i.paid || 0), 0);
-  const selOutstanding = selTotal - selCollected;
+  const selPaidOnly = selInvoices.reduce((s, i) => s + (i.paid || 0), 0);
+  const selTip = selInvoices.reduce((s, i) => s + (i.tip || 0), 0);
+  const selCollected = selPaidOnly + selTip;
+  const selOutstanding = Math.max(0, selTotal - selPaidOnly);
 
   // All-time stats
   const allTotal = invoices.reduce((s, i) => s + (i.total || 0), 0);
-  const allCollected = invoices.reduce((s, i) => s + (i.paid || 0), 0);
-  const allOutstanding = allTotal - allCollected;
+  const allPaidOnly = invoices.reduce((s, i) => s + (i.paid || 0), 0);
+  const allTip = invoices.reduce((s, i) => s + (i.tip || 0), 0);
+  const allCollected = allPaidOnly + allTip;
+  const allOutstanding = Math.max(0, allTotal - allPaidOnly);
 
   // U10: match by clientId (stored on invoice) if available, else fallback to name match
   const clientTotals = useMemo(() =>
@@ -63,6 +69,7 @@ export default function EarningsView() {
         name:  c.name,
         total: cInvs.reduce((s, i) => s + (i.total || 0), 0),
         paid:  cInvs.reduce((s, i) => s + (i.paid  || 0), 0),
+        tip:   cInvs.reduce((s, i) => s + (i.tip || 0), 0),
         count: cInvs.length,
       };
     }).filter(c => c.count > 0).sort((a, b) => b.total - a.total).slice(0, 5),
@@ -88,7 +95,8 @@ export default function EarningsView() {
       <div className="stats-row" style={{ marginBottom: '22px' }}>
         {[
           { label: 'Total Invoiced', val: fmtMoney(allTotal), sub: 'all time', color: '#4a90d9', bg: '#eef4fc' },
-          { label: 'Total Collected', val: fmtMoney(allCollected), sub: 'payments received', color: '#3fa85f', bg: '#e6f7ed' },
+          { label: 'Total Collected', val: fmtMoney(allCollected), sub: 'payments + tips', color: '#3fa85f', bg: '#e6f7ed' },
+          { label: 'Total Tips 💝', val: fmtMoney(allTip), sub: 'extra earned', color: '#d4a373', bg: '#faeedd' },
           { label: 'Outstanding', val: fmtMoney(allOutstanding), sub: 'still to collect', color: '#d94f4f', bg: '#fff0f0' },
           { label: 'This Month', val: fmtMoney(curb(selTotal)), sub: MONTHS[selectedMonth] + ' ' + selectedYear, color: '#9b59b6', bg: '#f5eeff' },
         ].map(({ label, val, sub, color, bg }) => (
@@ -192,6 +200,7 @@ export default function EarningsView() {
                 {[
                   { label: 'Invoiced', val: selTotal, color: 'var(--black)' },
                   { label: 'Collected', val: selCollected, color: 'var(--green)' },
+                  { label: 'Tips 💝', val: selTip, color: '#b8860b' },
                   { label: 'Outstanding', val: selOutstanding, color: selOutstanding > 0 ? 'var(--red)' : 'var(--green)' },
                 ].map(row => (
                   <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid #f4f4f0' }}>
@@ -211,6 +220,7 @@ export default function EarningsView() {
                         </div>
                         <div style={{ textAlign: 'right' }}>
                           <div style={{ fontWeight: 700 }}>{fmtMoney(inv.total)}</div>
+                          {Number(inv.tip) > 0 && <div style={{ color: '#b8860b', fontSize: '10.5px', fontWeight: 600 }}>+ {fmtMoney(inv.tip)} tip</div>}
                           {bal > 0 && <div style={{ color: 'var(--red)', fontSize: '10px' }}>-{fmtMoney(bal)} unpaid</div>}
                           {bal <= 0 && <div style={{ color: 'var(--green)', fontSize: '10px' }}>✓ Paid</div>}
                         </div>
@@ -237,7 +247,10 @@ export default function EarningsView() {
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 700, fontSize: '14px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.name}</div>
-                <div style={{ fontSize: '11px', color: 'var(--gray)' }}>{c.count} invoice{c.count !== 1 ? 's' : ''}</div>
+                <div style={{ fontSize: '11px', color: 'var(--gray)' }}>
+                  {c.count} invoice{c.count !== 1 ? 's' : ''}
+                  {Number(c.tip) > 0 && <span style={{ color: '#b8860b', fontWeight: 600 }}> • 💝 {fmtMoney(c.tip)} tip</span>}
+                </div>
               </div>
               {/* Revenue bar */}
               <div style={{ flex: 2, display: 'flex', alignItems: 'center', gap: '8px' }}>

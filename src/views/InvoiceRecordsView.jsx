@@ -128,16 +128,22 @@ export default function InvoiceRecordsView() {
                 {invoice.baseServiceName} • {invoice.dateSaved ? fmtDate(invoice.dateSaved) : 'No save date'}
               </div>
 
-              <div className="invoice-record-summary">
-                <div style={{ flex: 1 }}>
+              <div className="invoice-record-summary" style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: '60px' }}>
                   <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', marginBottom: '2px' }}>TOTAL</div>
                   <div style={{ fontWeight: 700 }}>PHP {invoice.total}</div>
                 </div>
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, minWidth: '60px' }}>
                   <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', marginBottom: '2px' }}>PAID</div>
                   <div style={{ fontWeight: 700, color: 'var(--green)' }}>PHP {invoice.paid}</div>
                 </div>
-                <div style={{ flex: 1 }}>
+                {Number(invoice.tip || 0) > 0 && (
+                  <div style={{ flex: 1, minWidth: '60px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', marginBottom: '2px' }}>TIP 💝</div>
+                    <div style={{ fontWeight: 700, color: '#b8860b' }}>PHP {invoice.tip}</div>
+                  </div>
+                )}
+                <div style={{ flex: `1.5`, minWidth: '70px' }}>
                   <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', marginBottom: '2px' }}>BALANCE</div>
                   <div style={{ fontWeight: 800, color: isPaid ? 'var(--green)' : 'var(--red)' }}>PHP {balance}</div>
                 </div>
@@ -175,6 +181,7 @@ export default function InvoiceRecordsView() {
                   <th>Service</th>
                   <th>Total</th>
                   <th>Paid</th>
+                  <th>Tip 💝</th>
                   <th>Balance</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -182,7 +189,7 @@ export default function InvoiceRecordsView() {
               </thead>
               <tbody>
                 {sortedInvoices.length === 0 ? (
-                  <tr className="empty-row"><td colSpan="9">No invoices saved yet. Go to Invoice Builder to save one.</td></tr>
+                  <tr className="empty-row"><td colSpan="10">No invoices saved yet. Go to Invoice Builder to save one.</td></tr>
                 ) : sortedInvoices.map((invoice) => {
                   const balance = Math.max(0, Number(invoice.total || 0) - Number(invoice.paid || 0));
                   const isPaid = balance <= 0;
@@ -195,6 +202,11 @@ export default function InvoiceRecordsView() {
                       <td style={{ fontSize: '12px', maxWidth: '280px', lineHeight: 1.45 }}>{invoice.baseServiceName}</td>
                       <td style={{ fontWeight: 700 }}>PHP {invoice.total}</td>
                       <td><span style={{ fontWeight: 600, color: invoice.paid > 0 ? 'var(--green)' : '#999' }}>PHP {invoice.paid}</span></td>
+                      <td>
+                        {Number(invoice.tip || 0) > 0 
+                          ? <span style={{ fontWeight: 700, color: '#b8860b' }}>PHP {invoice.tip}</span>
+                          : <span style={{ color: '#ddd' }}>—</span>}
+                      </td>
                       <td style={{ fontWeight: 800, color: isPaid ? 'var(--green)' : 'var(--red)' }}>PHP {balance}</td>
                       <td>
                         {isPaid
