@@ -4,7 +4,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import NumericInput from '../components/NumericInput';
 import { useToast } from '../components/Toast';
 import { CheckCircle, CircleDollarSign, Pencil, X, Check } from 'lucide-react';
-import { dateSortValue, fmtDate } from '../utils/dates';
+import { dateSortValue, fmtDate, getDateParts } from '../utils/dates';
 
 const toMoneyValue = (value) => Math.max(0, Number.parseInt(String(value ?? '0'), 10) || 0);
 
@@ -78,6 +78,26 @@ export default function InvoiceRecordsView() {
     }),
   [invoices]);
 
+  const groupedInvoices = useMemo(() => {
+    const groups = [];
+    const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    
+    sortedInvoices.forEach(inv => {
+      let label = 'Unknown Date';
+      if (inv.dateSaved) {
+        const parts = getDateParts(inv.dateSaved);
+        if (parts) label = `${MONTHS[parts.m - 1]} ${parts.y}`;
+      }
+      let group = groups.find(g => g.label === label);
+      if (!group) {
+        group = { label, invoices: [] };
+        groups.push(group);
+      }
+      group.invoices.push(inv);
+    });
+    return groups;
+  }, [sortedInvoices]);
+
   const handleDelete = async () => {
     if (!invoiceToDelete) return;
 
@@ -102,64 +122,71 @@ export default function InvoiceRecordsView() {
       </div>
 
       <div className="inv-records-mobile" style={{ display: 'none' }}>
-        {sortedInvoices.map((invoice) => {
-          const balance = Math.max(0, Number(invoice.total || 0) - Number(invoice.paid || 0));
-          const isPaid = balance <= 0;
-
-          return (
-            <div key={invoice.id} className="card" style={{ margin: '0 0 12px', borderLeft: `4px solid ${isPaid ? 'var(--green)' : 'var(--orange)'}` }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', gap: '10px' }}>
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontWeight: 800, fontSize: '15px' }}>{invoice.toName}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--gray)' }}>{invoice.pets}</div>
-                </div>
-                {isPaid ? (
-                  <span style={{ background: '#e6f7ed', color: 'var(--green)', padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
-                    <CheckCircle size={12} /> PAID
-                  </span>
-                ) : (
-                  <span style={{ background: '#fff4e0', color: 'var(--orange)', padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, flexShrink: 0 }}>
-                    UNPAID
-                  </span>
-                )}
-              </div>
-
-              <div style={{ fontSize: '12px', color: 'var(--gray)', marginBottom: '10px', lineHeight: 1.5 }}>
-                {invoice.baseServiceName} • {invoice.dateSaved ? fmtDate(invoice.dateSaved) : 'No save date'}
-              </div>
-
-              <div className="invoice-record-summary" style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-                <div style={{ flex: 1, minWidth: '60px' }}>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', marginBottom: '2px' }}>TOTAL</div>
-                  <div style={{ fontWeight: 700 }}>PHP {invoice.total}</div>
-                </div>
-                <div style={{ flex: 1, minWidth: '60px' }}>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', marginBottom: '2px' }}>PAID</div>
-                  <div style={{ fontWeight: 700, color: 'var(--green)' }}>PHP {invoice.paid}</div>
-                </div>
-                {Number(invoice.tip || 0) > 0 && (
-                  <div style={{ flex: 1, minWidth: '60px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', marginBottom: '2px' }}>TIP 💝</div>
-                    <div style={{ fontWeight: 700, color: '#b8860b' }}>PHP {invoice.tip}</div>
-                  </div>
-                )}
-                <div style={{ flex: `1.5`, minWidth: '70px' }}>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', marginBottom: '2px' }}>BALANCE</div>
-                  <div style={{ fontWeight: 800, color: isPaid ? 'var(--green)' : 'var(--red)' }}>PHP {balance}</div>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: '6px', marginTop: '10px', flexWrap: 'wrap' }}>
-                <button type="button" className="btn btn-xs btn-ghost" style={{ flex: 1, justifyContent: 'center' }} onClick={() => startEdit(invoice)}>
-                  <Pencil size={13} /> Edit
-                </button>
-                <button type="button" className="btn btn-xs btn-danger" onClick={() => setInvoiceToDelete(invoice)}>
-                  Delete
-                </button>
-              </div>
+        {groupedInvoices.map((group) => (
+          <React.Fragment key={group.label}>
+            <div style={{ padding: '4px 8px', margin: '14px 0 8px', fontWeight: 800, fontSize: '13px', color: '#888', textTransform: 'uppercase', letterSpacing: '.05em', borderBottom: '1px solid #eee' }}>
+              {group.label}
             </div>
-          );
-        })}
+            {group.invoices.map((invoice) => {
+            const balance = Math.max(0, Number(invoice.total || 0) - Number(invoice.paid || 0));
+            const isPaid = balance <= 0;
+
+            return (
+              <div key={invoice.id} className="card" style={{ margin: '0 0 12px', borderLeft: `4px solid ${isPaid ? 'var(--green)' : 'var(--orange)'}` }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', gap: '10px' }}>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 800, fontSize: '15px' }}>{invoice.toName}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--gray)' }}>{invoice.pets}</div>
+                  </div>
+                  {isPaid ? (
+                    <span style={{ background: '#e6f7ed', color: 'var(--green)', padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                      <CheckCircle size={12} /> PAID
+                    </span>
+                  ) : (
+                    <span style={{ background: '#fff4e0', color: 'var(--orange)', padding: '3px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, flexShrink: 0 }}>
+                      UNPAID
+                    </span>
+                  )}
+                </div>
+
+                <div style={{ fontSize: '12px', color: 'var(--gray)', marginBottom: '10px', lineHeight: 1.5 }}>
+                  {invoice.baseServiceName} • {invoice.dateSaved ? fmtDate(invoice.dateSaved) : 'No save date'}
+                </div>
+
+                <div className="invoice-record-summary" style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: '60px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', marginBottom: '2px' }}>TOTAL</div>
+                    <div style={{ fontWeight: 700 }}>PHP {invoice.total}</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: '60px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', marginBottom: '2px' }}>PAID</div>
+                    <div style={{ fontWeight: 700, color: 'var(--green)' }}>PHP {invoice.paid}</div>
+                  </div>
+                  {Number(invoice.tip || 0) > 0 && (
+                    <div style={{ flex: 1, minWidth: '60px' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', marginBottom: '2px' }}>TIP 💝</div>
+                      <div style={{ fontWeight: 700, color: '#b8860b' }}>PHP {invoice.tip}</div>
+                    </div>
+                  )}
+                  <div style={{ flex: `1.5`, minWidth: '70px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#888', marginBottom: '2px' }}>BALANCE</div>
+                    <div style={{ fontWeight: 800, color: isPaid ? 'var(--green)' : 'var(--red)' }}>PHP {balance}</div>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '6px', marginTop: '10px', flexWrap: 'wrap' }}>
+                  <button type="button" className="btn btn-xs btn-ghost" style={{ flex: 1, justifyContent: 'center' }} onClick={() => startEdit(invoice)}>
+                    <Pencil size={13} /> Edit
+                  </button>
+                  <button type="button" className="btn btn-xs btn-danger" onClick={() => setInvoiceToDelete(invoice)}>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+          </React.Fragment>
+        ))}
 
         {sortedInvoices.length === 0 && (
           <div style={{ textAlign: 'center', padding: '50px', background: '#fff', borderRadius: '14px', color: 'var(--gray)' }}>
@@ -188,43 +215,52 @@ export default function InvoiceRecordsView() {
                 </tr>
               </thead>
               <tbody>
-                {sortedInvoices.length === 0 ? (
+                {groupedInvoices.length === 0 ? (
                   <tr className="empty-row"><td colSpan="10">No invoices saved yet. Go to Invoice Builder to save one.</td></tr>
-                ) : sortedInvoices.map((invoice) => {
-                  const balance = Math.max(0, Number(invoice.total || 0) - Number(invoice.paid || 0));
-                  const isPaid = balance <= 0;
-
-                  return (
-                    <tr key={invoice.id} style={{ background: isPaid ? '#f8fff9' : '#fff' }}>
-                      <td style={{ fontSize: '12px', color: 'var(--gray)' }}>{invoice.dateSaved ? fmtDate(invoice.dateSaved) : 'No save date'}</td>
-                      <td style={{ fontWeight: 'bold' }}>{invoice.toName}</td>
-                      <td style={{ fontSize: '12px', color: 'var(--gray)', maxWidth: '140px' }}>{invoice.pets}</td>
-                      <td style={{ fontSize: '12px', maxWidth: '280px', lineHeight: 1.45 }}>{invoice.baseServiceName}</td>
-                      <td style={{ fontWeight: 700 }}>PHP {invoice.total}</td>
-                      <td><span style={{ fontWeight: 600, color: invoice.paid > 0 ? 'var(--green)' : '#999' }}>PHP {invoice.paid}</span></td>
-                      <td>
-                        {Number(invoice.tip || 0) > 0 
-                          ? <span style={{ fontWeight: 700, color: '#b8860b' }}>PHP {invoice.tip}</span>
-                          : <span style={{ color: '#ddd' }}>—</span>}
-                      </td>
-                      <td style={{ fontWeight: 800, color: isPaid ? 'var(--green)' : 'var(--red)' }}>PHP {balance}</td>
-                      <td>
-                        {isPaid
-                          ? <span className="badge b-active" style={{ display: 'inline-flex', gap: '4px' }}><CheckCircle size={11} /> Paid</span>
-                          : <span className="badge b-pending">Unpaid</span>
-                        }
-                      </td>
-                      <td>
-                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                          <button type="button" className="btn btn-xs btn-ghost" onClick={() => startEdit(invoice)} title="Edit invoice record">
-                            <Pencil size={12} /> Edit
-                          </button>
-                          <button type="button" className="btn btn-xs btn-danger" onClick={() => setInvoiceToDelete(invoice)}>Del</button>
-                        </div>
+                ) : groupedInvoices.map((group) => (
+                  <React.Fragment key={group.label}>
+                    <tr style={{ background: '#f8f8f8' }}>
+                      <td colSpan="10" style={{ padding: '8px 12px', fontWeight: 800, fontSize: '11px', color: '#888', textTransform: 'uppercase', letterSpacing: '.06em', borderTop: '2px solid #eaeaea', borderBottom: '1px solid #eaeaea' }}>
+                        {group.label}
                       </td>
                     </tr>
-                  );
-                })}
+                    {group.invoices.map((invoice) => {
+                      const balance = Math.max(0, Number(invoice.total || 0) - Number(invoice.paid || 0));
+                      const isPaid = balance <= 0;
+
+                      return (
+                        <tr key={invoice.id} style={{ background: isPaid ? '#fffffe' : '#fff9f0' }}>
+                          <td style={{ fontSize: '12px', color: 'var(--gray)' }}>{invoice.dateSaved ? fmtDate(invoice.dateSaved) : 'No save date'}</td>
+                          <td style={{ fontWeight: 'bold' }}>{invoice.toName}</td>
+                          <td style={{ fontSize: '12px', color: 'var(--gray)', maxWidth: '140px' }}>{invoice.pets}</td>
+                          <td style={{ fontSize: '12px', maxWidth: '280px', lineHeight: 1.45 }}>{invoice.baseServiceName}</td>
+                          <td style={{ fontWeight: 700 }}>PHP {invoice.total}</td>
+                          <td><span style={{ fontWeight: 600, color: invoice.paid > 0 ? 'var(--green)' : '#999' }}>PHP {invoice.paid}</span></td>
+                          <td>
+                            {Number(invoice.tip || 0) > 0 
+                              ? <span style={{ fontWeight: 700, color: '#b8860b' }}>PHP {invoice.tip}</span>
+                              : <span style={{ color: '#ddd' }}>—</span>}
+                          </td>
+                          <td style={{ fontWeight: 800, color: isPaid ? 'var(--green)' : 'var(--red)' }}>PHP {balance}</td>
+                          <td>
+                            {isPaid
+                              ? <span className="badge b-active" style={{ display: 'inline-flex', gap: '4px' }}><CheckCircle size={11} /> Paid</span>
+                              : <span className="badge b-pending">Unpaid</span>
+                            }
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                              <button type="button" className="btn btn-xs btn-ghost" onClick={() => startEdit(invoice)} title="Edit invoice record">
+                                <Pencil size={12} /> Edit
+                              </button>
+                              <button type="button" className="btn btn-xs btn-danger" onClick={() => setInvoiceToDelete(invoice)}>Del</button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </React.Fragment>
+                ))}
               </tbody>
             </table>
           </div>
