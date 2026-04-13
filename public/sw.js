@@ -1,7 +1,7 @@
 /* public/sw.js — Pet Sitting CRM Service Worker */
 const CACHE_NAME = 'petsitting-crm-v1';
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', () => {
   self.skipWaiting();
 });
 

@@ -8,11 +8,11 @@ export default function ErrandsView() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   
-  const [form, setForm] = useState({
+  const [form, setForm] = useState(() => ({
     title: '',
     clientId: '',
     items: [{ id: Math.random().toString(36).substr(2, 9), title: '', note: '', amount: '' }]
-  });
+  }));
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
 
