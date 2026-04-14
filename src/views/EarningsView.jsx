@@ -147,17 +147,17 @@ export default function EarningsView() {
                   <div style={{ fontSize: '10px', fontWeight: 700, color: isSelected ? 'var(--black)' : 'var(--gray)' }}>
                     {m.total > 0 ? fmtMoney(m.total) : '—'}
                   </div>
-                  <div style={{ width: '100%', display: 'flex', gap: '3px', alignItems: 'flex-end', height: '160px' }}>
+                  <div style={{ width: '100%', display: 'flex', gap: '3px', alignItems: 'flex-end', justifyContent: 'center', height: '160px' }}>
                     {/* Total bar */}
                     <div style={{
-                      flex: 1, height: `${totalH}px`, borderRadius: '6px 6px 0 0',
+                      flex: 1, maxWidth: '24px', height: `${totalH}px`, borderRadius: '4px 4px 0 0',
                       background: isSelected ? 'var(--lime-dark)' : 'var(--lime-pale)',
                       transition: 'all .2s', minHeight: m.total > 0 ? '4px' : '0'
                     }} />
                     {/* Collected bar */}
                     {m.collected > 0 && (
                       <div style={{
-                        flex: 1, height: `${collH}px`, borderRadius: '6px 6px 0 0',
+                        flex: 1, maxWidth: '24px', height: `${collH}px`, borderRadius: '4px 4px 0 0',
                         background: isSelected ? 'var(--green)' : '#b5e6c5',
                         transition: 'all .2s', minHeight: '4px'
                       }} />

@@ -20,6 +20,7 @@ export default function InvoiceRecordsView() {
     total: '0',
     paid: '0',
     tip: '0',
+    dateSaved: '',
   });
   const [invoiceToDelete, setInvoiceToDelete] = useState(null);
 
@@ -32,6 +33,7 @@ export default function InvoiceRecordsView() {
       total: String(Math.round(Number(invoice.total || 0))),
       paid: String(Math.round(Number(invoice.paid || 0))),
       tip: String(Math.round(Number(invoice.tip || 0))),
+      dateSaved: invoice.dateSaved || '',
     });
   };
 
@@ -55,6 +57,7 @@ export default function InvoiceRecordsView() {
         total: editTotal,
         paid: editPaid,
         tip: editTip,
+        dateSaved: editForm.dateSaved || new Date().toISOString().split('T')[0],
       });
       toast(`Updated invoice record for ${editForm.toName.trim() || editingInvoice.toName}.`, 'success');
       setEditingInvoice(null);
@@ -373,7 +376,7 @@ export default function InvoiceRecordsView() {
             </p>
 
             <div className="form-row">
-              <div className="fg">
+              <div className="fg" style={{ flex: 2 }}>
                 <label>Invoice To</label>
                 <input
                   type="text"
@@ -381,14 +384,23 @@ export default function InvoiceRecordsView() {
                   onChange={(event) => setEdit({ toName: event.target.value })}
                 />
               </div>
-              <div className="fg">
-                <label>Pets</label>
+              <div className="fg" style={{ flex: 1.5 }}>
+                <label>Date Invoiced</label>
                 <input
-                  type="text"
-                  value={editForm.pets}
-                  onChange={(event) => setEdit({ pets: event.target.value })}
+                  type="date"
+                  value={editForm.dateSaved}
+                  onChange={(event) => setEdit({ dateSaved: event.target.value })}
                 />
               </div>
+            </div>
+
+            <div className="fg">
+              <label>Pets</label>
+              <input
+                type="text"
+                value={editForm.pets}
+                onChange={(event) => setEdit({ pets: event.target.value })}
+              />
             </div>
 
             <div className="fg">
