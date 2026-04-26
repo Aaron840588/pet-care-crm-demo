@@ -25,6 +25,7 @@ export default function InvoiceView() {
   const { clients, bookings, addInvoice, errands = [], updateErrand } = useData();
   const toast  = useToast();
   const invoiceRef = useRef(null);
+  const bookingHandoffRef = useRef(false);
   const [saving, setSaving] = useState(false);
   const [confirmResetOpen, setConfirmResetOpen] = useState(false);
 
@@ -168,6 +169,30 @@ export default function InvoiceView() {
       setLineItems(lines);
     }
   }, [bookings, clients]);
+
+  useEffect(() => {
+    if (bookingHandoffRef.current || bookings.length === 0) return;
+
+    let bookingId = '';
+    try {
+      bookingId = sessionStorage.getItem('kats_invoice_booking_id') || '';
+    } catch {
+      bookingId = '';
+    }
+    if (!bookingId) return;
+
+    const bookingExists = bookings.some((booking) => booking.id === bookingId);
+    if (!bookingExists) return;
+
+    bookingHandoffRef.current = true;
+    try {
+      sessionStorage.removeItem('kats_invoice_booking_id');
+    } catch {
+      // Ignore storage access errors.
+    }
+    importFromBooking(bookingId);
+    toast('Invoice draft started from today\'s booking.');
+  }, [bookings, importFromBooking, toast]);
 
   const setLine = useCallback(
     (id, patch) => setLineItems(p => p.map(li => li.id === id ? { ...li, ...patch } : li)),
@@ -406,6 +431,23 @@ export default function InvoiceView() {
     [bookings]
   );
 
+  const getBookingOptionLabel = useCallback((booking) => {
+    const client = clients.find((item) => item.id === booking.clientId);
+    const clientName = booking.clientName || client?.name || 'Unknown client';
+    const serviceNames = booking.daySchedule?.length > 0
+      ? [...new Set(booking.daySchedule.map((day) => day.service?.split('|')[0]).filter(Boolean))]
+      : [];
+    const serviceLabel = serviceNames.length > 0
+      ? serviceNames.join(' + ')
+      : booking.service?.split('|')[0] || 'Booking';
+    const dateLabel = booking.startDate && booking.endDate
+      ? `${booking.startDate} -> ${booking.endDate}`
+      : 'No date set';
+    const total = Number(booking.total ?? booking.finalTotal ?? 0);
+
+    return `${clientName} - ${serviceLabel} - ${dateLabel} - ₱${total.toLocaleString('en-PH')}`;
+  }, [clients]);
+
   return (
     <>
       {/* ── Invoice CSS (moved to inline styles for CB4 compatibility) ── */}
@@ -623,7 +665,7 @@ export default function InvoiceView() {
               <option value="">— Pick a booking to auto-fill →</option>
               {sortedBookings.map(b => (
                 <option key={b.id} value={b.id}>
-                  {b.clientName} · {b.startDate} → {b.endDate} · ₱{b.total}
+                  {getBookingOptionLabel(b)}
                 </option>
               ))}
             </select>

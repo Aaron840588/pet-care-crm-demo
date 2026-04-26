@@ -60,7 +60,7 @@ function AppContent({ onLogout }) {
 
   const renderView = () => {
     switch (activeTab) {
-      case 'dashboard':   return <DashboardView />;
+      case 'dashboard':   return <DashboardView setActiveTab={setActiveTab} />;
       case 'clients':     return <ClientsView />;
       case 'schedule':    return <ScheduleView />;
       case 'keys':        return <KeysView />;
@@ -187,15 +187,8 @@ export default function App() {
       .then((reg) => {
         console.log('[SW] Registered:', reg.scope);
 
-        // Request notification permission once
-        if ('Notification' in window && Notification.permission === 'default') {
-          Notification.requestPermission().then((result) => {
-            console.log('[Notif] Permission:', result);
-          });
-        }
-
-        // Schedule today's visit reminder (once per day)
-        if (Notification.permission === 'granted') {
+        // Schedule today's visit reminder only after the user has already granted permission.
+        if ('Notification' in window && Notification.permission === 'granted') {
           const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
           const lastNotified = localStorage.getItem('crm_last_notified');
 

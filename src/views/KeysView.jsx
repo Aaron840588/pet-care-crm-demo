@@ -108,7 +108,7 @@ function KeyCard({ c, onSetStatus, openDropdown, setOpenDropdown }) {
     }}>
       {/* Watermark icon */}
       <div style={{
-        position: 'absolute', top: '-8px', right: '-12px',
+        position: 'absolute', top: '-8px', right: '8px',
         color: meta.accentColor, opacity: 0.06, transform: 'rotate(18deg)',
         pointerEvents: 'none', zIndex: 0,
       }}>

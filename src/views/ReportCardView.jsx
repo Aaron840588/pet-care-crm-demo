@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useData } from '../store/DataContext';
 import { useToast } from '../components/Toast';
 import { toPng } from 'html-to-image';
@@ -31,9 +31,10 @@ const TASKS = [
 ];
 
 export default function ReportCardView() {
-  const { clients } = useData();
+  const { clients, bookings } = useData();
   const toast = useToast();
   const cardRef = useRef(null);
+  const bookingHandoffRef = useRef(false);
 
   const [form, setForm] = useState({
     clientId: '', petNames: '',
@@ -45,6 +46,47 @@ export default function ReportCardView() {
   const [photos, setPhotos] = useState([]);
 
   const fld = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  useEffect(() => {
+    if (bookingHandoffRef.current || bookings.length === 0) return;
+
+    let bookingId = '';
+    try {
+      bookingId = sessionStorage.getItem('kats_report_booking_id') || '';
+    } catch {
+      bookingId = '';
+    }
+    if (!bookingId) return;
+
+    const booking = bookings.find((item) => item.id === bookingId);
+    if (!booking) return;
+
+    const client = clients.find((item) => item.id === booking.clientId);
+    if (booking.clientId && !client) return;
+
+    const pets = client?.pets || [];
+    const petNames = pets
+      .map((pet) => (typeof pet === 'string' ? pet : pet.name || ''))
+      .filter(Boolean)
+      .join(', ');
+    const todayVisit = booking.daySchedule?.find((day) => day.date === todayLocalStr());
+
+    bookingHandoffRef.current = true;
+    try {
+      sessionStorage.removeItem('kats_report_booking_id');
+    } catch {
+      // Ignore storage access errors.
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      clientId: booking.clientId || prev.clientId,
+      petNames: petNames || prev.petNames,
+      visitDate: todayVisit?.date || booking.startDate || prev.visitDate,
+      sitterName: prev.sitterName || 'Kat',
+    }));
+    toast('Report card started from today\'s booking.');
+  }, [bookings, clients, toast]);
 
   // ── Photo handling ────────────────────────────────────────────────────────
   const handlePhotoSelect = (e) => {
@@ -237,6 +279,11 @@ export default function ReportCardView() {
                 style={{ width: '100%', minHeight: '44px', padding: '10px 12px', border: '1.5px solid #ddd', borderRadius: '8px', fontSize: '14px' }}
               >
                 <option value="">— Select a pet —</option>
+                {selectedClient.pets.length > 1 && (
+                  <option value={selectedClient.pets.map((p) => typeof p === 'string' ? p : p.name).filter(Boolean).join(', ')}>
+                    All pets
+                  </option>
+                )}
                 {selectedClient.pets.map((p, i) => {
                   const name = typeof p === 'string' ? p : p.name;
                   return <option key={i} value={name}>{name}</option>;
@@ -424,7 +471,7 @@ export default function ReportCardView() {
                   <div key={cat.id} style={{ display: 'flex', alignItems: 'center', padding: '6px 10px', borderRadius: '8px', background: '#f9f9f2', border: '1px solid #ebebdc', gap: '8px' }}>
                     <span style={{ fontSize: '14px', width: '20px', flexShrink: 0 }}>{cat.emoji}</span>
                     <span style={{ fontSize: '9px', fontWeight: 800, color: '#888', letterSpacing: '.5px', textTransform: 'uppercase', width: '65px', flexShrink: 0, lineHeight: 1.2 }}>{cat.label}:</span>
-                    <div style={{ display: 'flex', flexWrap: 'nowrap', overflow: 'hidden', gap: '4px', flex: 1, whiteSpace: 'nowrap' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', overflow: 'visible', gap: '4px', flex: 1, whiteSpace: 'normal' }}>
                       {cat.options.map(opt => <PreviewChip key={opt} label={opt === 'Other' && form[cat.id] === 'Other' ? (form[cat.id + '_other'] || 'Other') : opt} selected={form[cat.id] === opt} />)}
                     </div>
                   </div>
@@ -491,7 +538,23 @@ export default function ReportCardView() {
       </div>
 
       <style>{`
-        @media (max-width: 768px) { .report-grid { grid-template-columns: 1fr !important; } }
+        @media (max-width: 768px) {
+          .report-grid {
+            grid-template-columns: 1fr !important;
+            max-width: 100% !important;
+          }
+
+          .report-grid > div {
+            min-width: 0 !important;
+            width: 100% !important;
+          }
+
+          .rc-preview-outer {
+            width: 100% !important;
+            max-width: 640px !important;
+            padding: 18px 12px !important;
+          }
+        }
       `}</style>
     </div>
   );

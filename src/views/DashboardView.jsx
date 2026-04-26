@@ -146,7 +146,7 @@ function MiniCalendar({ bookings }) {
 }
 
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
-export default function DashboardView() {
+export default function DashboardView({ setActiveTab }) {
   const { bookings, clients, invoices, reminders, errands, addReminder, toggleReminder, removeReminder, updateInvoice, updateBooking, updateErrand } = useData();
   const toast = useToast();
   const [newReminder, setNewReminder]       = useState('');
@@ -231,6 +231,21 @@ export default function DashboardView() {
     setPaymentModal(inv);
     setPaymentAmount('');
   };
+
+  const openBookingWorkflow = useCallback((booking, workflow) => {
+    if (!booking?.id || !setActiveTab) return;
+    try {
+      if (workflow === 'invoice') {
+        sessionStorage.setItem('kats_invoice_booking_id', booking.id);
+        setActiveTab('invoices');
+      } else {
+        sessionStorage.setItem('kats_report_booking_id', booking.id);
+        setActiveTab('report-card');
+      }
+    } catch {
+      toast('Could not open that shortcut. Try from the side menu.', 'error');
+    }
+  }, [setActiveTab, toast]);
 
   return (
     <div>
@@ -386,6 +401,35 @@ export default function DashboardView() {
                       </div>
                     </div>
 
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0, minWidth: '82px' }}>
+                      <button
+                        type="button"
+                        onClick={() => openBookingWorkflow(b, 'invoice')}
+                        style={{
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px',
+                          padding: '7px 9px', minHeight: '40px', borderRadius: '10px', cursor: 'pointer',
+                          border: '1.5px solid #111', background: '#111',
+                          fontWeight: 700, fontSize: '11px', color: '#fff',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        <ReceiptText size={13} />
+                        Invoice
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => openBookingWorkflow(b, 'report')}
+                        style={{
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px',
+                          padding: '7px 9px', minHeight: '40px', borderRadius: '10px', cursor: 'pointer',
+                          border: '1.5px solid #d4d800', background: '#fdffd1',
+                          fontWeight: 700, fontSize: '11px', color: '#555',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        <CalendarCheck2 size={13} />
+                        Report
+                      </button>
                     {/* MARK AS DONE button */}
                     <button
                       type="button"
@@ -393,7 +437,7 @@ export default function DashboardView() {
                       onClick={() => handleMarkBookingDone(b)}
                       style={{
                         flexShrink: 0, display: 'flex', alignItems: 'center', gap: '5px',
-                        padding: '7px 11px', borderRadius: '10px', cursor: isLoading ? 'wait' : 'pointer',
+                          padding: '7px 11px', minHeight: '40px', borderRadius: '10px', cursor: isLoading ? 'wait' : 'pointer',
                         border: '1.5px solid #b8e0a0', background: '#eafce8',
                         fontWeight: 700, fontSize: '11px', color: '#1a7a3a',
                         transition: 'all .15s', whiteSpace: 'nowrap',
@@ -403,6 +447,7 @@ export default function DashboardView() {
                       <Check size={13} />
                       {isLoading ? '…' : 'Done'}
                     </button>
+                  </div>
                   </div>
                 );
               })}
