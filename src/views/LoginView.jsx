@@ -39,7 +39,7 @@ export default function LoginView() {
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: 'var(--bg-main)',
+      backgroundColor: 'var(--light)',
       padding: '24px'
     }}>
       <div style={{
@@ -75,7 +75,7 @@ export default function LoginView() {
           Authorized Access
         </h1>
         <p style={{
-          color: 'var(--text-meta)',
+          color: 'var(--gray)',
           fontSize: '14px',
           marginBottom: '32px'
         }}>
@@ -83,47 +83,25 @@ export default function LoginView() {
         </p>
 
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-            <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#111', marginBottom: '8px' }}>EMAIL</label>
+          <div className="fg" style={{ textAlign: 'left', marginBottom: 0 }}>
+            <label>EMAIL</label>
             <input 
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@example.com"
               autoComplete="username"
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: '8px',
-                border: '1.5px solid var(--border-color)',
-                backgroundColor: 'var(--bg-card)',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '15px',
-                outline: 'none',
-                minHeight: '48px'
-              }}
             />
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-            <label style={{ fontSize: '12px', fontWeight: 'bold', color: '#111', marginBottom: '8px' }}>PASSWORD</label>
+          <div className="fg" style={{ textAlign: 'left', marginBottom: 0 }}>
+            <label>PASSWORD</label>
             <input 
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder=""
               autoComplete="current-password"
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                borderRadius: '8px',
-                border: '1.5px solid var(--border-color)',
-                backgroundColor: 'var(--bg-card)',
-                fontFamily: 'Inter, sans-serif',
-                fontSize: '15px',
-                outline: 'none',
-                minHeight: '48px'
-              }}
             />
           </div>
 

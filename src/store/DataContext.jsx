@@ -188,6 +188,10 @@ export function DataProvider({ children }) {
       setSyncStatus('offline');
     }, 8000);
 
+    if (!window.navigator.onLine) {
+      setSyncStatus('offline');
+    }
+
     const markListenerState = (key, state) => {
       listenerStateRef.current[key] = state;
       const allResolved = COLLECTION_KEYS.every((name) => listenerStateRef.current[name] !== 'pending');

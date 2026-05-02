@@ -285,8 +285,8 @@ body {
 
 /* ── KEY BADGES ────────────────────────────────────────────────────────────── */
 .key-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-.key-received { background: #e6f7ed; color: var(--green); }
-.key-pending  { background: #fff4e0; color: var(--orange); }
+.key-received { background: #e6f7ed; color: #2e8045; }
+.key-pending  { background: #fff4e0; color: #a65e10; }
 .key-returned { background: #f0f0f0; color: var(--gray); }
 .key-none     { background: transparent; color: var(--gray); font-weight: 400; }
 
@@ -321,8 +321,8 @@ tbody tr { border-bottom: 1px solid #f2f2ee; background: #fff; }
 tbody tr:hover { background: #fafaf5; }
 tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
 .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-.b-active  { background: #e6f7ed; color: var(--green); }
-.b-pending { background: #fff4e0; color: var(--orange); }
+.b-active  { background: #e6f7ed; color: #2e8045; }
+.b-pending { background: #fff4e0; color: #a65e10; }
 .b-done    { background: #f0f0f0; color: var(--gray); }
 .empty-row td { text-align: center; color: var(--gray); padding: 40px; font-style: italic; }
 
