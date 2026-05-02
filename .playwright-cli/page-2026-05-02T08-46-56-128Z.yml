@@ -1,0 +1,216 @@
+- generic [ref=e13]:
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]: Kat's Pet-sitting
+      - generic [ref=e17]: Business Manager 🐾
+    - navigation [ref=e18]:
+      - generic [ref=e19]: Overview
+      - button "Dashboard" [ref=e20] [cursor=pointer]:
+        - img [ref=e22]
+        - text: Dashboard
+      - generic [ref=e27]: Manage
+      - button "Clients" [ref=e28] [cursor=pointer]:
+        - img [ref=e30]
+        - text: Clients
+      - button "Errands & Pabili" [ref=e35] [cursor=pointer]:
+        - img [ref=e37]
+        - text: Errands & Pabili
+      - button "Schedule" [ref=e40] [cursor=pointer]:
+        - img [ref=e42]
+        - text: Schedule
+      - button "Key Tracker" [ref=e44] [cursor=pointer]:
+        - img [ref=e46]
+        - text: Key Tracker
+      - generic [ref=e49]: Billing
+      - button "Invoice Builder" [ref=e50] [cursor=pointer]:
+        - img [ref=e52]
+        - text: Invoice Builder
+      - button "Invoice Records" [ref=e56] [cursor=pointer]:
+        - img [ref=e58]
+        - text: Invoice Records
+      - button "Earnings Summary" [ref=e60] [cursor=pointer]:
+        - img [ref=e62]
+        - text: Earnings Summary
+      - button "Visit Report Card" [ref=e65] [cursor=pointer]:
+        - img [ref=e67]
+        - text: Visit Report Card
+      - generic [ref=e70]: System
+      - button "Settings & Backup" [ref=e71] [cursor=pointer]:
+        - img [ref=e73]
+        - text: Settings & Backup
+      - generic [ref=e76]: Account
+      - button "Sign Out" [ref=e77] [cursor=pointer]:
+        - img [ref=e79]
+        - text: Sign Out
+    - generic [ref=e82]:
+      - text: Kat's Pet-sitting Services
+      - text: San Antonio, Los Baños, Laguna
+      - text: "GCash: 09952664451"
+  - main [ref=e84]:
+    - generic [ref=e406]:
+      - generic [ref=e407]:
+        - heading "Clients" [level=2] [ref=e408]
+        - paragraph [ref=e409]: Client profiles, pets & special instructions
+      - button "+ Add Client" [ref=e411] [cursor=pointer]
+    - generic [ref=e412]:
+      - generic [ref=e413]:
+        - generic [ref=e414]: Ate Maria
+        - generic [ref=e415]: 0917-000-0001 | BGC, Taguig
+        - generic [ref=e416]:
+          - generic [ref=e417]:
+            - img [ref=e418]
+            - generic [ref=e423]: Buster
+          - generic [ref=e424]:
+            - img [ref=e425]
+            - generic [ref=e430]: Luna
+        - generic [ref=e431]: No general notes provided.
+        - generic [ref=e432]:
+          - generic [ref=e433]:
+            - text: Bookings
+            - strong [ref=e434]: "1"
+          - generic [ref=e435]:
+            - text: Total Earned
+            - strong [ref=e436]: ₱200
+          - generic [ref=e437]:
+            - text: Last Booking
+            - strong [ref=e438]: May 2
+        - generic [ref=e439]:
+          - text: "Key Status:"
+          - generic [ref=e440]: Received ✓
+        - generic [ref=e441]:
+          - button "🐾 Pet Bios ✓" [active] [ref=e442] [cursor=pointer]
+          - button "Edit" [ref=e443] [cursor=pointer]
+          - button "Delete" [ref=e444] [cursor=pointer]
+      - generic [ref=e445]:
+        - generic [ref=e446]: John Doe
+        - generic [ref=e447]: 0917-000-0002 | Makati City
+        - generic [ref=e449]:
+          - img [ref=e450]
+          - generic [ref=e455]: Fluffy
+        - generic [ref=e456]: No general notes provided.
+        - generic [ref=e457]:
+          - generic [ref=e458]:
+            - text: Bookings
+            - strong [ref=e459]: "1"
+          - generic [ref=e460]:
+            - text: Total Earned
+            - strong [ref=e461]: ₱250
+          - generic [ref=e462]:
+            - text: Last Booking
+            - strong [ref=e463]: May 2
+        - generic [ref=e464]:
+          - text: "Key Status:"
+          - generic [ref=e465]: Pending
+        - generic [ref=e466]:
+          - button "🐾 Pet Bios" [ref=e467] [cursor=pointer]
+          - button "Edit" [ref=e468] [cursor=pointer]
+          - button "Delete" [ref=e469] [cursor=pointer]
+      - generic [ref=e470]:
+        - generic [ref=e471]: Sarah Smith
+        - generic [ref=e472]: 0917-000-0003 | Quezon City
+        - generic [ref=e473]:
+          - generic [ref=e474]:
+            - img [ref=e475]
+            - generic [ref=e480]: Max
+          - generic [ref=e481]:
+            - img [ref=e482]
+            - generic [ref=e487]: Bella
+        - generic [ref=e488]: No general notes provided.
+        - generic [ref=e489]:
+          - text: "Key Status:"
+          - generic [ref=e490]: No Key
+        - generic [ref=e491]:
+          - button "🐾 Pet Bios" [ref=e492] [cursor=pointer]
+          - button "Edit" [ref=e493] [cursor=pointer]
+          - button "Delete" [ref=e494] [cursor=pointer]
+    - dialog "Ate Maria pet bios" [ref=e617]:
+      - generic [ref=e618]:
+        - generic [ref=e619]:
+          - generic [ref=e620]:
+            - generic [ref=e621]: 🐾 Pet Bios
+            - generic [ref=e622]: Ate Maria · 2 pets
+          - button "Close pet bios" [ref=e623] [cursor=pointer]:
+            - img [ref=e624]
+        - generic [ref=e627]:
+          - button "Buster" [ref=e628] [cursor=pointer]:
+            - img [ref=e629]
+            - text: Buster
+          - button "Luna" [ref=e634] [cursor=pointer]:
+            - img [ref=e635]
+            - text: Luna
+          - button "Add Pet" [ref=e640] [cursor=pointer]:
+            - img [ref=e641]
+            - text: Add Pet
+        - generic [ref=e643]:
+          - generic [ref=e644]:
+            - generic [ref=e645]:
+              - generic [ref=e646]: Pet Name *
+              - textbox "e.g. Coco" [ref=e647]: Buster
+            - generic [ref=e648]:
+              - generic [ref=e649]: Animal Type
+              - combobox [ref=e650]:
+                - option "Dog" [selected]
+                - option "Cat"
+          - generic [ref=e651]:
+            - generic [ref=e652]:
+              - img [ref=e653]
+              - text: Feeding Info
+            - generic [ref=e656]:
+              - generic [ref=e657]:
+                - generic [ref=e658]: Feeding Times
+                - textbox "e.g. 7am and 6pm" [ref=e659]: After morning visit
+              - generic [ref=e660]:
+                - generic [ref=e661]: Portion Size
+                - textbox "e.g. 1 cup" [ref=e662]
+          - generic [ref=e663]:
+            - generic [ref=e664]:
+              - img [ref=e665]
+              - text: Allergies & Health Flags
+            - textbox "e.g. Chicken, certain grains..." [ref=e667]
+          - generic [ref=e668]:
+            - generic [ref=e669]:
+              - img [ref=e670]
+              - text: Veterinarian / Emergency
+            - generic [ref=e672]:
+              - generic [ref=e673]:
+                - generic [ref=e674]: Vet Name
+                - textbox "Dr. Santos" [ref=e675]
+              - generic [ref=e676]:
+                - generic [ref=e677]: Vet Phone
+                - textbox "09171234567" [ref=e678]
+          - generic [ref=e679]:
+            - generic [ref=e680]:
+              - img [ref=e681]
+              - text: Behavioral Notes / Quirks
+            - textbox "e.g. Hides under the bed during storms. Loves belly rubs." [ref=e684]
+          - generic [ref=e685]:
+            - generic [ref=e686]:
+              - generic [ref=e687]:
+                - img [ref=e688]
+                - text: Medications
+              - button "Add Med" [ref=e692] [cursor=pointer]:
+                - img [ref=e693]
+                - text: Add Med
+            - generic [ref=e695]: No medications yet. Tap "Add Med" to add one.
+          - button "Remove Buster" [ref=e696] [cursor=pointer]:
+            - img [ref=e697]
+            - text: Remove Buster
+        - generic [ref=e700]:
+          - button "Cancel" [ref=e701] [cursor=pointer]
+          - button "💾 Save Pet Bios" [ref=e702] [cursor=pointer]
+  - navigation [ref=e376]:
+    - button "Today" [ref=e377] [cursor=pointer]:
+      - img [ref=e378]
+      - generic [ref=e383]: Today
+    - button "Clients" [ref=e384] [cursor=pointer]:
+      - img [ref=e385]
+      - generic [ref=e390]: Clients
+    - button "Schedule" [ref=e391] [cursor=pointer]:
+      - img [ref=e392]
+      - generic [ref=e394]: Schedule
+    - button "Earnings" [ref=e395] [cursor=pointer]:
+      - img [ref=e396]
+      - generic [ref=e399]: Earnings
+    - button "More" [ref=e400] [cursor=pointer]:
+      - img [ref=e401]
+      - generic [ref=e405]: More

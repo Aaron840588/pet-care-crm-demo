@@ -1,0 +1,148 @@
+- generic [ref=e13]:
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]: Kat's Pet-sitting
+      - generic [ref=e17]: Business Manager 🐾
+    - navigation [ref=e18]:
+      - generic [ref=e19]: Overview
+      - button "Dashboard" [ref=e20] [cursor=pointer]:
+        - img [ref=e22]
+        - text: Dashboard
+      - generic [ref=e27]: Manage
+      - button "Clients" [ref=e28] [cursor=pointer]:
+        - img [ref=e30]
+        - text: Clients
+      - button "Errands & Pabili" [ref=e35] [cursor=pointer]:
+        - img [ref=e37]
+        - text: Errands & Pabili
+      - button "Schedule" [ref=e40] [cursor=pointer]:
+        - img [ref=e42]
+        - text: Schedule
+      - button "Key Tracker" [ref=e44] [cursor=pointer]:
+        - img [ref=e46]
+        - text: Key Tracker
+      - generic [ref=e49]: Billing
+      - button "Invoice Builder" [ref=e50] [cursor=pointer]:
+        - img [ref=e52]
+        - text: Invoice Builder
+      - button "Invoice Records" [ref=e56] [cursor=pointer]:
+        - img [ref=e58]
+        - text: Invoice Records
+      - button "Earnings Summary" [ref=e60] [cursor=pointer]:
+        - img [ref=e62]
+        - text: Earnings Summary
+      - button "Visit Report Card" [ref=e65] [cursor=pointer]:
+        - img [ref=e67]
+        - text: Visit Report Card
+      - generic [ref=e70]: System
+      - button "Settings & Backup" [ref=e71] [cursor=pointer]:
+        - img [ref=e73]
+        - text: Settings & Backup
+      - generic [ref=e76]: Account
+      - button "Sign Out" [ref=e77] [cursor=pointer]:
+        - img [ref=e79]
+        - text: Sign Out
+    - generic [ref=e82]:
+      - text: Kat's Pet-sitting Services
+      - text: San Antonio, Los Baños, Laguna
+      - text: "GCash: 09952664451"
+  - main [ref=e84]:
+    - generic [ref=e736]:
+      - generic [ref=e737]:
+        - heading "Schedule" [level=2] [ref=e738]
+        - paragraph [ref=e739]: All bookings — tap a status badge to cycle it.
+      - button "+ Add Booking" [ref=e741] [cursor=pointer]
+    - generic [ref=e742]:
+      - button "All" [ref=e743] [cursor=pointer]
+      - button "Active" [ref=e744] [cursor=pointer]
+      - button "Upcoming" [ref=e745] [cursor=pointer]
+      - button "Done" [ref=e746] [cursor=pointer]
+    - generic [ref=e747]:
+      - generic [ref=e748]:
+        - generic [ref=e749]:
+          - generic [ref=e750]:
+            - generic [ref=e751]: Ate Maria
+            - generic [ref=e752]: Basic Visit
+          - button "● Active" [ref=e753]:
+            - generic [ref=e754] [cursor=pointer]: ● Active
+        - generic [ref=e755]:
+          - generic [ref=e756]:
+            - generic [ref=e757]: Dates
+            - generic [ref=e758]: May 2, 2026 → May 2, 2026
+          - generic [ref=e759]:
+            - generic [ref=e760]: Time
+            - generic [ref=e761]: 10:00 AM
+          - generic [ref=e762]:
+            - generic [ref=e763]: Days
+            - generic [ref=e764]: "1"
+          - generic [ref=e765]:
+            - generic [ref=e766]: Total
+            - generic [ref=e767]: ₱200
+        - generic [ref=e768]:
+          - button "View" [ref=e769] [cursor=pointer]:
+            - img [ref=e770]
+            - text: View
+          - button "Edit" [ref=e773] [cursor=pointer]:
+            - img [ref=e774]
+            - text: Edit
+          - button "Clone" [ref=e777] [cursor=pointer]:
+            - img [ref=e778]
+            - text: Clone
+          - button "Calendar" [ref=e781] [cursor=pointer]:
+            - img [ref=e782]
+            - text: Calendar
+          - button "Delete" [ref=e784] [cursor=pointer]:
+            - img [ref=e785]
+            - text: Delete
+      - generic [ref=e788]:
+        - generic [ref=e789]:
+          - generic [ref=e790]:
+            - generic [ref=e791]: John Doe
+            - generic [ref=e792]: Play & Visit
+          - button "● Upcoming" [ref=e793]:
+            - generic [ref=e794] [cursor=pointer]: ● Upcoming
+        - generic [ref=e795]:
+          - generic [ref=e796]:
+            - generic [ref=e797]: Dates
+            - generic [ref=e798]: May 2, 2026 → May 2, 2026
+          - generic [ref=e799]:
+            - generic [ref=e800]: Time
+            - generic [ref=e801]: 2:00 PM
+          - generic [ref=e802]:
+            - generic [ref=e803]: Days
+            - generic [ref=e804]: "1"
+          - generic [ref=e805]:
+            - generic [ref=e806]: Total
+            - generic [ref=e807]: ₱250
+        - generic [ref=e808]:
+          - button "View" [ref=e809] [cursor=pointer]:
+            - img [ref=e810]
+            - text: View
+          - button "Edit" [ref=e813] [cursor=pointer]:
+            - img [ref=e814]
+            - text: Edit
+          - button "Clone" [ref=e817] [cursor=pointer]:
+            - img [ref=e818]
+            - text: Clone
+          - button "Calendar" [ref=e821] [cursor=pointer]:
+            - img [ref=e822]
+            - text: Calendar
+          - button "Delete" [ref=e824] [cursor=pointer]:
+            - img [ref=e825]
+            - text: Delete
+  - navigation [ref=e376]:
+    - button "Today" [ref=e377] [cursor=pointer]:
+      - img [ref=e378]
+      - generic [ref=e383]: Today
+    - button "Clients" [ref=e384] [cursor=pointer]:
+      - img [ref=e385]
+      - generic [ref=e390]: Clients
+    - button "Schedule" [active] [ref=e391] [cursor=pointer]:
+      - img [ref=e392]
+      - generic [ref=e394]: Schedule
+    - button "Earnings" [ref=e395] [cursor=pointer]:
+      - img [ref=e396]
+      - generic [ref=e399]: Earnings
+    - button "More" [ref=e400] [cursor=pointer]:
+      - img [ref=e401]
+      - generic [ref=e405]: More

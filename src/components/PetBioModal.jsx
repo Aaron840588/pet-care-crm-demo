@@ -109,8 +109,8 @@ export default function PetBioModal({ client, onClose }) {
   };
 
   return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 200,
+    <div role="dialog" aria-modal="true" aria-label={`${client.name} pet bios`} style={{
+      position: 'fixed', inset: 0, zIndex: 520,
       background: 'rgba(0,0,0,0.55)',
       display: 'flex', alignItems: 'flex-end', justifyContent: 'center',
     }}>
@@ -142,7 +142,7 @@ export default function PetBioModal({ client, onClose }) {
               {client.name} · {pets.length} pet{pets.length !== 1 ? 's' : ''}
             </div>
           </div>
-          <button onClick={onClose} style={{ background: '#f5f5f5', border: 'none', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button type="button" aria-label="Close pet bios" onClick={onClose} style={{ background: '#f5f5f5', border: 'none', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <X size={18} />
           </button>
         </div>
@@ -366,11 +366,12 @@ export default function PetBioModal({ client, onClose }) {
         </div>
 
         {/* Footer action */}
-        <div style={{ padding: '16px 20px', borderTop: '1px solid #f0f0f0', flexShrink: 0, display: 'flex', gap: '10px' }}>
-          <button onClick={onClose} style={{ flex: 1, padding: '12px', border: '1.5px solid #eee', borderRadius: '10px', background: '#fafafa', fontWeight: 600, cursor: 'pointer', minHeight: '48px' }}>
+        <div style={{ padding: '16px 20px calc(16px + var(--safe-bottom))', borderTop: '1px solid #f0f0f0', flexShrink: 0, display: 'flex', gap: '10px' }}>
+          <button type="button" onClick={onClose} style={{ flex: 1, padding: '12px', border: '1.5px solid #eee', borderRadius: '10px', background: '#fafafa', fontWeight: 600, cursor: 'pointer', minHeight: '48px' }}>
             Cancel
           </button>
           <button
+            type="button"
             onClick={handleSave}
             disabled={saving}
             style={{ flex: 2, padding: '12px', border: 'none', borderRadius: '10px', background: 'var(--lime-dark)', fontWeight: 700, cursor: saving ? 'not-allowed' : 'pointer', minHeight: '48px', opacity: saving ? 0.7 : 1 }}

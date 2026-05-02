@@ -7,7 +7,7 @@ import {
 
 // Primary 4 tabs always visible
 const primary = [
-  { id: 'dashboard', label: 'Home',     Icon: LayoutDashboard },
+  { id: 'dashboard', label: 'Today',    Icon: LayoutDashboard },
   { id: 'clients',   label: 'Clients',  Icon: Users },
   { id: 'schedule',  label: 'Schedule', Icon: CalendarDays },
   { id: 'earnings',  label: 'Earnings', Icon: TrendingUp },
@@ -77,6 +77,7 @@ export default function BottomNav({ activeTab, setActiveTab }) {
       {/* Drawer overlay */}
       {drawerOpen && isMobileViewport && (
         <div
+          aria-hidden="true"
           style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 298 }}
           onClick={() => setDrawerOpen(false)}
         />
@@ -86,6 +87,9 @@ export default function BottomNav({ activeTab, setActiveTab }) {
       {drawerOpen && isMobileViewport && (
         <div
           id="bottom-nav-more-drawer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="More sections"
           style={{
           position: 'fixed', bottom: `calc(64px + var(--safe-bottom))`,
           left: '50%', transform: 'translateX(-50%)',
@@ -97,7 +101,7 @@ export default function BottomNav({ activeTab, setActiveTab }) {
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
             <span style={{ color: '#666', fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em' }}>More Sections</span>
-            <button type="button" onClick={() => setDrawerOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', padding: '4px' }}>
+            <button type="button" aria-label="Close more sections" onClick={() => setDrawerOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', padding: '4px' }}>
               <X size={18} />
             </button>
           </div>

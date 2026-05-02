@@ -1,0 +1,147 @@
+- generic [ref=e13]:
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]: Kat's Pet-sitting
+      - generic [ref=e17]: Business Manager 🐾
+    - navigation [ref=e18]:
+      - generic [ref=e19]: Overview
+      - button "Dashboard" [ref=e20] [cursor=pointer]:
+        - img [ref=e22]
+        - text: Dashboard
+      - generic [ref=e27]: Manage
+      - button "Clients" [ref=e28] [cursor=pointer]:
+        - img [ref=e30]
+        - text: Clients
+      - button "Errands & Pabili" [ref=e35] [cursor=pointer]:
+        - img [ref=e37]
+        - text: Errands & Pabili
+      - button "Schedule" [ref=e40] [cursor=pointer]:
+        - img [ref=e42]
+        - text: Schedule
+      - button "Key Tracker" [ref=e44] [cursor=pointer]:
+        - img [ref=e46]
+        - text: Key Tracker
+      - generic [ref=e49]: Billing
+      - button "Invoice Builder" [ref=e50] [cursor=pointer]:
+        - img [ref=e52]
+        - text: Invoice Builder
+      - button "Invoice Records" [ref=e56] [cursor=pointer]:
+        - img [ref=e58]
+        - text: Invoice Records
+      - button "Earnings Summary" [ref=e60] [cursor=pointer]:
+        - img [ref=e62]
+        - text: Earnings Summary
+      - button "Visit Report Card" [ref=e65] [cursor=pointer]:
+        - img [ref=e67]
+        - text: Visit Report Card
+      - generic [ref=e70]: System
+      - button "Settings & Backup" [ref=e71] [cursor=pointer]:
+        - img [ref=e73]
+        - text: Settings & Backup
+      - generic [ref=e76]: Account
+      - button "Sign Out" [ref=e77] [cursor=pointer]:
+        - img [ref=e79]
+        - text: Sign Out
+    - generic [ref=e82]:
+      - text: Kat's Pet-sitting Services
+      - text: San Antonio, Los Baños, Laguna
+      - text: "GCash: 09952664451"
+  - main [ref=e84]:
+    - generic [ref=e1670]:
+      - heading "Settings" [level=2] [ref=e1671]
+      - paragraph [ref=e1672]: Manage your services, prices, and data backups
+    - generic [ref=e1673]:
+      - generic [ref=e1674]:
+        - img [ref=e1676]
+        - generic [ref=e1680]:
+          - generic [ref=e1681]: 🟢 Live — Syncing to Cloud
+          - generic [ref=e1682]: Any device opening this app will see the same data.
+      - generic [ref=e1683]:
+        - generic [ref=e1685]:
+          - generic [ref=e1686]:
+            - generic [ref=e1687]: 🛎 My Services & Prices
+            - generic [ref=e1688]: These show up in the Schedule booking form and invoices.
+          - button "Add Service" [ref=e1689] [cursor=pointer]:
+            - img [ref=e1690]
+            - text: Add Service
+        - generic [ref=e1692]:
+          - generic [ref=e1693]:
+            - text: ₱200
+            - generic [ref=e1694]: /day
+          - generic [ref=e1695]:
+            - generic [ref=e1696]: Basic Visit
+            - generic [ref=e1697]: up to 2 pets
+          - generic [ref=e1698]:
+            - button "Edit" [ref=e1699] [cursor=pointer]:
+              - img [ref=e1700]
+            - button "Delete" [ref=e1703] [cursor=pointer]:
+              - img [ref=e1704]
+        - generic [ref=e1708]:
+          - generic [ref=e1709]:
+            - text: ₱250
+            - generic [ref=e1710]: /day
+          - generic [ref=e1711]:
+            - generic [ref=e1712]: Play & Visit
+            - generic [ref=e1713]: up to 2 pets
+          - generic [ref=e1714]:
+            - button "Edit" [ref=e1715] [cursor=pointer]:
+              - img [ref=e1716]
+            - button "Delete" [ref=e1719] [cursor=pointer]:
+              - img [ref=e1720]
+        - generic [ref=e1724]:
+          - generic [ref=e1725]:
+            - text: ₱350
+            - generic [ref=e1726]: /day
+          - generic [ref=e1727]:
+            - generic [ref=e1728]: Twice-a-day Visit
+            - generic [ref=e1729]: up to 2 pets
+          - generic [ref=e1730]:
+            - button "Edit" [ref=e1731] [cursor=pointer]:
+              - img [ref=e1732]
+            - button "Delete" [ref=e1735] [cursor=pointer]:
+              - img [ref=e1736]
+        - generic [ref=e1740]:
+          - generic [ref=e1741]:
+            - text: ₱450
+            - generic [ref=e1742]: /day
+          - generic [ref=e1743]:
+            - generic [ref=e1744]: Twice-a-day Play & Visit
+            - generic [ref=e1745]: up to 2 pets
+          - generic [ref=e1746]:
+            - button "Edit" [ref=e1747] [cursor=pointer]:
+              - img [ref=e1748]
+            - button "Delete" [ref=e1751] [cursor=pointer]:
+              - img [ref=e1752]
+      - generic [ref=e1755]:
+        - generic [ref=e1756]: 📦 Data Backup
+        - paragraph [ref=e1757]:
+          - text: Your data lives in the cloud (Firebase). As an extra safety net, you can export a local copy as a
+          - code [ref=e1758]: .json
+          - text: file and restore it at any time.
+        - generic [ref=e1759]:
+          - button "Export Backup" [ref=e1760] [cursor=pointer]:
+            - img [ref=e1761]
+            - text: Export Backup
+          - button "Import Backup" [ref=e1764] [cursor=pointer]:
+            - img [ref=e1765]
+            - text: Import Backup
+      - generic [ref=e1768]:
+        - text: Kat's Pet-sitting CRM 🐾
+        - text: San Antonio, Los Baños, Laguna
+        - text: "GCash: 09952664451"
+  - navigation [ref=e362]:
+    - button "Home" [ref=e363] [cursor=pointer]:
+      - img [ref=e364]
+      - generic [ref=e369]: Home
+    - button "Clients" [ref=e370] [cursor=pointer]:
+      - img [ref=e371]
+      - generic [ref=e376]: Clients
+    - button "Schedule" [ref=e377] [cursor=pointer]:
+      - img [ref=e378]
+      - generic [ref=e380]: Schedule
+    - button "Earnings" [ref=e381] [cursor=pointer]:
+      - img [ref=e382]
+      - generic [ref=e385]: Earnings
+    - button "Settings" [ref=e1769] [cursor=pointer]:
+      - img [ref=e387]
+      - generic [ref=e391]: Settings

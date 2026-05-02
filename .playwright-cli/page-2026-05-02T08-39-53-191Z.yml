@@ -1,0 +1,117 @@
+- generic [ref=e13]:
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]: Kat's Pet-sitting
+      - generic [ref=e17]: Business Manager 🐾
+    - navigation [ref=e18]:
+      - generic [ref=e19]: Overview
+      - button "Dashboard" [ref=e20] [cursor=pointer]:
+        - img [ref=e22]
+        - text: Dashboard
+      - generic [ref=e27]: Manage
+      - button "Clients" [ref=e28] [cursor=pointer]:
+        - img [ref=e30]
+        - text: Clients
+      - button "Errands & Pabili" [ref=e35] [cursor=pointer]:
+        - img [ref=e37]
+        - text: Errands & Pabili
+      - button "Schedule" [ref=e40] [cursor=pointer]:
+        - img [ref=e42]
+        - text: Schedule
+      - button "Key Tracker" [ref=e44] [cursor=pointer]:
+        - img [ref=e46]
+        - text: Key Tracker
+      - generic [ref=e49]: Billing
+      - button "Invoice Builder" [ref=e50] [cursor=pointer]:
+        - img [ref=e52]
+        - text: Invoice Builder
+      - button "Invoice Records" [ref=e56] [cursor=pointer]:
+        - img [ref=e58]
+        - text: Invoice Records
+      - button "Earnings Summary" [ref=e60] [cursor=pointer]:
+        - img [ref=e62]
+        - text: Earnings Summary
+      - button "Visit Report Card" [ref=e65] [cursor=pointer]:
+        - img [ref=e67]
+        - text: Visit Report Card
+      - generic [ref=e70]: System
+      - button "Settings & Backup" [ref=e71] [cursor=pointer]:
+        - img [ref=e73]
+        - text: Settings & Backup
+      - generic [ref=e76]: Account
+      - button "Sign Out" [ref=e77] [cursor=pointer]:
+        - img [ref=e79]
+        - text: Sign Out
+    - generic [ref=e82]:
+      - text: Kat's Pet-sitting Services
+      - text: San Antonio, Los Baños, Laguna
+      - text: "GCash: 09952664451"
+  - main [ref=e84]:
+    - generic [ref=e1367]:
+      - generic [ref=e1368]:
+        - generic [ref=e1369]:
+          - generic [ref=e1370]: 🛒 Shopping & Errands
+          - heading "Errands & Pabili Tracking" [level=2] [ref=e1371]
+          - paragraph [ref=e1372]: Mark off client requested items and tasks
+        - button "New Errand" [ref=e1373] [cursor=pointer]:
+          - img [ref=e1374]
+          - text: New Errand
+      - generic [ref=e1375]:
+        - button "Pending (1)" [ref=e1376] [cursor=pointer]
+        - button "Completed" [ref=e1377] [cursor=pointer]
+      - generic [ref=e1380]:
+        - generic [ref=e1381]:
+          - button "Mark Done" [ref=e1382] [cursor=pointer]:
+            - img [ref=e1383]
+          - generic [ref=e1385]:
+            - generic [ref=e1386]: Buy cat food
+            - generic [ref=e1387]: 👤 John Doe
+          - generic [ref=e1388]:
+            - button [ref=e1389] [cursor=pointer]:
+              - img [ref=e1390]
+            - button [ref=e1393] [cursor=pointer]:
+              - img [ref=e1394]
+        - generic [ref=e1397]:
+          - generic [ref=e1398]: Legacy flat-rate errand
+          - generic [ref=e1399]:
+            - generic [ref=e1400]: Grand Total
+            - generic [ref=e1401]: ₱500
+  - generic [ref=e1404]:
+    - generic [ref=e1405]:
+      - generic [ref=e1406]: More Sections
+      - button [ref=e1407] [cursor=pointer]:
+        - img [ref=e1408]
+    - button "Errands & Pabili" [ref=e1411] [cursor=pointer]:
+      - img [ref=e1412]
+      - text: Errands & Pabili
+    - button "Key Tracker" [ref=e1416] [cursor=pointer]:
+      - img [ref=e1417]
+      - text: Key Tracker
+    - button "Invoice Builder" [ref=e1420] [cursor=pointer]:
+      - img [ref=e1421]
+      - text: Invoice Builder
+    - button "Invoice Records" [ref=e1425] [cursor=pointer]:
+      - img [ref=e1426]
+      - text: Invoice Records
+    - button "Visit Report Card" [ref=e1428] [cursor=pointer]:
+      - img [ref=e1429]
+      - text: Visit Report Card
+    - button "Settings & Backup" [ref=e1432] [cursor=pointer]:
+      - img [ref=e1433]
+      - text: Settings & Backup
+  - navigation [ref=e362]:
+    - button "Home" [ref=e363] [cursor=pointer]:
+      - img [ref=e364]
+      - generic [ref=e369]: Home
+    - button "Clients" [ref=e370] [cursor=pointer]:
+      - img [ref=e371]
+      - generic [ref=e376]: Clients
+    - button "Schedule" [ref=e377] [cursor=pointer]:
+      - img [ref=e378]
+      - generic [ref=e380]: Schedule
+    - button "Earnings" [ref=e381] [cursor=pointer]:
+      - img [ref=e382]
+      - generic [ref=e385]: Earnings
+    - button "Errands" [expanded] [active] [ref=e1402] [cursor=pointer]:
+      - img [ref=e387]
+      - generic [ref=e391]: Errands

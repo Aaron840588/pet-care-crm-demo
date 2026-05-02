@@ -1,0 +1,282 @@
+- generic [ref=e13]:
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]: Kat's Pet-sitting
+      - generic [ref=e17]: Business Manager 🐾
+    - navigation [ref=e18]:
+      - generic [ref=e19]: Overview
+      - button "Dashboard" [ref=e20] [cursor=pointer]:
+        - img [ref=e22]
+        - text: Dashboard
+      - generic [ref=e27]: Manage
+      - button "Clients" [ref=e28] [cursor=pointer]:
+        - img [ref=e30]
+        - text: Clients
+      - button "Errands & Pabili" [ref=e35] [cursor=pointer]:
+        - img [ref=e37]
+        - text: Errands & Pabili
+      - button "Schedule" [ref=e40] [cursor=pointer]:
+        - img [ref=e42]
+        - text: Schedule
+      - button "Key Tracker" [ref=e44] [cursor=pointer]:
+        - img [ref=e46]
+        - text: Key Tracker
+      - generic [ref=e49]: Billing
+      - button "Invoice Builder" [ref=e50] [cursor=pointer]:
+        - img [ref=e52]
+        - text: Invoice Builder
+      - button "Invoice Records" [ref=e56] [cursor=pointer]:
+        - img [ref=e58]
+        - text: Invoice Records
+      - button "Earnings Summary" [ref=e60] [cursor=pointer]:
+        - img [ref=e62]
+        - text: Earnings Summary
+      - button "Visit Report Card" [ref=e65] [cursor=pointer]:
+        - img [ref=e67]
+        - text: Visit Report Card
+      - generic [ref=e70]: System
+      - button "Settings & Backup" [ref=e71] [cursor=pointer]:
+        - img [ref=e73]
+        - text: Settings & Backup
+      - generic [ref=e76]: Account
+      - button "Sign Out" [ref=e77] [cursor=pointer]:
+        - img [ref=e79]
+        - text: Sign Out
+    - generic [ref=e82]:
+      - text: Kat's Pet-sitting Services
+      - text: San Antonio, Los Baños, Laguna
+      - text: "GCash: 09952664451"
+  - main [ref=e84]:
+    - generic [ref=e1436]:
+      - generic [ref=e1437]:
+        - generic [ref=e1438]:
+          - heading "Visit Report Card" [level=2] [ref=e1439]
+          - paragraph [ref=e1440]: Generate a cute pet check-up report to send the owner
+        - generic [ref=e1441]:
+          - button "Save" [ref=e1442] [cursor=pointer]:
+            - img [ref=e1443]
+            - text: Save
+          - button "Share" [ref=e1446] [cursor=pointer]:
+            - img [ref=e1447]
+            - text: Share
+      - generic [ref=e1453]:
+        - generic [ref=e1454]:
+          - generic [ref=e1455]: 📋 Visit Details
+          - generic [ref=e1456]:
+            - generic [ref=e1457]: Client
+            - combobox [ref=e1458]:
+              - option "— Select a client —" [selected]
+              - option "QA Mobile Client"
+              - option "Ate Maria"
+              - option "John Doe"
+              - option "Sarah Smith"
+          - generic [ref=e1459]:
+            - generic [ref=e1460]: Pet Name
+            - textbox "e.g. Coco" [ref=e1461]
+          - generic [ref=e1462]:
+            - generic [ref=e1463]:
+              - generic [ref=e1464]: Visit Date
+              - textbox "e.g. April 12-14" [ref=e1465]: 2026-05-02
+            - generic [ref=e1466]:
+              - generic [ref=e1467]: Sitter Name
+              - textbox [ref=e1468]: Kat
+          - generic [ref=e1469]:
+            - generic [ref=e1470]: Upload Photos — 1st = Pet Profile, 2nd+ = Mood Photos (Max 4)
+            - generic [ref=e1471] [cursor=pointer]:
+              - img [ref=e1472]
+              - text: Choose Photos… (0/4)
+          - generic [ref=e1476]: Behavioral Assessment
+          - generic [ref=e1477]:
+            - generic [ref=e1478]:
+              - generic [ref=e1479]: 🐾
+              - generic [ref=e1480]: Energy Level
+              - generic [ref=e1481]:
+                - button "Sleepy" [ref=e1482] [cursor=pointer]
+                - button "Calm" [ref=e1483] [cursor=pointer]
+                - button "Playful" [ref=e1484] [cursor=pointer]
+                - button "Zoomies" [ref=e1485] [cursor=pointer]
+                - button "Other" [ref=e1486] [cursor=pointer]
+            - generic [ref=e1487]:
+              - generic [ref=e1488]: 🐱
+              - generic [ref=e1489]: Sociability
+              - generic [ref=e1490]:
+                - button "Came to greet" [ref=e1491] [cursor=pointer]
+                - button "Needed time" [ref=e1492] [cursor=pointer]
+                - button "Hid" [ref=e1493] [cursor=pointer]
+                - button "Clingy" [ref=e1494] [cursor=pointer]
+                - button "Other" [ref=e1495] [cursor=pointer]
+            - generic [ref=e1496]:
+              - generic [ref=e1497]: 🍽️
+              - generic [ref=e1498]: Appetite
+              - generic [ref=e1499]:
+                - button "Ate all" [ref=e1500] [cursor=pointer]
+                - button "Ate some" [ref=e1501] [cursor=pointer]
+                - button "Ignored" [ref=e1502] [cursor=pointer]
+                - button "Encouragement" [ref=e1503] [cursor=pointer]
+                - button "Other" [ref=e1504] [cursor=pointer]
+            - generic [ref=e1505]:
+              - generic [ref=e1506]: 🚽
+              - generic [ref=e1507]: Litter / Potty
+              - generic [ref=e1508]:
+                - button "Normal" [ref=e1509] [cursor=pointer]
+                - button "Slight change" [ref=e1510] [cursor=pointer]
+                - button "Not observed" [ref=e1511] [cursor=pointer]
+                - button "Other" [ref=e1512] [cursor=pointer]
+            - generic [ref=e1513]:
+              - generic [ref=e1514]: 🩺
+              - generic [ref=e1515]: Condition Today
+              - generic [ref=e1516]:
+                - button "Normal" [ref=e1517] [cursor=pointer]
+                - button "Minor concern" [ref=e1518] [cursor=pointer]
+                - button "See notes" [ref=e1519] [cursor=pointer]
+                - button "Other" [ref=e1520] [cursor=pointer]
+          - generic [ref=e1521]:
+            - generic [ref=e1522]: 📝 Notable Observations
+            - textbox "e.g. \"Kept scratching right ear intermittently\"" [ref=e1523]
+          - generic [ref=e1524]: 📸 Today's Mood
+          - generic [ref=e1525]:
+            - button "😴 Caught Sleeping" [ref=e1526] [cursor=pointer]
+            - button "😁 Caught in 4K" [ref=e1527] [cursor=pointer]
+            - button "🎭 Drama Mode" [ref=e1528] [cursor=pointer]
+            - button "😇 Perfect Angel" [ref=e1529] [cursor=pointer]
+            - button "😤 A Bit Judgey" [ref=e1530] [cursor=pointer]
+            - button "🤪 Chaos Gremlin" [ref=e1531] [cursor=pointer]
+            - button "🥰 Extra Clingy" [ref=e1532] [cursor=pointer]
+            - button "😑 Unimpressed" [ref=e1533] [cursor=pointer]
+            - button "Other" [ref=e1534] [cursor=pointer]
+          - generic [ref=e1535]: Tasks Completed
+          - generic [ref=e1536]:
+            - button "🍽️ Fed" [ref=e1537] [cursor=pointer]:
+              - generic [ref=e1538]:
+                - generic [ref=e1539]: 🍽️
+                - generic [ref=e1540]: Fed
+            - button "🦮 Walked" [ref=e1541] [cursor=pointer]:
+              - generic [ref=e1542]:
+                - generic [ref=e1543]: 🦮
+                - generic [ref=e1544]: Walked
+            - button "🎾 Played" [ref=e1545] [cursor=pointer]:
+              - generic [ref=e1546]:
+                - generic [ref=e1547]: 🎾
+                - generic [ref=e1548]: Played
+            - button "✅ Potty Break" [ref=e1549] [cursor=pointer]:
+              - generic [ref=e1550]:
+                - generic [ref=e1551]: ✅
+                - generic [ref=e1552]: Potty Break
+            - button "✨ Groomed" [ref=e1553] [cursor=pointer]:
+              - generic [ref=e1554]:
+                - generic [ref=e1555]: ✨
+                - generic [ref=e1556]: Groomed
+            - button "💊 Medicine" [ref=e1557] [cursor=pointer]:
+              - generic [ref=e1558]:
+                - generic [ref=e1559]: 💊
+                - generic [ref=e1560]: Medicine
+            - button "📌 Other" [ref=e1561] [cursor=pointer]:
+              - generic [ref=e1562]:
+                - generic [ref=e1563]: 📌
+                - generic [ref=e1564]: Other
+          - generic [ref=e1565]:
+            - generic [ref=e1566]: Personal Message to Owner
+            - textbox "e.g. All good today, nothing concerning ♡" [ref=e1567]
+        - generic [ref=e1568]:
+          - generic [ref=e1569]: Preview — downloads as PNG
+          - generic [ref=e1571]:
+            - generic [ref=e1572]:
+              - generic [ref=e1573]: ♡ PET CHECK-UP REPORT ♡
+              - generic [ref=e1574]: Kat's Pet-Sitting Services
+            - generic [ref=e1575]:
+              - generic [ref=e1577]:
+                - generic [ref=e1578]: 🐱
+                - generic [ref=e1579]: Upload photo
+              - generic [ref=e1580]:
+                - generic [ref=e1581]: Pet Name
+                - generic [ref=e1582]: May 2, 2026
+                - generic [ref=e1583]:
+                  - generic [ref=e1584]: "Visit Date: May 2, 2026"
+                  - generic [ref=e1585]: "Sitter: Kat"
+            - generic [ref=e1586]:
+              - generic [ref=e1587]:
+                - generic [ref=e1588]: 🐾
+                - generic [ref=e1589]: "Energy Level:"
+                - generic [ref=e1590]:
+                  - generic [ref=e1591]: Sleepy
+                  - generic [ref=e1592]: Calm
+                  - generic [ref=e1593]: Playful
+                  - generic [ref=e1594]: Zoomies
+                  - generic [ref=e1595]: Other
+              - generic [ref=e1596]:
+                - generic [ref=e1597]: 🐱
+                - generic [ref=e1598]: "Sociability:"
+                - generic [ref=e1599]:
+                  - generic [ref=e1600]: Came to greet
+                  - generic [ref=e1601]: Needed time
+                  - generic [ref=e1602]: Hid
+                  - generic [ref=e1603]: Clingy
+                  - generic [ref=e1604]: Other
+              - generic [ref=e1605]:
+                - generic [ref=e1606]: 🍽️
+                - generic [ref=e1607]: "Appetite:"
+                - generic [ref=e1608]:
+                  - generic [ref=e1609]: Ate all
+                  - generic [ref=e1610]: Ate some
+                  - generic [ref=e1611]: Ignored
+                  - generic [ref=e1612]: Encouragement
+                  - generic [ref=e1613]: Other
+              - generic [ref=e1614]:
+                - generic [ref=e1615]: 🚽
+                - generic [ref=e1616]: "Litter / Potty:"
+                - generic [ref=e1617]:
+                  - generic [ref=e1618]: Normal
+                  - generic [ref=e1619]: Slight change
+                  - generic [ref=e1620]: Not observed
+                  - generic [ref=e1621]: Other
+              - generic [ref=e1622]:
+                - generic [ref=e1623]: 🩺
+                - generic [ref=e1624]: "Condition Today:"
+                - generic [ref=e1625]:
+                  - generic [ref=e1626]: Normal
+                  - generic [ref=e1627]: Minor concern
+                  - generic [ref=e1628]: See notes
+                  - generic [ref=e1629]: Other
+            - generic [ref=e1630]:
+              - generic [ref=e1631]: "Notable Observations:"
+              - generic [ref=e1632]: No special observations
+            - generic [ref=e1634]: Cared for by Kat 🐾
+  - generic [ref=e1637]:
+    - generic [ref=e1638]:
+      - generic [ref=e1639]: More Sections
+      - button [ref=e1640] [cursor=pointer]:
+        - img [ref=e1641]
+    - button "Errands & Pabili" [ref=e1644] [cursor=pointer]:
+      - img [ref=e1645]
+      - text: Errands & Pabili
+    - button "Key Tracker" [ref=e1649] [cursor=pointer]:
+      - img [ref=e1650]
+      - text: Key Tracker
+    - button "Invoice Builder" [ref=e1653] [cursor=pointer]:
+      - img [ref=e1654]
+      - text: Invoice Builder
+    - button "Invoice Records" [ref=e1658] [cursor=pointer]:
+      - img [ref=e1659]
+      - text: Invoice Records
+    - button "Visit Report Card" [ref=e1661] [cursor=pointer]:
+      - img [ref=e1662]
+      - text: Visit Report Card
+    - button "Settings & Backup" [ref=e1665] [cursor=pointer]:
+      - img [ref=e1666]
+      - text: Settings & Backup
+  - navigation [ref=e362]:
+    - button "Home" [ref=e363] [cursor=pointer]:
+      - img [ref=e364]
+      - generic [ref=e369]: Home
+    - button "Clients" [ref=e370] [cursor=pointer]:
+      - img [ref=e371]
+      - generic [ref=e376]: Clients
+    - button "Schedule" [ref=e377] [cursor=pointer]:
+      - img [ref=e378]
+      - generic [ref=e380]: Schedule
+    - button "Earnings" [ref=e381] [cursor=pointer]:
+      - img [ref=e382]
+      - generic [ref=e385]: Earnings
+    - button "Visit" [expanded] [active] [ref=e1635] [cursor=pointer]:
+      - img [ref=e387]
+      - generic [ref=e391]: Visit

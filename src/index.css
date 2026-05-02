@@ -201,6 +201,69 @@ body {
 .stat-val { font-size: 28px; font-weight: 800; margin-top: 5px; line-height: 1; }
 .stat-sub { font-size: 11px; color: var(--gray); margin-top: 3px; }
 
+.next-visit-card {
+  background: #fff;
+  border: 2px solid var(--lime);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  padding: 18px 20px;
+}
+
+.next-visit-kicker {
+  color: #596000;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+}
+
+.next-visit-title {
+  color: var(--black);
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.next-visit-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.next-visit-meta span,
+.next-visit-note {
+  background: #f6f7ed;
+  border: 1px solid #e2e5c8;
+  border-radius: 999px;
+  color: #3f4224;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 9px;
+}
+
+.next-visit-note {
+  border-radius: 10px;
+  display: inline-block;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: 8px;
+}
+
+.next-visit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 /* Hover only on pointer devices — no sticky hover on Android/iOS */
 @media (hover: hover) and (pointer: fine) {
   .stat-card { transition: transform .18s, box-shadow .18s; cursor: default; }
@@ -544,6 +607,30 @@ tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
 
   /* Dashboard grid: 1 column */
   .dash-grid { grid-template-columns: 1fr; gap: 14px; }
+  .dash-grid > .card:nth-child(2) { order: 10; }
+
+  .next-visit-card {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+  }
+
+  .next-visit-title {
+    font-size: 22px;
+  }
+
+  .next-visit-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .next-visit-actions .btn {
+    justify-content: center;
+    min-width: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
 
   /* Earnings responsive */
   .earnings-grid { grid-template-columns: 1fr !important; }
@@ -640,6 +727,9 @@ tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
     height: 100%;
     display: flex;
     flex-direction: column;
+  }
+  .overlay.open {
+    z-index: 520;
   }
   .modal-content-scroller {
     flex: 1;

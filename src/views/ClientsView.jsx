@@ -344,7 +344,8 @@ export default function ClientsView() {
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                         {colorPresets.map(cp => (
-                          <button type="button" key={cp.color} onClick={() => setPetColor(cp.color)}
+                          <button type="button" key={`${cp.label}-${cp.color}`} onClick={() => setPetColor(cp.color)}
+                            aria-label={`Choose ${cp.label} pet color`}
                             title={cp.label}
                             style={{
                               width: '28px', height: '28px', borderRadius: '50%',

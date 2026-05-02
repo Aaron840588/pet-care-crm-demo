@@ -1,0 +1,215 @@
+- generic [ref=e13]:
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]: Kat's Pet-sitting
+      - generic [ref=e17]: Business Manager 🐾
+    - navigation [ref=e18]:
+      - generic [ref=e19]: Overview
+      - button "Dashboard" [ref=e20] [cursor=pointer]:
+        - img [ref=e22]
+        - text: Dashboard
+      - generic [ref=e27]: Manage
+      - button "Clients" [ref=e28] [cursor=pointer]:
+        - img [ref=e30]
+        - text: Clients
+      - button "Errands & Pabili" [ref=e35] [cursor=pointer]:
+        - img [ref=e37]
+        - text: Errands & Pabili
+      - button "Schedule" [ref=e40] [cursor=pointer]:
+        - img [ref=e42]
+        - text: Schedule
+      - button "Key Tracker" [ref=e44] [cursor=pointer]:
+        - img [ref=e46]
+        - text: Key Tracker
+      - generic [ref=e49]: Billing
+      - button "Invoice Builder" [ref=e50] [cursor=pointer]:
+        - img [ref=e52]
+        - text: Invoice Builder
+      - button "Invoice Records" [ref=e56] [cursor=pointer]:
+        - img [ref=e58]
+        - text: Invoice Records
+      - button "Earnings Summary" [ref=e60] [cursor=pointer]:
+        - img [ref=e62]
+        - text: Earnings Summary
+      - button "Visit Report Card" [ref=e65] [cursor=pointer]:
+        - img [ref=e67]
+        - text: Visit Report Card
+      - generic [ref=e70]: System
+      - button "Settings & Backup" [ref=e71] [cursor=pointer]:
+        - img [ref=e73]
+        - text: Settings & Backup
+      - generic [ref=e76]: Account
+      - button "Sign Out" [ref=e77] [cursor=pointer]:
+        - img [ref=e79]
+        - text: Sign Out
+    - generic [ref=e82]:
+      - text: Kat's Pet-sitting Services
+      - text: San Antonio, Los Baños, Laguna
+      - text: "GCash: 09952664451"
+  - main [ref=e84]:
+    - generic [ref=e425]:
+      - generic [ref=e426]:
+        - heading "Clients" [level=2] [ref=e427]
+        - paragraph [ref=e428]: Client profiles, pets & special instructions
+      - button "+ Add Client" [active] [ref=e430] [cursor=pointer]
+    - generic [ref=e431]:
+      - generic [ref=e432]:
+        - generic [ref=e433]: Ate Maria
+        - generic [ref=e434]: 0917-000-0001 | BGC, Taguig
+        - generic [ref=e435]:
+          - generic [ref=e436]:
+            - img [ref=e437]
+            - generic [ref=e442]: Buster
+          - generic [ref=e443]:
+            - img [ref=e444]
+            - generic [ref=e449]: Luna
+        - generic [ref=e450]: No general notes provided.
+        - generic [ref=e451]:
+          - generic [ref=e452]:
+            - text: Bookings
+            - strong [ref=e453]: "1"
+          - generic [ref=e454]:
+            - text: Total Earned
+            - strong [ref=e455]: ₱200
+          - generic [ref=e456]:
+            - text: Last Booking
+            - strong [ref=e457]: May 2
+        - generic [ref=e458]:
+          - text: "Key Status:"
+          - generic [ref=e459]: Received ✓
+        - generic [ref=e460]:
+          - button "🐾 Pet Bios ✓" [ref=e461] [cursor=pointer]
+          - button "Edit" [ref=e462] [cursor=pointer]
+          - button "Delete" [ref=e463] [cursor=pointer]
+      - generic [ref=e464]:
+        - generic [ref=e465]: John Doe
+        - generic [ref=e466]: 0917-000-0002 | Makati City
+        - generic [ref=e468]:
+          - img [ref=e469]
+          - generic [ref=e474]: Fluffy
+        - generic [ref=e475]: No general notes provided.
+        - generic [ref=e476]:
+          - generic [ref=e477]:
+            - text: Bookings
+            - strong [ref=e478]: "1"
+          - generic [ref=e479]:
+            - text: Total Earned
+            - strong [ref=e480]: ₱250
+          - generic [ref=e481]:
+            - text: Last Booking
+            - strong [ref=e482]: May 2
+        - generic [ref=e483]:
+          - text: "Key Status:"
+          - generic [ref=e484]: Pending
+        - generic [ref=e485]:
+          - button "🐾 Pet Bios" [ref=e486] [cursor=pointer]
+          - button "Edit" [ref=e487] [cursor=pointer]
+          - button "Delete" [ref=e488] [cursor=pointer]
+      - generic [ref=e489]:
+        - generic [ref=e490]: Sarah Smith
+        - generic [ref=e491]: 0917-000-0003 | Quezon City
+        - generic [ref=e492]:
+          - generic [ref=e493]:
+            - img [ref=e494]
+            - generic [ref=e499]: Max
+          - generic [ref=e500]:
+            - img [ref=e501]
+            - generic [ref=e506]: Bella
+        - generic [ref=e507]: No general notes provided.
+        - generic [ref=e508]:
+          - text: "Key Status:"
+          - generic [ref=e509]: No Key
+        - generic [ref=e510]:
+          - button "🐾 Pet Bios" [ref=e511] [cursor=pointer]
+          - button "Edit" [ref=e512] [cursor=pointer]
+          - button "Delete" [ref=e513] [cursor=pointer]
+    - generic [ref=e515]:
+      - generic [ref=e516]: Add Client
+      - generic [ref=e517]:
+        - generic [ref=e518]:
+          - generic [ref=e519]: Client Name *
+          - textbox "e.g. Kuya Paolo" [ref=e520]
+        - generic [ref=e521]:
+          - generic [ref=e522]:
+            - generic [ref=e523]: Contact Number
+            - textbox [ref=e524]
+          - generic [ref=e525]:
+            - generic [ref=e526]: Address / Location
+            - textbox [ref=e527]
+        - generic [ref=e528]:
+          - generic [ref=e529]: Pets
+          - generic [ref=e531]:
+            - generic [ref=e532]:
+              - button "Cat" [ref=e533] [cursor=pointer]:
+                - img [ref=e534]
+                - text: Cat
+              - button "Dog" [ref=e548] [cursor=pointer]:
+                - img [ref=e549]
+                - text: Dog
+              - button "Rabbit" [ref=e561] [cursor=pointer]:
+                - img [ref=e562]
+                - text: Rabbit
+              - button "Bird" [ref=e574] [cursor=pointer]:
+                - img [ref=e575]
+                - text: Bird
+            - generic [ref=e583]:
+              - generic [ref=e584]: Common Cat Colors 🇵🇭
+              - generic [ref=e585]:
+                - button "Orange Tabby" [ref=e586] [cursor=pointer]
+                - button "Black" [ref=e587] [cursor=pointer]
+                - button "White" [ref=e588] [cursor=pointer]
+                - button "Gray / Blue" [ref=e589] [cursor=pointer]
+                - button "Brown Tabby" [ref=e590] [cursor=pointer]
+                - button "Calico (Orange)" [ref=e591] [cursor=pointer]
+                - button "Tuxedo" [ref=e592] [cursor=pointer]
+                - button "Tortoiseshell" [ref=e593] [cursor=pointer]
+                - button "Cream / Beige" [ref=e594] [cursor=pointer]
+                - button "Silver Tabby" [ref=e595] [cursor=pointer]
+                - generic "Custom color" [ref=e596] [cursor=pointer]:
+                  - text: ✏️
+                  - textbox "✏️" [ref=e597]: "#d4823a"
+              - generic [ref=e598]:
+                - text: "Selected:"
+                - strong [ref=e599]: Orange Tabby
+            - generic [ref=e600]:
+              - img [ref=e602]
+              - textbox "e.g. Luna, Mochi" [ref=e616]
+              - button "Add" [ref=e617] [cursor=pointer]
+        - generic [ref=e618]:
+          - generic [ref=e619]: Special Instructions / Notes
+          - textbox "Feeding schedule, medicine, quirks..." [ref=e620]
+        - generic [ref=e621]:
+          - generic [ref=e622]: 🔑 Key Information
+          - generic [ref=e623]:
+            - generic [ref=e624]:
+              - generic [ref=e625]: Key Status
+              - combobox [ref=e626]:
+                - option "No key needed" [selected]
+                - option "Pending — not yet received"
+                - option "Received ✓"
+                - option "Returned to owner"
+            - generic [ref=e627]:
+              - generic [ref=e628]: Date Received
+              - textbox [ref=e629]
+          - generic [ref=e630]:
+            - generic [ref=e631]: Key Notes
+            - textbox "e.g. Black key for Unit 4B" [ref=e632]
+        - generic [ref=e633]:
+          - button "Cancel" [ref=e634] [cursor=pointer]
+          - button "Save Client" [ref=e635] [cursor=pointer]
+  - navigation [ref=e362]:
+    - button "Home" [ref=e363] [cursor=pointer]:
+      - img [ref=e364]
+      - generic [ref=e369]: Home
+    - button "Clients" [ref=e370] [cursor=pointer]:
+      - img [ref=e371]
+      - generic [ref=e376]: Clients
+    - button "Schedule" [ref=e377] [cursor=pointer]:
+      - img [ref=e378]
+      - generic [ref=e380]: Schedule
+    - button "Earnings" [ref=e381] [cursor=pointer]:
+      - img [ref=e382]
+      - generic [ref=e385]: Earnings
+    - button "More" [ref=e386] [cursor=pointer]:
+      - img [ref=e387]
+      - generic [ref=e391]: More

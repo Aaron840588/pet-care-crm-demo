@@ -170,6 +170,17 @@ export default function DashboardView({ setActiveTab }) {
     [bookings, todayStr]
   );
 
+  const sortedTodaysSchedule = useMemo(() =>
+    [...todaysSchedule].sort((a, b) => {
+      const aEntry = a.daySchedule?.find(d => d.date === todayStr);
+      const bEntry = b.daySchedule?.find(d => d.date === todayStr);
+      return (aEntry?.time || a.timeText || '').localeCompare(bEntry?.time || b.timeText || '');
+    }),
+    [todaysSchedule, todayStr]
+  );
+
+  const nextVisit = sortedTodaysSchedule[0] || null;
+
   const upcoming = useMemo(() =>
     bookings
       .filter(b => b.status === 'pending')
@@ -305,6 +316,43 @@ export default function DashboardView({ setActiveTab }) {
         })}
       </div>
 
+      {/* NEXT VISIT */}
+      {nextVisit && (() => {
+        const todayEntry = nextVisit.daySchedule?.find(d => d.date === todayStr);
+        const displayTime = todayEntry?.time || nextVisit.timeText || 'Time not set';
+        const session = getSessionLabel(displayTime);
+        const serviceName = todayEntry?.service?.split('|')[0] || getServiceLabel(nextVisit);
+        const client = clients.find(c => c.id === nextVisit.clientId);
+        const petNames = client?.pets?.map(p => typeof p === 'string' ? p : p.name).filter(Boolean).join(', ');
+
+        return (
+          <div className="next-visit-card">
+            <div>
+              <div className="next-visit-kicker">Next visit</div>
+              <div className="next-visit-title">{nextVisit.clientName}</div>
+              <div className="next-visit-meta">
+                <span>{displayTime}</span>
+                {session && <span>{session}</span>}
+                <span>{serviceName}</span>
+              </div>
+              {petNames && <div className="next-visit-note">Pets: {petNames}</div>}
+              {nextVisit.notes && <div className="next-visit-note">{nextVisit.notes}</div>}
+            </div>
+            <div className="next-visit-actions">
+              <button type="button" className="btn btn-lime btn-sm" onClick={() => openBookingWorkflow(nextVisit, 'report')}>
+                Report
+              </button>
+              <button type="button" className="btn btn-ghost btn-sm" onClick={() => openBookingWorkflow(nextVisit, 'invoice')}>
+                Invoice
+              </button>
+              <button type="button" className="btn btn-dark btn-sm" onClick={() => handleMarkBookingDone(nextVisit)} disabled={markingDone === nextVisit.id}>
+                {markingDone === nextVisit.id ? 'Saving...' : 'Done'}
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* PENDING ERRANDS */}
       {pendingErrands.length > 0 && (
         <div style={{ marginBottom: '22px' }}>
@@ -361,7 +409,7 @@ export default function DashboardView({ setActiveTab }) {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {todaysSchedule.map((b, idx) => {
+              {sortedTodaysSchedule.map((b, idx) => {
                 const todayEntry  = b.daySchedule?.find(d => d.date === todayStr);
                 const displayTime = todayEntry?.time || b.timeText || '';
                 const session     = getSessionLabel(displayTime);
