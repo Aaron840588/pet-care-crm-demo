@@ -320,10 +320,13 @@ thead th { padding: 12px 14px; text-align: left; font-size: 11px; text-transform
 tbody tr { border-bottom: 1px solid #f2f2ee; background: #fff; }
 tbody tr:hover { background: #fafaf5; }
 tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
-.badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
 .b-active  { background: #e6f7ed; color: #2e8045; }
 .b-pending { background: #fff4e0; color: #a65e10; }
+.b-tentative { background: #fff8d7; color: #7c6515; border: 1px dashed #d9c166; }
 .b-done    { background: #f0f0f0; color: var(--gray); }
+.schedule-row-tentative { background: #fffdf1; }
+.schedule-row-tentative:hover { background: #fff9d8; }
 .empty-row td { text-align: center; color: var(--gray); padding: 40px; font-style: italic; }
 
 /* ── TIME CHIPS ────────────────────────────────────────────────────────────── */
@@ -521,6 +524,16 @@ tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
   border: 1px solid #ececdf;
   border-radius: 12px;
   padding: 12px;
+}
+
+.schedule-card-tentative {
+  background: #fffdf1;
+  border: 1.5px dashed #e1cc6f;
+}
+
+.schedule-card-tentative .schedule-card-summary {
+  background: #fffbdf;
+  border-color: #eadb8c;
 }
 
 .schedule-card-label {

@@ -17,6 +17,16 @@ export default function ViewBookingModal({ viewBooking, setViewBooking, clients 
   const dayDiscountTotal = getDiscountTotal(vb.daySchedule || []);
   const hasLegacyDiscount = vb.discount?.mode && vb.discount.mode !== 'none' && Number(vb.discount.value) > 0;
   const hasDiscount = dayDiscountTotal > 0 || hasLegacyDiscount;
+  const statusLabel = vb.status === 'tentative'
+    ? 'Needs confirmation'
+    : vb.status === 'active'
+      ? 'Active'
+      : vb.status === 'done'
+        ? 'Done'
+        : 'Upcoming';
+  const statusStyle = vb.status === 'tentative'
+    ? { background: '#fff8d7', color: '#7c6515', border: '1px dashed #d9c166' }
+    : { background: 'var(--lime)', color: 'var(--black)', border: '1px solid var(--lime)' };
 
   return (
     <div className="overlay open" onClick={() => setViewBooking(null)}>
@@ -37,6 +47,9 @@ export default function ViewBookingModal({ viewBooking, setViewBooking, clients 
           </div>
           <div style={{ fontSize: '13px', color: '#ccc', marginTop: '6px', fontWeight: 500, letterSpacing: '.03em' }}>
             {client?.address || 'No address saved'}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px' }}>
+            <span className="badge" style={statusStyle}>{statusLabel}</span>
           </div>
         </div>
 

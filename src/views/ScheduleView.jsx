@@ -13,6 +13,21 @@ import {
 } from '../utils/calculations';
 import { getServiceLabel, makeDay, normalizeDay, getDayDiscountTotal, hasPerDayDiscounts } from '../utils/scheduleLogic';
 
+const STATUS_FILTERS = ['all', 'active', 'pending', 'tentative', 'done'];
+const STATUS_LABELS = {
+  all: 'All',
+  active: 'Active',
+  pending: 'Upcoming',
+  tentative: 'Tentative',
+  done: 'Done',
+};
+const STATUS_FLOW = {
+  pending: 'tentative',
+  tentative: 'active',
+  active: 'done',
+  done: 'pending',
+};
+
 export default function ScheduleView() {
   const { bookings, addBooking, updateBooking, removeBooking, clients, services } = useData();
   const toast = useToast();
@@ -214,8 +229,7 @@ export default function ScheduleView() {
   }, [formData, daySchedule, clients, editingId, addBooking, updateBooking, getDefaultService, toast]);
 
   const cycleStatus = useCallback((booking) => {
-    const next = booking.status === 'pending' ? 'active'
-      : booking.status === 'active' ? 'done' : 'pending';
+    const next = STATUS_FLOW[booking.status] || 'pending';
     updateBooking(booking.id, { status: next });
   }, [updateBooking]);
 
@@ -235,6 +249,7 @@ export default function ScheduleView() {
   const getStatusBadge = (status) => {
     if (status === 'active')  return <span className="badge b-active"  style={{ cursor: 'pointer' }}>● Active</span>;
     if (status === 'pending') return <span className="badge b-pending" style={{ cursor: 'pointer' }}>● Upcoming</span>;
+    if (status === 'tentative') return <span className="badge b-tentative" style={{ cursor: 'pointer' }}><Pencil size={11} /> Needs confirmation</span>;
     return <span className="badge b-done" style={{ cursor: 'pointer' }}>✓ Done</span>;
   };
 
@@ -292,13 +307,13 @@ export default function ScheduleView() {
       </div>
 
       <div className="filter-bar">
-        {['all', 'active', 'pending', 'done'].map(f => (
+        {STATUS_FILTERS.map(f => (
           <button
             key={f}
             className={`fchip ${filter === f ? 'active' : ''}`}
             onClick={() => setFilter(f)}
           >
-            {f === 'pending' ? 'Upcoming' : f.charAt(0).toUpperCase() + f.slice(1)}
+            {STATUS_LABELS[f]}
           </button>
         ))}
       </div>
@@ -312,7 +327,11 @@ export default function ScheduleView() {
             const { uniqueServices, dayDiscountTotal, hasDiscount, timeLabel } = getBookingRenderMeta(b);
 
             return (
-              <div key={b.id} className="card schedule-mobile-card" style={{ marginBottom: '12px', borderTop: '4px solid var(--lime)' }}>
+              <div
+                key={b.id}
+                className={`card schedule-mobile-card ${b.status === 'tentative' ? 'schedule-card-tentative' : ''}`}
+                style={{ marginBottom: '12px', borderTop: b.status === 'tentative' ? '4px solid #d6bf5f' : '4px solid var(--lime)' }}
+              >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px', marginBottom: '12px' }}>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontWeight: 800, fontSize: '16px', lineHeight: 1.2 }}>{b.clientName}</div>
@@ -412,7 +431,7 @@ export default function ScheduleView() {
                     const { uniqueServices, dayDiscountTotal, hasDiscount, timeLabel } = getBookingRenderMeta(b);
 
                     return (
-                      <tr key={b.id}>
+                      <tr key={b.id} className={b.status === 'tentative' ? 'schedule-row-tentative' : undefined}>
                         <td style={{ fontWeight: 'bold' }}>{b.clientName}</td>
                         <td>
                           {uniqueServices
@@ -549,6 +568,7 @@ export default function ScheduleView() {
                   <label>Status</label>
                   <select value={formData.status} onChange={e => set({ status: e.target.value })}>
                     <option value="pending">Upcoming</option>
+                    <option value="tentative">Tentative / needs confirmation</option>
                     <option value="active">Active (ongoing)</option>
                     <option value="done">Done</option>
                   </select>
