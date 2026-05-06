@@ -387,6 +387,7 @@ tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
 .overlay.open .modal { transform: translateY(0); }
 .modal-title { font-family: var(--font-display); font-size: 20px; font-weight: 700; margin-bottom: 18px; }
 .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid #f0f0f0; }
+.confirm-modal { height: auto; }
 
 /* ── FORMS ─────────────────────────────────────────────────────────────────── */
 .fg { margin-bottom: 14px; }
@@ -736,6 +737,13 @@ tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding-bottom: 20px;
+  }
+  .confirm-modal {
+    display: block;
+    flex-direction: initial;
+    height: auto;
+    margin: 0 12px 12px;
+    max-height: calc(100dvh - 24px);
   }
   .modal-action-footer {
     padding: 14px 20px calc(14px + var(--safe-bottom));

@@ -71,7 +71,7 @@ export default function SettingsView() {
         toast('Backup imported successfully.', 'success');
       } catch (error) {
         console.error(error);
-        toast('Import failed. Check that the backup file is valid JSON.', 'error');
+        toast(error?.message || 'Import failed. Check that the backup file is valid JSON.', 'error');
       }
     };
     reader.readAsText(file);

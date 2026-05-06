@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useData } from '../store/DataContext';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { CheckCircle2, Circle, Plus, Trash2, CheckSquare, Edit, X } from 'lucide-react';
 
 export default function ErrandsView() {
@@ -7,6 +8,7 @@ export default function ErrandsView() {
   const [activeTab, setActiveTab] = useState('pending');
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [errandToDelete, setErrandToDelete] = useState(null);
   
   const [form, setForm] = useState(() => ({
     title: '',
@@ -78,6 +80,12 @@ export default function ErrandsView() {
     setFormOpen(false);
   };
 
+  const confirmDeleteErrand = async () => {
+    if (!errandToDelete) return;
+    await deleteErrand(errandToDelete.id);
+    setErrandToDelete(null);
+  };
+
   const updateItem = (id, field, val) => {
     setForm(f => ({
       ...f,
@@ -122,7 +130,7 @@ export default function ErrandsView() {
           <p style={{ color: '#888', fontSize: '13px' }}>Mark off client requested items and tasks</p>
         </div>
         {!formOpen && (
-          <button className="btn btn-lime" onClick={openAdd} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button type="button" className="btn btn-lime" onClick={openAdd} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Plus size={18} /> New Errand
           </button>
         )}
@@ -131,7 +139,8 @@ export default function ErrandsView() {
       {/* ── TABS ── */}
       {!formOpen && (
         <div style={{ display: 'flex', gap: '8px', marginBottom: '18px' }}>
-          <button 
+          <button
+            type="button"
             onClick={() => setActiveTab('pending')}
             style={{ 
               padding: '10px 18px', borderRadius: '20px', fontWeight: 700, fontSize: '13px', border: 'none', cursor: 'pointer',
@@ -141,7 +150,8 @@ export default function ErrandsView() {
           >
             Pending ({pending.length})
           </button>
-          <button 
+          <button
+            type="button"
             onClick={() => setActiveTab('done')}
             style={{ 
               padding: '10px 18px', borderRadius: '20px', fontWeight: 700, fontSize: '13px', border: 'none', cursor: 'pointer',
@@ -159,7 +169,7 @@ export default function ErrandsView() {
         <div className="card" style={{ marginBottom: '22px', border: '2px solid var(--lime-dark)', background: '#fff', padding: '24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div style={{ fontWeight: 800, fontSize: '18px' }}>{editingId ? 'Edit Errand' : 'Add New Errand'}</div>
-            <button onClick={() => setFormOpen(false)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}><X size={20} /></button>
+            <button type="button" aria-label="Close errand form" onClick={() => setFormOpen(false)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer' }}><X size={20} /></button>
           </div>
           
           <div style={{ marginBottom: '16px' }}>
@@ -206,7 +216,7 @@ export default function ErrandsView() {
                           style={{ flex: 1, maxWidth: '120px', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '14px' }}
                         />
                         {form.items.length > 1 && (
-                          <button onClick={() => removeItem(item.id)} style={{ background: '#fff0f0', border: 'none', color: '#fca5a5', cursor: 'pointer', padding: '0 14px', borderRadius: '8px', display: 'flex', alignItems: 'center' }}>
+                          <button type="button" aria-label={`Remove item ${i + 1}`} onClick={() => removeItem(item.id)} style={{ background: '#fff0f0', border: 'none', color: '#fca5a5', cursor: 'pointer', padding: '0 14px', borderRadius: '8px', display: 'flex', alignItems: 'center' }}>
                             <Trash2 size={18} />
                           </button>
                         )}
@@ -224,7 +234,8 @@ export default function ErrandsView() {
               ))}
             </div>
 
-            <button 
+            <button
+              type="button"
               onClick={addItemRow} 
               style={{ padding: '8px 12px', borderRadius: '8px', border: '1.5px dashed #ccc', background: 'transparent', color: '#666', fontWeight: 700, fontSize: '11px', marginTop: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
@@ -233,7 +244,7 @@ export default function ErrandsView() {
           </div>
 
           <div style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap-reverse' }}>
-            <button className="btn btn-dark" onClick={handleSave} style={{ flex: '1 1 auto', paddingLeft: '30px', paddingRight: '30px', minHeight: '48px' }}>
+            <button type="button" className="btn btn-dark" onClick={handleSave} style={{ flex: '1 1 auto', paddingLeft: '30px', paddingRight: '30px', minHeight: '48px' }}>
               {editingId ? 'Update Record' : 'Save Errand'}
             </button>
             <div style={{ fontSize: '16px', fontWeight: 700, color: '#333', marginLeft: 'auto', background: '#f5f7fa', padding: '8px 16px', borderRadius: '12px', border: '1.5px solid #e0e6ed' }}>
@@ -266,8 +277,10 @@ export default function ErrandsView() {
                   <div key={errand.id} className="card" style={{ margin: 0, padding: 0, overflow: 'hidden' }}>
                     {/* Header Strip */}
                     <div style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', background: errand.status === 'done' ? '#fcfcfc' : '#fff' }}>
-                      <button 
+                      <button
+                        type="button"
                         onClick={() => updateErrand(errand.id, { status: errand.status === 'done' ? 'pending' : 'done' })}
+                        aria-label={errand.status === 'done' ? `Mark ${errand.title} pending` : `Mark ${errand.title} done`}
                         title={errand.status === 'done' ? 'Mark Pending' : 'Mark Done'}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, paddingRight: '16px', color: errand.status === 'done' ? 'var(--green)' : '#ddd', display: 'flex' }}
                       >
@@ -290,14 +303,18 @@ export default function ErrandsView() {
                       </div>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <button 
+                        <button
+                          type="button"
                           onClick={() => openEdit(errand)} 
+                          aria-label={`Edit ${errand.title}`}
                           style={{ background: '#f5f5f5', border: 'none', cursor: 'pointer', color: '#555', padding: '8px', borderRadius: '8px' }}
                         >
                           <Edit size={16} />
                         </button>
-                        <button 
-                          onClick={() => { if(window.confirm('Delete this errand forever?')) deleteErrand(errand.id) }} 
+                        <button
+                          type="button"
+                          onClick={() => setErrandToDelete(errand)}
+                          aria-label={`Delete ${errand.title}`}
                           style={{ background: '#fef2f2', border: 'none', cursor: 'pointer', color: '#ef4444', padding: '8px', borderRadius: '8px' }}
                         >
                           <Trash2 size={16} />
@@ -339,6 +356,16 @@ export default function ErrandsView() {
             </div>
           )}
         </div>
+      )}
+
+      {errandToDelete && (
+        <ConfirmDialog
+          title="Delete Errand?"
+          description={`This removes ${errandToDelete.title} from the errand list.`}
+          confirmLabel="Delete Errand"
+          onConfirm={confirmDeleteErrand}
+          onCancel={() => setErrandToDelete(null)}
+        />
       )}
     </div>
   );

@@ -336,7 +336,15 @@ export function DataProvider({ children }) {
   };
 
   const exportData = () => {
-    const data = { bookings, clients, services, invoices, reminders, exportedAt: new Date().toISOString() };
+    const data = {
+      bookings,
+      clients,
+      services,
+      invoices,
+      reminders,
+      errands,
+      exportedAt: new Date().toISOString(),
+    };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -387,11 +395,10 @@ export function DataProvider({ children }) {
 
   const importData = async (jsonData) => {
     if (isDemo) {
-        alert("Import disabled in Demo Sandbox Mode.");
-        return;
+      throw new Error('Import is disabled in Demo Sandbox Mode.');
     }
     const data = JSON.parse(jsonData);
-    const existingByCollection = { bookings, clients, invoices, reminders };
+    const existingByCollection = { bookings, clients, invoices, reminders, errands };
     for (const colName of COLLECTION_KEYS) {
       await commitDeletes(colName, existingByCollection[colName]);
       await commitImports(colName, Array.isArray(data[colName]) ? data[colName] : []);

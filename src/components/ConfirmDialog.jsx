@@ -31,7 +31,7 @@ export default function ConfirmDialog({
   return (
     <div className="overlay open" onClick={onCancel}>
       <div
-        className="modal"
+        className="modal confirm-modal"
         style={{ maxWidth: '420px', borderRadius: '20px' }}
         onClick={(event) => event.stopPropagation()}
       >
