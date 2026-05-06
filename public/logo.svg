@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#0c0c0c"/>
+  <g fill="#E8BA35">
+    <!-- House outline & wave bottom -->
+    <path d="M 256 135 L 145 220 C 138 225 140 236 148 238 L 157 238 L 157 300 C 157 325 170 340 195 348 C 220 355 285 345 315 348 C 340 350 355 325 355 300 L 355 210 L 370 220 C 378 225 385 215 380 208 L 320 162 L 320 145 C 320 140 315 135 310 135 L 295 135 C 290 135 285 140 285 145 L 285 155 L 265 140 C 260 136 255 135 256 135 Z M 256 150 L 305 188 L 305 145 L 310 145 L 310 192 L 340 215 L 345 215 L 256 140 L 165 210 L 168 210 L 168 300 C 168 320 178 335 200 340 C 220 345 280 338 310 340 C 330 342 345 320 345 300 L 345 210 L 348 212 L 256 142 Z" stroke="#E8BA35" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+    
+    <!-- Toe 1 -->
+    <ellipse cx="200" cy="245" rx="20" ry="26" transform="rotate(-30 200 245)" />
+    <!-- Toe 2 -->
+    <ellipse cx="235" cy="215" rx="20" ry="28" transform="rotate(-10 235 215)" />
+    <!-- Toe 3 -->
+    <ellipse cx="280" cy="215" rx="20" ry="28" transform="rotate(10 280 215)" />
+    <!-- Toe 4 -->
+    <ellipse cx="315" cy="245" rx="20" ry="26" transform="rotate(30 315 245)" />
+    
+    <!-- Main Pad with Heart Hole -->
+    <path d="M 210 320 C 180 320 190 280 215 260 C 235 245 275 245 295 260 C 320 280 330 320 300 320 C 285 320 270 330 255 330 C 240 330 225 320 210 320 Z M 255 310 C 270 295 275 285 275 275 C 275 265 265 260 255 265 C 245 260 235 265 235 275 C 235 285 240 295 255 310 Z" fill-rule="evenodd" />
+    
+    <!-- The swoosh wave underneath -->
+    <path d="M 185 358 C 225 340 285 370 335 345 C 315 365 255 355 215 365 C 200 368 190 365 185 358 Z" />
+  </g>
+</svg>

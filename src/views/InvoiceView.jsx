@@ -425,20 +425,23 @@ export default function InvoiceView() {
     setConfirmResetOpen(false);
   }, []);
 
-  // P6: split and sort bookings for dropdown
-  const activeBookings = useMemo(
-    () => [...bookings].filter(b => b.status === 'active' || b.status === 'pending').sort((a, b) => dateSortValue(b.startDate) - dateSortValue(a.startDate)),
-    [bookings]
-  );
-  
-  const pastBookings = useMemo(
-    () => [...bookings].filter(b => b.status !== 'active' && b.status !== 'pending').sort((a, b) => dateSortValue(b.startDate) - dateSortValue(a.startDate)),
-    [bookings]
-  );
+  // P6: group bookings by client for dropdown
+  const bookingsByClient = useMemo(() => {
+    const grouped = {};
+    bookings.forEach(b => {
+      const client = clients.find(c => c.id === b.clientId);
+      const cName = b.clientName || client?.name || 'Unknown Client';
+      if (!grouped[cName]) grouped[cName] = [];
+      grouped[cName].push(b);
+    });
+    // Sort clients alphabetically, and within each group sort by date descending
+    return Object.keys(grouped).sort().map(cName => ({
+      clientName: cName,
+      bookings: grouped[cName].sort((a, b) => dateSortValue(b.startDate) - dateSortValue(a.startDate))
+    }));
+  }, [bookings, clients]);
 
   const getBookingOptionLabel = useCallback((booking) => {
-    const client = clients.find((item) => item.id === booking.clientId);
-    const clientName = booking.clientName || client?.name || 'Unknown client';
     const serviceNames = booking.daySchedule?.length > 0
       ? [...new Set(booking.daySchedule.map((day) => day.service?.split('|')[0]).filter(Boolean))]
       : [];
@@ -452,8 +455,8 @@ export default function InvoiceView() {
       
     const total = Number(booking.total ?? booking.finalTotal ?? 0);
 
-    return `${dateLabel} — ${clientName} — ${serviceLabel} (₱${total.toLocaleString('en-PH')})`;
-  }, [clients]);
+    return `${dateLabel} — ${serviceLabel} (₱${total.toLocaleString('en-PH')})`;
+  }, []);
 
   return (
     <>
@@ -670,20 +673,19 @@ export default function InvoiceView() {
                 style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1.5px solid #d4d800', fontSize: '14px', background: '#fff', fontFamily: 'var(--font-body)' }}
               >
                 <option value="">— Pick a booking to auto-fill —</option>
-                {activeBookings.length > 0 && (
-                  <optgroup label="Active & Upcoming">
-                    {activeBookings.map(b => (
-                      <option key={b.id} value={b.id}>{getBookingOptionLabel(b)}</option>
-                    ))}
+                {bookingsByClient.map(group => (
+                  <optgroup key={group.clientName} label={group.clientName}>
+                    {group.bookings.map(b => {
+                      // Add a small status indicator in the label
+                      const statusIcon = (b.status === 'active' || b.status === 'pending') ? '🗓️' : '✔️';
+                      return (
+                        <option key={b.id} value={b.id}>
+                          {statusIcon} {getBookingOptionLabel(b)}
+                        </option>
+                      );
+                    })}
                   </optgroup>
-                )}
-                {pastBookings.length > 0 && (
-                  <optgroup label="Done & Tentative">
-                    {pastBookings.map(b => (
-                      <option key={b.id} value={b.id}>{getBookingOptionLabel(b)}</option>
-                    ))}
-                  </optgroup>
-                )}
+                ))}
               </select>
             <div style={{ fontSize: '11px', color: '#777', marginTop: '6px' }}>
               Per-day bookings auto-group into service lines.
