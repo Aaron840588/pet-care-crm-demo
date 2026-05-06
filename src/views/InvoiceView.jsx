@@ -9,7 +9,7 @@ import { shareImageFile, downloadImage } from '../utils/share';
 import { calcDayDiscount, calcLine, DISC_MODES, newLineItem, EXTRA_PET_RATE } from '../utils/calculations';
 import { buildDateNote, groupImportedLineItems, buildSingleDayInvoiceLines } from '../utils/invoiceLogic';
 import InvoicePreviewCard from '../features/invoices/InvoicePreviewCard';
-import { fmtGcash, todayLocalStr, dateSortValue } from '../utils/dates';
+import { fmtGcash, todayLocalStr, dateSortValue, fmtDate } from '../utils/dates';
 
 // ── Struck: renders a strikethrough that html-to-image can capture ───────────
 const Struck = ({ children, style }) => (
@@ -425,9 +425,14 @@ export default function InvoiceView() {
     setConfirmResetOpen(false);
   }, []);
 
-  // P6: sorted bookings memoized
-  const sortedBookings = useMemo(
-    () => [...bookings].sort((a, b) => dateSortValue(b.startDate) - dateSortValue(a.startDate)),
+  // P6: split and sort bookings for dropdown
+  const activeBookings = useMemo(
+    () => [...bookings].filter(b => b.status === 'active' || b.status === 'pending').sort((a, b) => dateSortValue(b.startDate) - dateSortValue(a.startDate)),
+    [bookings]
+  );
+  
+  const pastBookings = useMemo(
+    () => [...bookings].filter(b => b.status !== 'active' && b.status !== 'pending').sort((a, b) => dateSortValue(b.startDate) - dateSortValue(a.startDate)),
     [bookings]
   );
 
@@ -440,12 +445,14 @@ export default function InvoiceView() {
     const serviceLabel = serviceNames.length > 0
       ? serviceNames.join(' + ')
       : booking.service?.split('|')[0] || 'Booking';
+      
     const dateLabel = booking.startDate && booking.endDate
-      ? `${booking.startDate} -> ${booking.endDate}`
-      : 'No date set';
+      ? `${fmtDate(booking.startDate)}${booking.startDate !== booking.endDate ? ` to ${fmtDate(booking.endDate)}` : ''}`
+      : 'No date';
+      
     const total = Number(booking.total ?? booking.finalTotal ?? 0);
 
-    return `${clientName} - ${serviceLabel} - ${dateLabel} - ₱${total.toLocaleString('en-PH')}`;
+    return `${dateLabel} — ${clientName} — ${serviceLabel} (₱${total.toLocaleString('en-PH')})`;
   }, [clients]);
 
   return (
@@ -657,18 +664,27 @@ export default function InvoiceView() {
             <div style={{ fontWeight: 700, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '.04em', color: '#555', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <ClipboardList size={13} /> Auto-fill from Schedule
             </div>
-            <select
-              value={importBookingId}
-              onChange={e => importFromBooking(e.target.value)}
-              style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1.5px solid #d4d800', fontSize: '14px', background: '#fff', fontFamily: 'var(--font-body)' }}
-            >
-              <option value="">— Pick a booking to auto-fill →</option>
-              {sortedBookings.map(b => (
-                <option key={b.id} value={b.id}>
-                  {getBookingOptionLabel(b)}
-                </option>
-              ))}
-            </select>
+              <select
+                value={importBookingId}
+                onChange={e => importFromBooking(e.target.value)}
+                style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1.5px solid #d4d800', fontSize: '14px', background: '#fff', fontFamily: 'var(--font-body)' }}
+              >
+                <option value="">— Pick a booking to auto-fill —</option>
+                {activeBookings.length > 0 && (
+                  <optgroup label="Active & Upcoming">
+                    {activeBookings.map(b => (
+                      <option key={b.id} value={b.id}>{getBookingOptionLabel(b)}</option>
+                    ))}
+                  </optgroup>
+                )}
+                {pastBookings.length > 0 && (
+                  <optgroup label="Done & Tentative">
+                    {pastBookings.map(b => (
+                      <option key={b.id} value={b.id}>{getBookingOptionLabel(b)}</option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
             <div style={{ fontSize: '11px', color: '#777', marginTop: '6px' }}>
               Per-day bookings auto-group into service lines.
             </div>

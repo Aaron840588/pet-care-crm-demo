@@ -34,7 +34,7 @@ export default function ScheduleView() {
 
   const [modalOpen,   setModalOpen]   = useState(false);
   const [editingId,   setEditingId]   = useState(null);
-  const [filter,      setFilter]      = useState('all');
+  const [filter,      setFilter]      = useState('active');
   const [viewBooking, setViewBooking] = useState(null);
   const [daySchedule, setDaySchedule] = useState([]);
   // U4: default collapsed — show only count summary for long bookings

@@ -189,6 +189,14 @@ export default function DashboardView({ setActiveTab }) {
     [bookings]
   );
 
+  const tentativeBookings = useMemo(() =>
+    bookings
+      .filter(b => b.status === 'tentative')
+      .sort((a, b) => dateSortValue(a.startDate) - dateSortValue(b.startDate))
+      .slice(0, 4),
+    [bookings]
+  );
+
   const todayFull = new Date().toLocaleDateString('en-PH', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
@@ -536,6 +544,29 @@ export default function DashboardView({ setActiveTab }) {
             );
           })}
         </div>
+
+        {/* TENTATIVE BOOKINGS */}
+        {tentativeBookings.length > 0 && (
+          <div className="card" style={{ margin: 0, borderTop: '4px solid #d6bf5f' }}>
+            <div className="card-title">Tentative Bookings</div>
+            {tentativeBookings.map(b => {
+              const [y, mo, d] = b.startDate.split('-').map(Number);
+              return (
+                <div key={b.id} className="list-item">
+                  <div className="date-badge" style={{ background: '#f5f2c8', color: '#7a5200' }}>
+                    <div className="db-day">{d}</div>
+                    <div className="db-mon">{new Date(y, mo - 1, d).toLocaleString('default', { month: 'short' }).toUpperCase()}</div>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="li-main">{b.clientName}</div>
+                    <div className="li-sub">{getServiceLabel(b)}</div>
+                    <div className="li-sub">{fmtDate(b.startDate)} to {fmtDate(b.endDate)}</div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* KEYS TO COLLECT */}
         <div className="card" style={{ margin: 0 }}>
