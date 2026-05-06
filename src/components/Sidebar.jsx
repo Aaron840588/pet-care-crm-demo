@@ -30,8 +30,13 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setMobi
   return (
     <div className={`sidebar ${isMobileOpen ? 'open' : ''}`}>
       <div className="sb-brand">
-        <div className="logo">Kat's <span>Pet-sitting</span></div>
-        <div className="sub">Business Manager 🐾</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img src="/logo.png" alt="Kat's Pet-sitting" style={{ width: '48px', height: '48px', objectFit: 'contain' }} />
+          <div>
+            <div className="logo" style={{ fontSize: '18px' }}>Kat's <span>Pet-sitting</span></div>
+            <div className="sub">Business Manager dY?_</div>
+          </div>
+        </div>
       </div>
 
       <nav className="nav">
