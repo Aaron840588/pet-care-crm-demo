@@ -205,12 +205,27 @@ export default function DashboardView({ setActiveTab }) {
     setMarkingDone(b.id);
     try {
       await updateBooking(b.id, { status: 'done' });
-      toast(`✅ ${b.clientName} marked as done!`);
+      toast(`✔️ ${b.clientName} marked as done!`);
     } catch (e) {
       console.error(e);
       toast('Could not update. Try again.', 'error');
     } finally {
       setMarkingDone(null);
+    }
+  }, [updateBooking, toast]);
+
+  const [confirmingTentative, setConfirmingTentative] = useState(null);
+
+  const handleConfirmTentative = useCallback(async (b) => {
+    setConfirmingTentative(b.id);
+    try {
+      await updateBooking(b.id, { status: 'pending' });
+      toast(`✔️ ${b.clientName} confirmed as upcoming!`);
+    } catch (e) {
+      console.error(e);
+      toast('Could not update. Try again.', 'error');
+    } finally {
+      setConfirmingTentative(null);
     }
   }, [updateBooking, toast]);
 
@@ -551,9 +566,11 @@ export default function DashboardView({ setActiveTab }) {
             <div className="card-title">Tentative Bookings</div>
             {tentativeBookings.map(b => {
               const [y, mo, d] = b.startDate.split('-').map(Number);
+              const isConfirming = confirmingTentative === b.id;
+              
               return (
-                <div key={b.id} className="list-item">
-                  <div className="date-badge" style={{ background: '#f5f2c8', color: '#7a5200' }}>
+                <div key={b.id} className="list-item" style={{ alignItems: 'center' }}>
+                  <div className="date-badge" style={{ background: '#f5f2c8', color: '#7a5200', flexShrink: 0 }}>
                     <div className="db-day">{d}</div>
                     <div className="db-mon">{new Date(y, mo - 1, d).toLocaleString('default', { month: 'short' }).toUpperCase()}</div>
                   </div>
@@ -562,6 +579,22 @@ export default function DashboardView({ setActiveTab }) {
                     <div className="li-sub">{getServiceLabel(b)}</div>
                     <div className="li-sub">{fmtDate(b.startDate)} to {fmtDate(b.endDate)}</div>
                   </div>
+                  <button
+                    type="button"
+                    disabled={isConfirming}
+                    onClick={() => handleConfirmTentative(b)}
+                    style={{
+                      flexShrink: 0, display: 'flex', alignItems: 'center', gap: '4px',
+                      padding: '6px 10px', borderRadius: '8px', cursor: isConfirming ? 'wait' : 'pointer',
+                      border: '1.5px solid #d6bf5f', background: '#fffcf2',
+                      fontWeight: 700, fontSize: '11px', color: '#7a5200',
+                      transition: 'all .15s', whiteSpace: 'nowrap',
+                      opacity: isConfirming ? 0.6 : 1,
+                    }}
+                  >
+                    <Check size={12} />
+                    {isConfirming ? '...' : 'Confirm'}
+                  </button>
                 </div>
               );
             })}
