@@ -1,5 +1,5 @@
-const sharp = require('sharp');
-const fs = require('fs');
+import fs from 'node:fs';
+import sharp from 'sharp';
 
 async function generate() {
   const inputFile = 'public/logo.png';

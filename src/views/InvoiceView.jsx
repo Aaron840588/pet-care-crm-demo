@@ -8,8 +8,9 @@ import { Plus, Trash2, ClipboardList, Share2 } from 'lucide-react';
 import { shareImageFile, downloadImage } from '../utils/share';
 import { calcDayDiscount, calcLine, DISC_MODES, newLineItem, EXTRA_PET_RATE } from '../utils/calculations';
 import { buildDateNote, groupImportedLineItems, buildSingleDayInvoiceLines } from '../utils/invoiceLogic';
-import InvoicePreviewCard from '../features/invoices/InvoicePreviewCard';
-import { fmtGcash, todayLocalStr, dateSortValue, fmtDate } from '../utils/dates';
+import { sortInvoiceImportBookings } from '../utils/bookingOrdering.mjs';
+import { escapeHtml } from '../utils/htmlEscape.mjs';
+import { fmtGcash, todayLocalStr, fmtDate } from '../utils/dates';
 
 // ── Struck: renders a strikethrough that html-to-image can capture ───────────
 const Struck = ({ children, style }) => (
@@ -374,7 +375,7 @@ export default function InvoiceView() {
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Invoice — ${data.toName || 'Kat'}</title>
+        <title>Invoice — ${escapeHtml(data.toName || 'Kat')}</title>
         ${styleMarkup}
         <style>
           @page { margin: 0; }
@@ -425,21 +426,10 @@ export default function InvoiceView() {
     setConfirmResetOpen(false);
   }, []);
 
-  // P6: group bookings by client for dropdown
-  const bookingsByClient = useMemo(() => {
-    const grouped = {};
-    bookings.forEach(b => {
-      const client = clients.find(c => c.id === b.clientId);
-      const cName = b.clientName || client?.name || 'Unknown Client';
-      if (!grouped[cName]) grouped[cName] = [];
-      grouped[cName].push(b);
-    });
-    // Sort clients alphabetically, and within each group sort by date descending
-    return Object.keys(grouped).sort().map(cName => ({
-      clientName: cName,
-      bookings: grouped[cName].sort((a, b) => dateSortValue(b.startDate) - dateSortValue(a.startDate))
-    }));
-  }, [bookings, clients]);
+  const sortedImportBookings = useMemo(
+    () => sortInvoiceImportBookings(bookings),
+    [bookings]
+  );
 
   const getBookingOptionLabel = useCallback((booking) => {
     const serviceNames = booking.daySchedule?.length > 0
@@ -673,22 +663,19 @@ export default function InvoiceView() {
                 style={{ width: '100%', padding: '10px 12px', borderRadius: '10px', border: '1.5px solid #d4d800', fontSize: '14px', background: '#fff', fontFamily: 'var(--font-body)' }}
               >
                 <option value="">— Pick a booking to auto-fill —</option>
-                {bookingsByClient.map(group => (
-                  <optgroup key={group.clientName} label={group.clientName}>
-                    {group.bookings.map(b => {
-                      // Add a small status indicator in the label
-                      const statusIcon = (b.status === 'active' || b.status === 'pending') ? '🗓️' : '✔️';
-                      return (
-                        <option key={b.id} value={b.id}>
-                          {statusIcon} {getBookingOptionLabel(b)}
-                        </option>
-                      );
-                    })}
-                  </optgroup>
-                ))}
+                {sortedImportBookings.map(b => {
+                  const client = clients.find(c => c.id === b.clientId);
+                  const clientName = b.clientName || client?.name || 'Unknown Client';
+                  const statusIcon = (b.status === 'active' || b.status === 'pending') ? '🗓️' : '✔️';
+                  return (
+                    <option key={b.id} value={b.id}>
+                      {statusIcon} {clientName} — {getBookingOptionLabel(b)}
+                    </option>
+                  );
+                })}
               </select>
             <div style={{ fontSize: '11px', color: '#777', marginTop: '6px' }}>
-              Per-day bookings auto-group into service lines.
+              Newest added bookings appear first. Per-day bookings auto-group into service lines.
             </div>
           </div>
 
