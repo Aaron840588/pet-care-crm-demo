@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { sortInvoiceImportBookings } from './bookingOrdering.mjs';
 
-test('invoice import booking list puts the newest created booking first', () => {
+test('invoice import booking list puts the newest booking date first', () => {
   const older = {
     id: 'older',
     clientName: 'A Client',
@@ -24,14 +24,22 @@ test('invoice import booking list puts the newest created booking first', () => 
 
   const sorted = sortInvoiceImportBookings([older, newest, middle]);
 
-  assert.deepEqual(sorted.map((booking) => booking.id), ['newest', 'middle', 'older']);
+  assert.deepEqual(sorted.map((booking) => booking.id), ['middle', 'older', 'newest']);
 });
 
-test('invoice import booking list uses service date for legacy bookings without createdAt', () => {
-  const oldDate = { id: 'old-date', startDate: '2026-01-15' };
-  const newDate = { id: 'new-date', startDate: '2026-03-20' };
+test('invoice import booking list falls back to newest created booking first when service dates are the same', () => {
+  const olderCreated = {
+    id: 'older-created',
+    startDate: '2026-06-10',
+    createdAt: { toMillis: () => 1000 },
+  };
+  const newerCreated = {
+    id: 'newer-created',
+    startDate: '2026-06-10',
+    createdAt: { toMillis: () => 2000 },
+  };
 
-  const sorted = sortInvoiceImportBookings([oldDate, newDate]);
+  const sorted = sortInvoiceImportBookings([olderCreated, newerCreated]);
 
-  assert.deepEqual(sorted.map((booking) => booking.id), ['new-date', 'old-date']);
+  assert.deepEqual(sorted.map((booking) => booking.id), ['newer-created', 'older-created']);
 });

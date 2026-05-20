@@ -675,7 +675,7 @@ export default function InvoiceView() {
                 })}
               </select>
             <div style={{ fontSize: '11px', color: '#777', marginTop: '6px' }}>
-              Newest added bookings appear first. Per-day bookings auto-group into service lines.
+              Bookings with the latest dates appear first. Per-day bookings auto-group into service lines.
             </div>
           </div>
 

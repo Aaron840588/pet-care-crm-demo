@@ -25,11 +25,11 @@ export const getBookingCreatedSortValue = (booking) => toMillis(booking?.created
 
 export const sortInvoiceImportBookings = (bookings = []) => (
   [...bookings].sort((a, b) => {
-    const createdDiff = getBookingCreatedSortValue(b) - getBookingCreatedSortValue(a);
-    if (createdDiff !== 0) return createdDiff;
-
     const dateDiff = localDateMillis(b?.startDate) - localDateMillis(a?.startDate);
     if (dateDiff !== 0) return dateDiff;
+
+    const createdDiff = getBookingCreatedSortValue(b) - getBookingCreatedSortValue(a);
+    if (createdDiff !== 0) return createdDiff;
 
     const clientDiff = String(a?.clientName || '').localeCompare(String(b?.clientName || ''));
     if (clientDiff !== 0) return clientDiff;
