@@ -317,6 +317,13 @@ export default function InvoiceRecordsView() {
                               {li.subtitle && <div style={{ fontSize: '10px', color: '#999', fontStyle: 'italic' }}>{li.subtitle}</div>}
                               {li.note && <div style={{ fontSize: '9.5px', color: '#bbb', marginTop: '2px' }}>{li.note}</div>}
                               {hasDisc && li.discountLabel && <div style={{ fontSize: '9px', color: '#d06060', fontStyle: 'italic', fontWeight: 600 }}>{li.discountLabel}</div>}
+                              {/* Render sub-items inline inside the td */}
+                              {isErrand && li.items && li.items.length > 0 && li.items.map((sub, j) => (
+                                <React.Fragment key={j}>
+                                  <div style={{ fontSize: '10px', color: '#999', fontStyle: 'italic' }}>• {sub.title}</div>
+                                  {sub.note && <div style={{ fontSize: '9.5px', color: '#bbb', marginTop: '2px', paddingLeft: '10px' }}>{sub.note}</div>}
+                                </React.Fragment>
+                              ))}
                             </td>
                             <td style={{ padding: '10px 8px', textAlign: 'center', fontWeight: 700 }}>{!isErrand && li.days}</td>
                             <td style={{ padding: '10px 8px', textAlign: 'right', whiteSpace: 'nowrap' }}>
@@ -332,19 +339,6 @@ export default function InvoiceRecordsView() {
                               <span>₱{isErrand ? Number(li.amount || final).toFixed(0) : final.toFixed(0)}</span>
                             </td>
                           </tr>
-                          {isErrand && li.items && li.items.length > 0 && li.items.map((sub, j) => (
-                            <tr key={j} style={{ background: '#F5F882', opacity: 0.9 }}>
-                              <td style={{ padding: '4px 8px 4px 32px', verticalAlign: 'top' }}>
-                                <div style={{ fontSize: '10px', color: '#999', fontStyle: 'italic' }}>• {sub.title}</div>
-                                {sub.note && <div style={{ fontSize: '9.5px', color: '#bbb', marginTop: '2px', paddingLeft: '10px' }}>{sub.note}</div>}
-                              </td>
-                              <td></td>
-                              <td></td>
-                              <td style={{ padding: '4px 8px', textAlign: 'right', fontSize: '10px', color: '#555' }}>
-                                {Number(sub.amount) > 0 ? `₱${Number(sub.amount).toFixed(0)}` : ''}
-                              </td>
-                            </tr>
-                          ))}
                         </React.Fragment>
                       );
                     })}

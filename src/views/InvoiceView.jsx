@@ -14,9 +14,13 @@ import { fmtGcash, todayLocalStr, fmtDate } from '../utils/dates';
 
 // ── Struck: renders a strikethrough that html-to-image can capture ───────────
 const Struck = ({ children, style }) => (
-  <span style={{ position: 'relative', display: 'inline-block', color: '#aaa', fontSize: '10px', ...style }}>
+  <span style={{ position: 'relative', display: 'inline-block', color: '#888', fontSize: '10px', ...style }}>
     {children}
-    <span style={{ position: 'absolute', top: '50%', left: 0, right: 0, borderTop: '1px solid currentColor', opacity: 0.7 }} />
+    <span style={{
+      position: 'absolute', left: '0px', right: '0px', top: '50%',
+      height: '1.5px', background: '#888', display: 'block',
+      transform: 'translateY(-50%)',
+    }} />
   </span>
 );
 
@@ -282,8 +286,8 @@ export default function InvoiceView() {
     // Apply generation overrides directly to DOM
     el.style.cssText = `
       display: block !important;
-      width: 500px !important;
-      max-width: 500px !important;
+      width: 640px !important;
+      max-width: 640px !important;
       min-height: 520px !important;
       padding: 28px 14px !important;
       box-sizing: border-box !important;
@@ -993,8 +997,8 @@ export default function InvoiceView() {
                           {/* Inline sub-items for errands — no separate rows */}
                           {isErrand && li.items && li.items.map((sub, i) => (
                             <React.Fragment key={i}>
-                              <div className="inv-svc-sub">{sub.title}</div>
-                              {sub.note && <div className="inv-day-note">{sub.note}</div>}
+                              <div className="inv-svc-sub">• {sub.title}</div>
+                              {sub.note && <div className="inv-day-note" style={{ paddingLeft: '10px' }}>{sub.note}</div>}
                             </React.Fragment>
                           ))}
                         </td>
@@ -1006,8 +1010,8 @@ export default function InvoiceView() {
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                               {hasDisc && Number.isInteger(c.displayRate) ? (
                                 <div style={{ whiteSpace: 'nowrap' }}>
-                                  <Struck>{c.rate}</Struck>
-                                  <span> {c.displayRate.toFixed(0)}</span>
+                                  <Struck style={{ marginRight: '4px' }}>{c.rate}</Struck>
+                                  <span>{c.displayRate.toFixed(0)}</span>
                                 </div>
                               ) : (
                                 <span>{c.rate}</span>
@@ -1020,8 +1024,8 @@ export default function InvoiceView() {
                           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                             {hasDisc && !isErrand ? (
                               <div style={{ whiteSpace: 'nowrap' }}>
-                                <Struck>{c.baseAmount}</Struck>
-                                <span className="inv-final-amt"> {c.finalAmount.toFixed(0)}</span>
+                                <Struck style={{ marginRight: '4px' }}>{c.baseAmount}</Struck>
+                                <span className="inv-final-amt">{c.finalAmount.toFixed(0)}</span>
                               </div>
                             ) : (
                               <span className="inv-final-amt">{c.finalAmount.toFixed(0)}</span>
@@ -1051,7 +1055,7 @@ export default function InvoiceView() {
             <div className="inv-summary-boxes">
               {Number(data.tip) > 0 && (
                 <div className="inv-tip-row">
-                  <span>🎉 Tip</span>
+                  <span>💝 Tip</span>
                   <span>₱{data.tip}</span>
                 </div>
               )}

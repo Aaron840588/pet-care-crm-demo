@@ -39,7 +39,7 @@ export const calcDayTotal = (day) => Math.max(0, calcDaySubtotal(day) - calcDayD
 
 // ── Invoice line item calculation ─────────────────────────────────────────────
 export const calcLine = (item) => {
-  if (item.isErrand) {
+  if (item.isErrand || String(item.customName || '').toLowerCase().includes('errand')) {
     const amt = Number(item.amount || 0);
     return { rate: '', baseAmount: amt, discountAmount: 0, finalAmount: amt, displayRate: '' };
   }
