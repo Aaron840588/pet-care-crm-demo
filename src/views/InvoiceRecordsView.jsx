@@ -5,6 +5,19 @@ import NumericInput from '../components/NumericInput';
 import { useToast } from '../components/Toast';
 import { CheckCircle, CircleDollarSign, Pencil, X, Check } from 'lucide-react';
 import { dateSortValue, fmtDate, getDateParts } from '../utils/dates';
+import { calcLine } from '../utils/calculations';
+
+// ⭐ Struck: renders a strikethrough that html-to-image can capture
+const Struck = ({ children, style }) => (
+  <span style={{ position: 'relative', display: 'inline-block', color: '#888', fontSize: '10px', ...style }}>
+    {children}
+    <span style={{
+      position: 'absolute', left: '0px', right: '0px', top: '50%',
+      height: '1.5px', background: '#888', display: 'block',
+      transform: 'translateY(-50%)',
+    }} />
+  </span>
+);
 
 const toMoneyValue = (value) => Math.max(0, Number.parseInt(String(value ?? '0'), 10) || 0);
 
@@ -299,16 +312,20 @@ export default function InvoiceRecordsView() {
                   </thead>
                   <tbody>
                     {editingInvoice.lineItems.map((li, i) => {
-                      const rate = Number(li.customRate || 0);
-                      const days = Math.max(1, Number(li.days) || 1);
-                      const base = rate * days;
-                      const discVal = Number(li.discountValue || 0);
-                      let discAmt = 0;
-                      if (li.discountMode === 'total_flat') discAmt = Math.min(discVal, base);
-                      if (li.discountMode === 'rate_flat') discAmt = Math.min(discVal * days, base);
-                      const final = Math.max(0, base - discAmt);
-                      const hasDisc = discAmt > 0;
-                      const isErrand = li.isErrand || String(li.customName).toLowerCase().includes('errand');
+                      const c = calcLine(li);
+                      const hasDisc = c.discountAmount > 0;
+                      const isErrand = li.isErrand || String(li.customName || '').toLowerCase().includes('errand');
+                      const autoDiscLabel = (() => {
+                        if (!hasDisc) return '';
+                        const val = li.discountValue || 0;
+                        const mode = li.discountMode || '';
+                        if (mode === 'total_flat')    return `₱${c.discountAmount.toFixed(0)} Off`;
+                        if (mode === 'total_percent') return `${val}% Off`;
+                        if (mode === 'rate_flat')     return `₱${val}/day Off`;
+                        if (mode === 'rate_percent')  return `${val}% Rate Off`;
+                        return 'Discount';
+                      })();
+                      const discLabel = li.discountLabel?.trim() || autoDiscLabel;
                       return (
                         <React.Fragment key={li.id || i}>
                           <tr style={{ borderBottom: '1px solid #f2f2f0', background: isErrand ? '#F5F882' : 'transparent' }}>
@@ -316,7 +333,6 @@ export default function InvoiceRecordsView() {
                               <div style={{ fontWeight: 600, color: '#111' }}>{li.customName || '—'}</div>
                               {li.subtitle && <div style={{ fontSize: '10px', color: '#999', fontStyle: 'italic' }}>{li.subtitle}</div>}
                               {li.note && <div style={{ fontSize: '9.5px', color: '#bbb', marginTop: '2px' }}>{li.note}</div>}
-                              {hasDisc && li.discountLabel && <div style={{ fontSize: '9px', color: '#d06060', fontStyle: 'italic', fontWeight: 600 }}>{li.discountLabel}</div>}
                               {/* Render sub-items inline inside the td */}
                               {isErrand && li.items && li.items.length > 0 && li.items.map((sub, j) => (
                                 <React.Fragment key={j}>
@@ -328,15 +344,30 @@ export default function InvoiceRecordsView() {
                             <td style={{ padding: '10px 8px', textAlign: 'center', fontWeight: 700 }}>{!isErrand && li.days}</td>
                             <td style={{ padding: '10px 8px', textAlign: 'right', whiteSpace: 'nowrap' }}>
                               {!isErrand && (
-                                <>
-                                  {hasDisc && <span style={{ color: '#bbb', textDecoration: 'line-through', fontSize: '10px', marginRight: '3px' }}>{rate}</span>}
-                                  <span>{li.discountMode === 'rate_flat' ? Math.max(0, rate - discVal) : rate}</span>
-                                </>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                  {hasDisc && Number.isInteger(c.displayRate) ? (
+                                    <div style={{ whiteSpace: 'nowrap' }}>
+                                      <Struck style={{ marginRight: '4px' }}>{c.rate}</Struck>
+                                      <span>{c.displayRate.toFixed(0)}</span>
+                                    </div>
+                                  ) : (
+                                    <span>{c.rate}</span>
+                                  )}
+                                  {hasDisc && <span style={{ fontSize: '9px', color: '#d06060', fontStyle: 'italic', fontWeight: 600, marginTop: '3px', display: 'block' }}>{discLabel}</span>}
+                                </div>
                               )}
                             </td>
                             <td style={{ padding: '10px 8px', textAlign: 'right', whiteSpace: 'nowrap', fontWeight: 700 }}>
-                              {hasDisc && !isErrand && <span style={{ color: '#bbb', textDecoration: 'line-through', fontSize: '10px', marginRight: '3px' }}>{base}</span>}
-                              <span>₱{isErrand ? Number(li.amount || final).toFixed(0) : final.toFixed(0)}</span>
+                              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                                {hasDisc && !isErrand ? (
+                                  <div style={{ whiteSpace: 'nowrap' }}>
+                                    <Struck style={{ marginRight: '4px' }}>{c.baseAmount}</Struck>
+                                    <span>{c.finalAmount.toFixed(0)}</span>
+                                  </div>
+                                ) : (
+                                  <span>{c.finalAmount.toFixed(0)}</span>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         </React.Fragment>
@@ -347,15 +378,14 @@ export default function InvoiceRecordsView() {
                 <div style={{ textAlign: 'right', marginTop: '10px', paddingTop: '8px', borderTop: '1.5px solid #ddd' }}>
                   {(() => {
                     const fullTotal = editingInvoice.lineItems.reduce((s, li) => {
-                      const r = Number(li.customRate || 0);
-                      const d = Math.max(1, Number(li.days) || 1);
-                      return s + r * d;
+                      const c = calcLine(li);
+                      return s + c.baseAmount;
                     }, 0);
                     const grandTotal = Number(editingInvoice.total || 0);
                     return (
                       <span style={{ fontSize: '14px', fontWeight: 800 }}>
                         {fullTotal > grandTotal && (
-                          <span style={{ color: '#bbb', textDecoration: 'line-through', marginRight: '8px', fontSize: '12px' }}>₱{fullTotal.toFixed(0)}</span>
+                          <Struck style={{ marginRight: '8px', fontSize: '12px', fontWeight: 700 }}>₱{fullTotal.toFixed(0)}</Struck>
                         )}
                         Total: ₱{grandTotal.toFixed(0)}
                       </span>

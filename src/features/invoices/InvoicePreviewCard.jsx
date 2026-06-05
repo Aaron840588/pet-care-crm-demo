@@ -46,7 +46,7 @@ export default function InvoicePreviewCard({ invoiceRef, data, lineItems, lineCa
               const c        = lineCalcs[idx];
               if (!c) return null;
               const hasDisc  = c.discountAmount > 0;
-              const isErrand = li.isErrand || String(li.customName).toLowerCase().includes('errand');
+              const isErrand = li.isErrand || String(li.customName || '').toLowerCase().includes('errand');
 
               const autoDiscLabel = (() => {
                 if (!hasDisc) return '';

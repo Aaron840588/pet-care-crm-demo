@@ -100,6 +100,11 @@ export default function ErrandsView() {
     }));
   };
 
+  const getErrandTime = (e) => {
+    if (e?.createdAt?.toMillis) return e.createdAt.toMillis();
+    return 0;
+  };
+
   const addItemRow = () => {
     setForm(f => ({
       ...f,
@@ -107,8 +112,8 @@ export default function ErrandsView() {
     }));
   };
 
-  const pending = errands.filter(e => e.status !== 'done').sort((a, b) => b.createdAt?.toMillis?.() - a.createdAt?.toMillis?.());
-  const completed = errands.filter(e => e.status === 'done').sort((a, b) => b.createdAt?.toMillis?.() - a.createdAt?.toMillis?.());
+  const pending = errands.filter(e => e.status !== 'done').sort((a, b) => getErrandTime(b) - getErrandTime(a));
+  const completed = errands.filter(e => e.status === 'done').sort((a, b) => getErrandTime(b) - getErrandTime(a));
   const displayErrands = activeTab === 'pending' ? pending : completed;
 
   return (
@@ -205,13 +210,13 @@ export default function ErrandsView() {
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       <input 
-                        type="text" placeholder="Item (e.g. Cat Food)" value={item.title}
+                        type="text" placeholder="Item (e.g. Cat Food)" value={item.title || ''}
                         onChange={e => updateItem(item.id, 'title', e.target.value)}
                         style={{ flex: '1 1 140px', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '14px', minWidth: '120px' }}
                       />
                       <div style={{ display: 'flex', gap: '8px', flex: '1 0 auto' }}>
                         <input 
-                          type="number" placeholder="Cost (₱)" value={item.amount}
+                          type="number" placeholder="Cost (₱)" value={item.amount ?? ''}
                           onChange={e => updateItem(item.id, 'amount', e.target.value)}
                           style={{ flex: 1, maxWidth: '120px', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '14px' }}
                         />
@@ -224,7 +229,7 @@ export default function ErrandsView() {
                     </div>
                     <div>
                       <input 
-                        type="text" placeholder="Any notes? (e.g. Make sure it's chicken flavor)" value={item.note}
+                        type="text" placeholder="Any notes? (e.g. Make sure it's chicken flavor)" value={item.note || ''}
                         onChange={e => updateItem(item.id, 'note', e.target.value)}
                         style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid transparent', background: '#f5f5f5', fontSize: '13px', color: '#555' }}
                       />

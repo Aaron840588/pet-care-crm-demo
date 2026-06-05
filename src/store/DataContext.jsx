@@ -25,6 +25,21 @@ export const initialServices = [
   { id: '4', name: 'Twice-a-day Play & Visit', price: 450, defaultSub: 'up to 2 pets' },
 ];
 
+const sanitizeServices = (servicesArray) => {
+  if (!Array.isArray(servicesArray)) return initialServices;
+  const sanitized = servicesArray.map((s, idx) => {
+    if (!s || typeof s !== 'object') return null;
+    const price = Math.max(0, Number(s.price) || 0);
+    return {
+      id: s.id ? String(s.id) : `imported-service-${idx}-${Date.now()}`,
+      name: s.name ? String(s.name).trim() : 'Unnamed Service',
+      price: isNaN(price) ? 0 : price,
+      defaultSub: s.defaultSub ? String(s.defaultSub).trim() : '',
+    };
+  }).filter(Boolean);
+  return sanitized.length > 0 ? sanitized : initialServices;
+};
+
 const COLLECTION_KEYS = ['bookings', 'clients', 'invoices', 'reminders', 'errands', 'ownPets', 'donations'];
 const BATCH_MAX = 450;
 
@@ -199,7 +214,7 @@ export function DataProvider({ children }) {
   const [errands, setErrands] = useState([]);
   const [ownPets, setOwnPets] = useState([]);
   const [donations, setDonations] = useState([]);
-  const [services, setServicesState] = useState(() => loadLocal('kats_services', initialServices));
+  const [services, setServicesState] = useState(() => sanitizeServices(loadLocal('kats_services', initialServices)));
   const [loading, setLoading] = useState(true);
   const [syncStatus, setSyncStatus] = useState('connecting');
 
@@ -369,9 +384,10 @@ export function DataProvider({ children }) {
     const { id: _id, ...data } = errand;
     await addDoc(collection(db, 'errands'), { ...data, createdAt: serverTimestamp() });
   };
-  const updateErrand = async (id, data) => {
-    if (isDemo) return _update(setErrands)(id, data);
-    await updateDoc(doc(db, 'errands', id), data);
+  const updateErrand = async (id, updates) => {
+    if (isDemo) return _update(setErrands)(id, updates);
+    const { id: _id, createdAt: _createdAt, ...safeData } = updates;
+    await updateDoc(doc(db, 'errands', id), safeData);
   };
   const deleteErrand = async (id) => {
     if (isDemo) return _remove(setErrands)(id);
@@ -478,7 +494,7 @@ export function DataProvider({ children }) {
       await commitDeletes(colName, existingByCollection[colName]);
       await commitImports(colName, Array.isArray(data[colName]) ? data[colName] : []);
     }
-    if (Array.isArray(data.services)) setServicesState(data.services);
+    if (Array.isArray(data.services)) setServicesState(sanitizeServices(data.services));
   };
 
   return (

@@ -296,13 +296,13 @@ export default function ReportCardView() {
           {(!selectedClient?.pets?.length) && (
             <div className="fg" style={{ marginBottom: '12px' }}>
               <label>Pet Name</label>
-              <input value={form.petNames} onChange={e => fld('petNames', e.target.value)} placeholder="e.g. Coco" />
+              <input value={form.petNames || ''} onChange={e => fld('petNames', e.target.value)} placeholder="e.g. Coco" />
             </div>
           )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-            <div className="fg"><label>Visit Date</label><input type="text" value={form.visitDate} onChange={e => fld('visitDate', e.target.value)} placeholder="e.g. April 12-14" /></div>
-            <div className="fg"><label>Sitter Name</label><input value={form.sitterName} onChange={e => fld('sitterName', e.target.value)} /></div>
+            <div className="fg"><label>Visit Date</label><input type="text" value={form.visitDate || ''} onChange={e => fld('visitDate', e.target.value)} placeholder="e.g. April 12-14" /></div>
+            <div className="fg"><label>Sitter Name</label><input value={form.sitterName || ''} onChange={e => fld('sitterName', e.target.value)} /></div>
           </div>
 
           {/* Photos */}
@@ -358,7 +358,7 @@ export default function ReportCardView() {
           {/* Notable Observations */}
           <div className="fg" style={{ marginBottom: '14px' }}>
             <label>📝 Notable Observations</label>
-            <textarea value={form.observations} onChange={e => fld('observations', e.target.value)}
+            <textarea value={form.observations || ''} onChange={e => fld('observations', e.target.value)}
               placeholder={`e.g. "Kept scratching right ear intermittently"`} rows={2}
               style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #ddd', borderRadius: '8px', fontSize: '13px', resize: 'vertical', fontFamily: 'var(--font-body)', boxSizing: 'border-box' }} />
           </div>
@@ -404,7 +404,7 @@ export default function ReportCardView() {
           {/* Personal Message */}
           <div className="fg">
             <label>Personal Message to Owner</label>
-            <textarea value={form.message} onChange={e => fld('message', e.target.value)}
+            <textarea value={form.message || ''} onChange={e => fld('message', e.target.value)}
               placeholder="e.g. All good today, nothing concerning ♡" rows={2}
               style={{ width: '100%', padding: '10px 12px', border: '1.5px solid #ddd', borderRadius: '8px', fontSize: '13px', resize: 'vertical', fontFamily: 'var(--font-body)', boxSizing: 'border-box' }} />
           </div>
