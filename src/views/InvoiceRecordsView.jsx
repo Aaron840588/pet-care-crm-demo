@@ -292,16 +292,18 @@ export default function InvoiceRecordsView() {
 
       {editingInvoice && (
         <div className="overlay open" onClick={cancelEdit}>
-          <div className="modal" style={{ maxWidth: '600px', borderRadius: '20px', maxHeight: '90dvh', overflowY: 'auto' }} onClick={(event) => event.stopPropagation()}>
-            <div className="modal-title" style={{ marginBottom: '10px' }}>
+          <div className="modal" style={{ maxWidth: '600px', borderRadius: '20px', maxHeight: '90dvh', display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }} onClick={(event) => event.stopPropagation()}>
+            <div className="modal-title" style={{ margin: 0, padding: '24px 24px 12px', flexShrink: 0, borderBottom: '1px solid #f0f0f0' }}>
               Edit Invoice Record
             </div>
 
-            {/* ── Full Invoice Preview (if lineItems were saved) ── */}
-            {editingInvoice.lineItems?.length > 0 && (
-              <div style={{ background: '#fafafa', border: '1px solid #eee', borderRadius: '12px', padding: '14px', marginBottom: '18px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#999', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: '10px' }}>Invoice Preview</div>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+            <div className="modal-content-scroller" style={{ flex: 1, overflowY: 'auto', padding: '20px 24px' }}>
+              {/* ── Full Invoice Preview (if lineItems were saved) ── */}
+              {editingInvoice.lineItems?.length > 0 && (
+                <div style={{ background: '#fafafa', border: '1px solid #eee', borderRadius: '12px', padding: '14px', marginBottom: '18px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#999', textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: '10px' }}>Invoice Preview</div>
+                  <div style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', minWidth: '400px' }}>
                   <thead>
                     <tr style={{ background: '#f5f5f3' }}>
                       <td style={{ padding: '7px 8px', fontWeight: 700, color: '#666', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '1px', borderBottom: '1.5px solid #ddd' }}>Service</td>
@@ -375,6 +377,7 @@ export default function InvoiceRecordsView() {
                     })}
                   </tbody>
                 </table>
+              </div>
                 <div style={{ textAlign: 'right', marginTop: '10px', paddingTop: '8px', borderTop: '1.5px solid #ddd' }}>
                   {(() => {
                     const fullTotal = editingInvoice.lineItems.reduce((s, li) => {
@@ -475,7 +478,9 @@ export default function InvoiceRecordsView() {
               </div>
             </div>
 
-            <div className="modal-actions">
+            </div>
+
+            <div className="modal-actions modal-action-footer" style={{ flexShrink: 0, padding: '16px 24px', borderTop: '1px solid #eee', marginTop: 0 }}>
               <button type="button" className="btn btn-ghost" onClick={cancelEdit}>
                 <X size={14} /> Cancel
               </button>

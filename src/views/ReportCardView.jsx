@@ -169,7 +169,8 @@ export default function ReportCardView() {
     const origOuter = el.style.cssText;
     const origCard = whiteCard ? whiteCard.style.cssText : '';
     el.style.cssText = `
-      display: block !important; width: 640px !important; max-width: 640px !important;
+      display: block !important; position: absolute !important; left: -9999px !important; top: 0 !important;
+      width: 640px !important; max-width: 640px !important;
       min-height: 520px !important; padding: 22px 18px !important; box-sizing: border-box !important;
       background-color: #d4e84a; background-size: cover !important;
       background-position: center !important; background-repeat: no-repeat !important;

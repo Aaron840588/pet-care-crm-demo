@@ -17,6 +17,7 @@ import { useData } from '../store/DataContext';
 import { useToast } from '../components/Toast';
 import { todayLocalStr } from '../utils/dates';
 import { getOwnPetCareStatus, parseGcashDonationText } from '../utils/ownPetLogic';
+import NumericInput from '../components/NumericInput';
 
 const emptyPetForm = {
   name: '',
@@ -401,7 +402,7 @@ export default function OwnPetsView() {
               </div>
               <div className="fg">
                 <label>Amount *</label>
-                <input type="number" min="0" value={donationForm.amount} onChange={e => setDonation({ amount: e.target.value })} placeholder="0" />
+                <NumericInput min={0} value={donationForm.amount} onValueChange={val => setDonation({ amount: val })} placeholder="0" />
               </div>
             </div>
             <div className="form-row">

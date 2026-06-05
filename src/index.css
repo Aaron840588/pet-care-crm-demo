@@ -44,6 +44,7 @@ body {
   /* Prevent pull-to-refresh rubber band on iOS */
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
 }
 
 /* ── SCROLLBARS (Opera & Chrome on Windows) ────────────────────────────── */
@@ -53,7 +54,7 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: #b0b0b0; }
 
 #root { width: 100%; min-height: 100vh; min-height: 100dvh; }
-.app-container { display: flex; width: 100%; min-height: 100vh; min-height: 100dvh; }
+.app-container { display: flex; width: 100%; min-height: 100vh; min-height: 100dvh; overflow-x: hidden; }
 
 /* ── SIDEBAR (desktop) ─────────────────────────────────────────────────────── */
 .sidebar {

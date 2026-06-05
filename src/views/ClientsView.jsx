@@ -277,136 +277,138 @@ export default function ClientsView() {
 
       {modalOpen && (
         <div className="overlay open">
-          <div className="modal">
-            <div className="modal-title">{editingId ? 'Edit Client' : 'Add Client'}</div>
-            <form onSubmit={handleSave}>
-              <div className="fg"><label>Client Name *</label><input required type="text" value={formData.name} onChange={e=>setFormData({...formData, name: e.target.value})} placeholder="e.g. Kuya Paolo" /></div>
-              <div className="form-row">
-                <div className="fg"><label>Contact Number</label><input type="text" value={formData.contact} onChange={e=>setFormData({...formData, contact: e.target.value})} /></div>
-                <div className="fg"><label>Address / Location</label><input type="text" value={formData.address} onChange={e=>setFormData({...formData, address: e.target.value})} /></div>
-              </div>
-
-              {/* ── PET ADDER SECTION ── */}
-              <div className="fg">
-                <label>Pets</label>
-                {/* Added pets list */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px', minHeight: '10px' }}>
-                  {formData.pets.map((p, idx) => {
-                    const petName = typeof p === 'string' ? p : p.name;
-                    const petType = typeof p === 'string' ? 'paw' : p.icon;
-                    const pColor = typeof p === 'string' ? '#888' : p.color;
-                    return (
-                      <div key={idx} style={{ background: `${pColor}15`, border: `1.5px solid ${pColor}50`, borderRadius: '20px', padding: '4px 12px 4px 8px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                        {getPetSvg(petType, pColor, 22)}
-                        <span style={{ fontWeight: 700, fontSize: '12px', color: pColor }}>{petName}</span>
-                        <button
-                          type="button"
-                          onClick={() => removePet(idx)}
-                          style={{ cursor: 'pointer', color: '#aaa', fontWeight: 'bold', fontSize: '14px', lineHeight: 1, marginLeft: '2px', background: 'none', border: 'none', padding: 0 }}
-                          aria-label={`Remove ${petName}`}
-                        >
-                          ×
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Pet builder row */}
-                <div style={{ background: '#fafafa', borderRadius: '10px', padding: '12px', border: '1px solid #eee' }}>
-                  {/* Type selector */}
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
-                    {[
-                      { id: 'cat',    label: 'Cat',    Svg: CatSvg,    c: '#d4823a' },
-                      { id: 'dog',    label: 'Dog',    Svg: DogSvg,    c: '#c89648' },
-                      { id: 'rabbit', label: 'Rabbit', Svg: RabbitSvg, c: '#d4c09a' },
-                      { id: 'bird',   label: 'Bird',   Svg: BirdSvg,   c: '#58b0e0' },
-                    ].map(t => (
-                      <button type="button" key={t.id}
-                        onClick={() => handlePetTypeChange(t.id)}
-                        style={{
-                          display: 'flex', alignItems: 'center', gap: '5px',
-                          padding: '6px 12px', borderRadius: '20px', border: `2px solid ${petIcon === t.id ? petColor : '#ddd'}`,
-                          background: petIcon === t.id ? `${petColor}15` : '#fff',
-                          cursor: 'pointer', fontWeight: 600, fontSize: '12px', transition: 'all .15s'
-                        }}>
-                        <t.Svg color={petIcon === t.id ? petColor : '#aaa'} size={20} />
-                        {t.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Color presets */}
-                  {colorPresets && (
-                    <div style={{ marginBottom: '10px' }}>
-                      <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#888', marginBottom: '6px' }}>
-                        Common {petIcon === 'cat' ? 'Cat' : 'Dog'} Colors 🇵🇭
-                      </div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                        {colorPresets.map(cp => (
-                          <button type="button" key={`${cp.label}-${cp.color}`} onClick={() => setPetColor(cp.color)}
-                            aria-label={`Choose ${cp.label} pet color`}
-                            title={cp.label}
-                            style={{
-                              width: '28px', height: '28px', borderRadius: '50%',
-                              background: cp.color,
-                              border: petColor === cp.color ? '3px solid #333' : cp.border ? '2px solid #ccc' : '2px solid transparent',
-                              cursor: 'pointer', transition: 'transform .1s, border .1s',
-                              transform: petColor === cp.color ? 'scale(1.2)' : 'scale(1)',
-                              boxShadow: '0 1px 4px rgba(0,0,0,0.15)'
-                            }}
-                          />
-                        ))}
-                        {/* Manual color picker */}
-                        <label title="Custom color" style={{ width: '28px', height: '28px', borderRadius: '50%', border: '2px dashed #bbb', overflow: 'hidden', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
-                          ✏️
-                          <input type="color" value={petColor} onChange={e => setPetColor(e.target.value)} style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }} />
-                        </label>
-                      </div>
-
-                      {/* Color name preview */}
-                      <div style={{ fontSize: '11px', color: '#666', marginTop: '5px' }}>
-                        Selected: <strong style={{color: petColor}}>{colorPresets.find(c => c.color === petColor)?.label || 'Custom Color'}</strong>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Preview + Name input */}
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <div style={{ background: `${petColor}20`, borderRadius: '8px', padding: '6px', flexShrink: 0, border: `1px solid ${petColor}50` }}>
-                      {getPetSvg(petIcon, petColor, 32)}
-                    </div>
-                    <input type="text" value={petInput} onChange={e => setPetInput(e.target.value)}
-                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddPetObj(); }}}
-                      placeholder={`${petIcon === 'cat' ? 'e.g. Luna, Mochi' : petIcon === 'dog' ? 'e.g. Bruno, Coco' : 'Pet name...'}`}
-                      style={{ flex: 1, margin: 0 }}
-                    />
-                    <button type="button" className="btn btn-sm btn-lime" onClick={handleAddPetObj}>Add</button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="fg"><label>Special Instructions / Notes</label>
-                 <textarea value={formData.notes} onChange={e=>setFormData({...formData, notes: e.target.value})} placeholder="Feeding schedule, medicine, quirks..."></textarea>
-              </div>
-
-              <div style={{ background: 'var(--lime-pale)', borderRadius: '10px', padding: '14px', marginBottom: '14px' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', color: '#555', marginBottom: '10px' }}>🔑 Key Information</div>
+          <div className="modal" style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="modal-title" style={{ flexShrink: 0 }}>{editingId ? 'Edit Client' : 'Add Client'}</div>
+            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+              <div className="modal-content-scroller" style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+                <div className="fg"><label>Client Name *</label><input required type="text" value={formData.name} onChange={e=>setFormData({...formData, name: e.target.value})} placeholder="e.g. Kuya Paolo" /></div>
                 <div className="form-row">
-                  <div className="fg"><label>Key Status</label>
-                    <select value={formData.keyStatus} onChange={e=>setFormData({...formData, keyStatus: e.target.value})}>
-                      <option value="none">No key needed</option>
-                      <option value="pending">Pending — not yet received</option>
-                      <option value="received">Received ✓</option>
-                      <option value="returned">Returned to owner</option>
-                    </select>
-                  </div>
-                  <div className="fg"><label>Date Received</label><input type="date" value={formData.keyDate} onChange={e=>setFormData({...formData, keyDate: e.target.value})} /></div>
+                  <div className="fg"><label>Contact Number</label><input type="text" value={formData.contact} onChange={e=>setFormData({...formData, contact: e.target.value})} /></div>
+                  <div className="fg"><label>Address / Location</label><input type="text" value={formData.address} onChange={e=>setFormData({...formData, address: e.target.value})} /></div>
                 </div>
-                <div className="fg" style={{margin:0}}><label>Key Notes</label><input type="text" value={formData.keyNotes} onChange={e=>setFormData({...formData, keyNotes: e.target.value})} placeholder="e.g. Black key for Unit 4B" /></div>
+
+                {/* ── PET ADDER SECTION ── */}
+                <div className="fg">
+                  <label>Pets</label>
+                  {/* Added pets list */}
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '10px', minHeight: '10px' }}>
+                    {formData.pets.map((p, idx) => {
+                      const petName = typeof p === 'string' ? p : p.name;
+                      const petType = typeof p === 'string' ? 'paw' : p.icon;
+                      const pColor = typeof p === 'string' ? '#888' : p.color;
+                      return (
+                        <div key={idx} style={{ background: `${pColor}15`, border: `1.5px solid ${pColor}50`, borderRadius: '20px', padding: '4px 12px 4px 8px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                          {getPetSvg(petType, pColor, 22)}
+                          <span style={{ fontWeight: 700, fontSize: '12px', color: pColor }}>{petName}</span>
+                          <button
+                            type="button"
+                            onClick={() => removePet(idx)}
+                            style={{ cursor: 'pointer', color: '#aaa', fontWeight: 'bold', fontSize: '14px', lineHeight: 1, marginLeft: '2px', background: 'none', border: 'none', padding: 0 }}
+                            aria-label={`Remove ${petName}`}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Pet builder row */}
+                  <div style={{ background: '#fafafa', borderRadius: '10px', padding: '12px', border: '1px solid #eee' }}>
+                    {/* Type selector */}
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
+                      {[
+                        { id: 'cat',    label: 'Cat',    Svg: CatSvg,    c: '#d4823a' },
+                        { id: 'dog',    label: 'Dog',    Svg: DogSvg,    c: '#c89648' },
+                        { id: 'rabbit', label: 'Rabbit', Svg: RabbitSvg, c: '#d4c09a' },
+                        { id: 'bird',   label: 'Bird',   Svg: BirdSvg,   c: '#58b0e0' },
+                      ].map(t => (
+                        <button type="button" key={t.id}
+                          onClick={() => handlePetTypeChange(t.id)}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: '5px',
+                            padding: '6px 12px', borderRadius: '20px', border: `2px solid ${petIcon === t.id ? petColor : '#ddd'}`,
+                            background: petIcon === t.id ? `${petColor}15` : '#fff',
+                            cursor: 'pointer', fontWeight: 600, fontSize: '12px', transition: 'all .15s'
+                          }}>
+                          <t.Svg color={petIcon === t.id ? petColor : '#aaa'} size={20} />
+                          {t.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Color presets */}
+                    {colorPresets && (
+                      <div style={{ marginBottom: '10px' }}>
+                        <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.06em', color: '#888', marginBottom: '6px' }}>
+                          Common {petIcon === 'cat' ? 'Cat' : 'Dog'} Colors 🇵🇭
+                        </div>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                          {colorPresets.map(cp => (
+                            <button type="button" key={`${cp.label}-${cp.color}`} onClick={() => setPetColor(cp.color)}
+                              aria-label={`Choose ${cp.label} pet color`}
+                              title={cp.label}
+                              style={{
+                                width: '28px', height: '28px', borderRadius: '50%',
+                                background: cp.color,
+                                border: petColor === cp.color ? '3px solid #333' : cp.border ? '2px solid #ccc' : '2px solid transparent',
+                                cursor: 'pointer', transition: 'transform .1s, border .1s',
+                                transform: petColor === cp.color ? 'scale(1.2)' : 'scale(1)',
+                                boxShadow: '0 1px 4px rgba(0,0,0,0.15)'
+                              }}
+                            />
+                          ))}
+                          {/* Manual color picker */}
+                          <label title="Custom color" style={{ width: '28px', height: '28px', borderRadius: '50%', border: '2px dashed #bbb', overflow: 'hidden', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
+                            ✏️
+                            <input type="color" value={petColor} onChange={e => setPetColor(e.target.value)} style={{ opacity: 0, width: 0, height: 0, position: 'absolute' }} />
+                          </label>
+                        </div>
+
+                        {/* Color name preview */}
+                        <div style={{ fontSize: '11px', color: '#666', marginTop: '5px' }}>
+                          Selected: <strong style={{color: petColor}}>{colorPresets.find(c => c.color === petColor)?.label || 'Custom Color'}</strong>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Preview + Name input */}
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <div style={{ background: `${petColor}20`, borderRadius: '8px', padding: '6px', flexShrink: 0, border: `1px solid ${petColor}50` }}>
+                        {getPetSvg(petIcon, petColor, 32)}
+                      </div>
+                      <input type="text" value={petInput} onChange={e => setPetInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleAddPetObj(); }}}
+                        placeholder={`${petIcon === 'cat' ? 'e.g. Luna, Mochi' : petIcon === 'dog' ? 'e.g. Bruno, Coco' : 'Pet name...'}`}
+                        style={{ flex: 1, margin: 0 }}
+                      />
+                      <button type="button" className="btn btn-sm btn-lime" onClick={handleAddPetObj}>Add</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="fg"><label>Special Instructions / Notes</label>
+                   <textarea value={formData.notes} onChange={e=>setFormData({...formData, notes: e.target.value})} placeholder="Feeding schedule, medicine, quirks..."></textarea>
+                </div>
+
+                <div style={{ background: 'var(--lime-pale)', borderRadius: '10px', padding: '14px', marginBottom: '14px' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', color: '#555', marginBottom: '10px' }}>🔑 Key Information</div>
+                  <div className="form-row">
+                    <div className="fg"><label>Key Status</label>
+                      <select value={formData.keyStatus} onChange={e=>setFormData({...formData, keyStatus: e.target.value})}>
+                        <option value="none">No key needed</option>
+                        <option value="pending">Pending — not yet received</option>
+                        <option value="received">Received ✓</option>
+                        <option value="returned">Returned to owner</option>
+                      </select>
+                    </div>
+                    <div className="fg"><label>Date Received</label><input type="date" value={formData.keyDate} onChange={e=>setFormData({...formData, keyDate: e.target.value})} /></div>
+                  </div>
+                  <div className="fg" style={{margin:0}}><label>Key Notes</label><input type="text" value={formData.keyNotes} onChange={e=>setFormData({...formData, keyNotes: e.target.value})} placeholder="e.g. Black key for Unit 4B" /></div>
+                </div>
               </div>
 
-              <div className="modal-actions">
+              <div className="modal-actions modal-action-footer" style={{ flexShrink: 0, padding: '16px', borderTop: '1px solid #eee' }}>
                 <button type="button" className="btn btn-ghost" onClick={() => setModalOpen(false)}>Cancel</button>
                 <button type="submit" className="btn btn-lime">Save Client</button>
               </div>

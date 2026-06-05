@@ -286,6 +286,9 @@ export default function InvoiceView() {
     // Apply generation overrides directly to DOM
     el.style.cssText = `
       display: block !important;
+      position: absolute !important;
+      left: -9999px !important;
+      top: 0 !important;
       width: 640px !important;
       max-width: 640px !important;
       min-height: 520px !important;

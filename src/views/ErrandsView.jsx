@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useData } from '../store/DataContext';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { CheckCircle2, Circle, Plus, Trash2, CheckSquare, Edit, X } from 'lucide-react';
+import NumericInput from '../components/NumericInput';
 
 export default function ErrandsView() {
   const { errands, clients, addErrand, updateErrand, deleteErrand } = useData();
@@ -215,10 +216,10 @@ export default function ErrandsView() {
                         style={{ flex: '1 1 140px', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '14px', minWidth: '120px' }}
                       />
                       <div style={{ display: 'flex', gap: '8px', flex: '1 0 auto' }}>
-                        <input 
-                          type="number" placeholder="Cost (₱)" value={item.amount ?? ''}
-                          onChange={e => updateItem(item.id, 'amount', e.target.value)}
-                          style={{ flex: 1, maxWidth: '120px', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '14px' }}
+                        <NumericInput 
+                          placeholder="Cost (₱)" value={item.amount ?? ''}
+                          onValueChange={val => updateItem(item.id, 'amount', val)}
+                          inputStyle={{ flex: 1, maxWidth: '120px', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '14px' }}
                         />
                         {form.items.length > 1 && (
                           <button type="button" aria-label={`Remove item ${i + 1}`} onClick={() => removeItem(item.id)} style={{ background: '#fff0f0', border: 'none', color: '#fca5a5', cursor: 'pointer', padding: '0 14px', borderRadius: '8px', display: 'flex', alignItems: 'center' }}>

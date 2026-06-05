@@ -611,8 +611,8 @@ export default function ScheduleView() {
       {/* ── ADD / EDIT MODAL ── */}
       {modalOpen && (
         <div className="overlay open">
-          <div className="modal" style={{ maxWidth: '680px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
+          <div className="modal" style={{ maxWidth: '680px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px', flexShrink: 0 }}>
               <div className="modal-title" style={{ margin: 0 }}>
                 {editingId ? 'Edit Booking' : 'Add Booking'}
               </div>
@@ -626,7 +626,8 @@ export default function ScheduleView() {
               </button>
             </div>
 
-            <form onSubmit={handleSave}>
+            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+              <div className="modal-content-scroller" style={{ flex: 1, overflowY: 'auto', paddingRight: '4px' }}>
               {/* Client + Status */}
               <div className="form-row">
                 <div className="fg">
@@ -1012,7 +1013,8 @@ export default function ScheduleView() {
               )}
 
               {/* M3: sticky footer actions so Save is always visible */}
-              <div className="modal-actions">
+              </div>
+              <div className="modal-actions modal-action-footer" style={{ flexShrink: 0, padding: '16px', borderTop: '1px solid #eee' }}>
                 <button type="button" className="btn btn-ghost" onClick={() => setModalOpen(false)}>
                   Cancel
                 </button>

@@ -3,6 +3,7 @@ import { useData } from '../store/DataContext';
 import { useToast } from '../components/Toast';
 import { KeyRound, ReceiptText, CalendarCheck2, Users, TrendingUp, Plus, Check, Trash2, ChevronLeft, ChevronRight, X, CheckCircle2 } from 'lucide-react';
 import { fmtDate, dateSortValue } from '../utils/dates';
+import NumericInput from '../components/NumericInput';
 import { bookingHasVisitOnDate } from '../utils/scheduleLogic';
 
 const getLocalTodayStr = () => {
@@ -846,13 +847,12 @@ export default function DashboardView({ setActiveTab }) {
               {/* Amount input */}
               <div className="fg" style={{ marginBottom: '6px' }}>
                 <label>Amount Received (₱)</label>
-                <input
-                  type="number"
-                  min="1"
+                <NumericInput
+                  min={1}
                   value={paymentAmount}
-                  onChange={e => setPaymentAmount(e.target.value)}
+                  onValueChange={val => setPaymentAmount(val)}
                   placeholder={`e.g. ${balance}`}
-                  style={{ fontSize: '20px', fontWeight: 700 }}
+                  inputStyle={{ fontSize: '20px', fontWeight: 700 }}
                   autoFocus
                 />
               </div>
