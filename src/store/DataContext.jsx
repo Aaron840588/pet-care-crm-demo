@@ -25,7 +25,7 @@ export const initialServices = [
   { id: '4', name: 'Twice-a-day Play & Visit', price: 450, defaultSub: 'up to 2 pets' },
 ];
 
-const COLLECTION_KEYS = ['bookings', 'clients', 'invoices', 'reminders', 'errands'];
+const COLLECTION_KEYS = ['bookings', 'clients', 'invoices', 'reminders', 'errands', 'ownPets', 'donations'];
 const BATCH_MAX = 450;
 
 const loadLocal = (key, fallbackValue) => {
@@ -154,6 +154,41 @@ const demoInvoices = [
     createdAt: { toDate: () => new Date(), toMillis: () => Date.now() },
   },
 ];
+
+const demoOwnPets = [
+  {
+    id: 'op1',
+    name: 'Rosemarie Rescue Cat',
+    type: 'Cat',
+    sex: 'Female',
+    birthday: '',
+    color: 'Tortoiseshell',
+    isSick: true,
+    sickStartedAt: '2026-05-28',
+    sicknessNotes: 'Under observation. Appetite and meds need tracking.',
+    vaccinesUpdated: false,
+    lastVaccineDate: '',
+    nextVaccineDate: '2026-06-20',
+    vaccineNotes: 'Confirm schedule once vet clears her.',
+    notes: 'Donation-supported care.',
+  },
+];
+
+const demoDonations = [
+  {
+    id: 'd1',
+    petId: 'op1',
+    donorName: 'Juan Dela Cruz',
+    amount: 1250,
+    rawDate: 'June 5, 2026 10:42 AM',
+    referenceNumber: '123456789012',
+    channel: 'GCash',
+    notes: 'OCR demo record',
+    rawText: 'You received PHP 1,250.00 from JUAN DELA CRUZ Ref No. 1234 5678 9012 June 5, 2026 10:42 AM',
+    screenshotName: 'gcash-demo.png',
+    dateRecorded: todayLocalStr(),
+  },
+];
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function DataProvider({ children }) {
@@ -162,6 +197,8 @@ export function DataProvider({ children }) {
   const [invoices, setInvoices] = useState([]);
   const [reminders, setReminders] = useState([]);
   const [errands, setErrands] = useState([]);
+  const [ownPets, setOwnPets] = useState([]);
+  const [donations, setDonations] = useState([]);
   const [services, setServicesState] = useState(() => loadLocal('kats_services', initialServices));
   const [loading, setLoading] = useState(true);
   const [syncStatus, setSyncStatus] = useState('connecting');
@@ -176,6 +213,8 @@ export function DataProvider({ children }) {
       setInvoices(demoInvoices);
       setReminders([{ id: 'r1', text: 'Give Buster his meds', done: false }]);
       setErrands([{ id: 'e1', title: 'Buy cat food', amount: 500, clientId: 'c2', isBilled: false, date: todayLocalStr() }]);
+      setOwnPets(demoOwnPets);
+      setDonations(demoDonations);
       setLoading(false);
       setSyncStatus('online');
       return;
@@ -221,6 +260,8 @@ export function DataProvider({ children }) {
     const unsubInvoices = onSnapshot(query(collection(db, 'invoices'), orderBy('createdAt', 'desc'), limit(300)), handleSnapshot('invoices', setInvoices), handleError('invoices'));
     const unsubReminders = onSnapshot(collection(db, 'reminders'), handleSnapshot('reminders', setReminders), handleError('reminders'));
     const unsubErrands = onSnapshot(collection(db, 'errands'), handleSnapshot('errands', setErrands), handleError('errands'));
+    const unsubOwnPets = onSnapshot(query(collection(db, 'ownPets'), orderBy('createdAt', 'desc'), limit(300)), handleSnapshot('ownPets', setOwnPets), handleError('ownPets'));
+    const unsubDonations = onSnapshot(query(collection(db, 'donations'), orderBy('createdAt', 'desc'), limit(500)), handleSnapshot('donations', setDonations), handleError('donations'));
 
     const handleOnline = () => {
       const allResolved = COLLECTION_KEYS.every((name) => listenerStateRef.current[name] !== 'pending');
@@ -239,6 +280,8 @@ export function DataProvider({ children }) {
       unsubInvoices();
       unsubReminders();
       unsubErrands();
+      unsubOwnPets();
+      unsubDonations();
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
@@ -335,6 +378,36 @@ export function DataProvider({ children }) {
     await deleteDoc(doc(db, 'errands', id));
   };
 
+  const addOwnPet = async (pet) => {
+    if (isDemo) return _add(setOwnPets)(pet);
+    const { id: _id, ...data } = pet;
+    await addDoc(collection(db, 'ownPets'), { ...data, createdAt: serverTimestamp() });
+  };
+  const updateOwnPet = async (id, updates) => {
+    if (isDemo) return _update(setOwnPets)(id, updates);
+    const { id: _id, createdAt: _createdAt, ...safeData } = updates;
+    await updateDoc(doc(db, 'ownPets', id), safeData);
+  };
+  const removeOwnPet = async (id) => {
+    if (isDemo) return _remove(setOwnPets)(id);
+    await deleteDoc(doc(db, 'ownPets', id));
+  };
+
+  const addDonation = async (donation) => {
+    if (isDemo) return _add(setDonations)(donation);
+    const { id: _id, ...data } = donation;
+    await addDoc(collection(db, 'donations'), { ...data, createdAt: serverTimestamp() });
+  };
+  const updateDonation = async (id, updates) => {
+    if (isDemo) return _update(setDonations)(id, updates);
+    const { id: _id, createdAt: _createdAt, ...safeData } = updates;
+    await updateDoc(doc(db, 'donations', id), safeData);
+  };
+  const removeDonation = async (id) => {
+    if (isDemo) return _remove(setDonations)(id);
+    await deleteDoc(doc(db, 'donations', id));
+  };
+
   const exportData = () => {
     const data = {
       bookings,
@@ -343,6 +416,8 @@ export function DataProvider({ children }) {
       invoices,
       reminders,
       errands,
+      ownPets,
+      donations,
       exportedAt: new Date().toISOString(),
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -398,7 +473,7 @@ export function DataProvider({ children }) {
       throw new Error('Import is disabled in Demo Sandbox Mode.');
     }
     const data = JSON.parse(jsonData);
-    const existingByCollection = { bookings, clients, invoices, reminders, errands };
+    const existingByCollection = { bookings, clients, invoices, reminders, errands, ownPets, donations };
     for (const colName of COLLECTION_KEYS) {
       await commitDeletes(colName, existingByCollection[colName]);
       await commitImports(colName, Array.isArray(data[colName]) ? data[colName] : []);
@@ -413,6 +488,8 @@ export function DataProvider({ children }) {
       invoices, addInvoice, updateInvoice, removeInvoice,
       reminders, addReminder, toggleReminder, removeReminder,
       errands, addErrand, updateErrand, deleteErrand,
+      ownPets, addOwnPet, updateOwnPet, removeOwnPet,
+      donations, addDonation, updateDonation, removeDonation,
       services, setServices: setServicesState,
       exportData, importData,
       loading, syncStatus,

@@ -11,7 +11,19 @@ import {
   DISC_MODES, calcDaySubtotal, calcDayDiscount, calcDayTotal, applyDiscount,
   emptyDiscount, defaultBookingForm,
 } from '../utils/calculations';
-import { getServiceLabel, makeDay, normalizeDay, getDayDiscountTotal, hasPerDayDiscounts } from '../utils/scheduleLogic';
+import {
+  addVisitDateToSchedule,
+  buildVisitScheduleFromRange,
+  getServiceLabel,
+  getVisitDateBounds,
+  hasSkippedVisitDates,
+  makeDay,
+  normalizeDay,
+  removeVisitDateFromSchedule,
+  sortVisitSchedule,
+  getDayDiscountTotal,
+  hasPerDayDiscounts,
+} from '../utils/scheduleLogic';
 
 const STATUS_FILTERS = ['all', 'active', 'pending', 'tentative', 'done'];
 const STATUS_LABELS = {
@@ -37,6 +49,7 @@ export default function ScheduleView() {
   const [filter,      setFilter]      = useState('active');
   const [viewBooking, setViewBooking] = useState(null);
   const [daySchedule, setDaySchedule] = useState([]);
+  const [visitDateToAdd, setVisitDateToAdd] = useState('');
   // U4: default collapsed — show only count summary for long bookings
   const [showDays,    setShowDays]    = useState(false);
   const [confirmId,   setConfirmId]   = useState(null); // M4: inline confirm
@@ -51,11 +64,18 @@ export default function ScheduleView() {
 
   // ── B1+B2: Date change — uses local-safe generateDateRange, decouple from formData ──
   const buildDaySchedule = useCallback((start, end, prevSchedule = []) => {
-    const dates = generateDateRange(start, end);
-    if (!dates.length) return [];
-    const defSvc = services[0] ? `${services[0].name}|${services[0].price}` : '';
-    return dates.map(d => normalizeDay(prevSchedule.find(p => p.date === d) || makeDay(d, defSvc)));
-  }, [services]);
+    return buildVisitScheduleFromRange(start, end, prevSchedule, getDefaultService());
+  }, [getDefaultService]);
+
+  const syncDaySchedule = useCallback((nextSchedule) => {
+    const sorted = sortVisitSchedule(nextSchedule);
+    const bounds = getVisitDateBounds(sorted);
+    setDaySchedule(sorted);
+    if (bounds.startDate && bounds.endDate) {
+      setFormData(f => ({ ...f, startDate: bounds.startDate, endDate: bounds.endDate }));
+    }
+    return sorted;
+  }, []);
 
   const handleStartDateChange = useCallback((value) => {
     setFormData(f => {
@@ -73,6 +93,25 @@ export default function ScheduleView() {
       return { ...f, endDate: value };
     });
   }, [buildDaySchedule, daySchedule]);
+
+  const handleAddVisitDate = useCallback(() => {
+    if (!visitDateToAdd) return;
+    const nextSchedule = addVisitDateToSchedule(
+      daySchedule,
+      visitDateToAdd,
+      getDefaultService(),
+      formData.timeText,
+    );
+    syncDaySchedule(nextSchedule);
+    setVisitDateToAdd('');
+    setShowDays(true);
+  }, [daySchedule, formData.timeText, getDefaultService, syncDaySchedule, visitDateToAdd]);
+
+  const handleRemoveVisitDate = useCallback((date) => {
+    const nextSchedule = removeVisitDateFromSchedule(daySchedule, date);
+    if (!nextSchedule.length) return;
+    syncDaySchedule(nextSchedule);
+  }, [daySchedule, syncDaySchedule]);
 
   const set = useCallback((patch) => setFormData(f => ({ ...f, ...patch })), []);
 
@@ -123,6 +162,7 @@ export default function ScheduleView() {
   const openAdd = useCallback(() => {
     setFormData({ ...defaultBookingForm });
     setDaySchedule([]);
+    setVisitDateToAdd('');
     setShowDays(false);
     setEditingId(null);
     setModalOpen(true);
@@ -150,6 +190,7 @@ export default function ScheduleView() {
       const legacyTime = booking.timeText || '';
       setDaySchedule(dates.map(d => normalizeDay({ ...makeDay(d, baseService, legacyTime), extraPets })));
     }
+    setVisitDateToAdd('');
     setShowDays(false);
     setEditingId(booking.id);
     setModalOpen(true);
@@ -175,6 +216,7 @@ export default function ScheduleView() {
       const legacyTime = booking.timeText || '';
       setDaySchedule(dates.map(d => normalizeDay({ ...makeDay(d, baseService, legacyTime), extraPets })));
     }
+    setVisitDateToAdd('');
     setShowDays(false);
     setEditingId(null);
     setModalOpen(true);
@@ -183,13 +225,16 @@ export default function ScheduleView() {
   // ── Save booking ─────────────────────────────────────────────────────────────
   const handleSave = useCallback(async (e) => {
     e.preventDefault();
-    if (!formData.clientId || !formData.startDate || !formData.endDate) return;
+    const normalizedSchedule = sortVisitSchedule(daySchedule);
+    const scheduleBounds = getVisitDateBounds(normalizedSchedule);
+    const startDate = scheduleBounds.startDate || formData.startDate;
+    const endDate = scheduleBounds.endDate || formData.endDate;
+    if (!formData.clientId || !startDate || !endDate) return;
     setSaving(true);
     try {
       const client     = clients.find(c => c.id === formData.clientId);
       const clientName = client?.name || 'Unknown';
-      const numDays    = daySchedule.length || generateDateRange(formData.startDate, formData.endDate).length || 1;
-      const normalizedSchedule = daySchedule.map(normalizeDay);
+      const numDays    = normalizedSchedule.length || generateDateRange(startDate, endDate).length || 1;
       const gross      = normalizedSchedule.reduce((s, d) => s + calcDaySubtotal(d), 0);
       const totalFromDays = normalizedSchedule.reduce((s, d) => s + calcDayTotal(d), 0);
       const usePerDayDiscounts = hasPerDayDiscounts(normalizedSchedule);
@@ -204,6 +249,8 @@ export default function ScheduleView() {
 
       const payload = {
         ...formData,
+        startDate,
+        endDate,
         clientName,
         days:     numDays,
         total:    Math.round(total * 100) / 100,
@@ -257,6 +304,18 @@ export default function ScheduleView() {
     const current = formData.timeText ? formData.timeText.trim() + ', ' : '';
     set({ timeText: current + text });
   };
+
+  const getBookingDateLabel = useCallback((booking) => {
+    const schedule = booking.daySchedule?.length > 0 ? sortVisitSchedule(booking.daySchedule) : [];
+    if (schedule.length > 0 && hasSkippedVisitDates(schedule)) {
+      const labels = schedule.slice(0, 3).map((day) => fmtDate(day.date)).join(', ');
+      return schedule.length > 3 ? `${labels} +${schedule.length - 3} more` : labels;
+    }
+    if (!booking.startDate || !booking.endDate) return 'No dates';
+    return booking.startDate === booking.endDate
+      ? fmtDate(booking.startDate)
+      : `${fmtDate(booking.startDate)} to ${fmtDate(booking.endDate)}`;
+  }, []);
 
   // P2: memoize filtered + sorted bookings
   const filteredBookings = useMemo(() =>
@@ -352,6 +411,11 @@ export default function ScheduleView() {
                 <div className="schedule-card-summary">
                   <div>
                     <div className="schedule-card-label">Dates</div>
+                    {hasSkippedVisitDates(b.daySchedule || []) && (
+                      <div className="schedule-card-value" style={{ color: 'var(--gray)', fontSize: '11px', marginBottom: '2px' }}>
+                        Selected: {getBookingDateLabel(b)}
+                      </div>
+                    )}
                     <div className="schedule-card-value">{fmtDate(b.startDate)} → {fmtDate(b.endDate)}</div>
                   </div>
                   <div>
@@ -469,6 +533,14 @@ export default function ScheduleView() {
                           )}
                         </td>
                         <td style={{ fontSize: '12px', lineHeight: 1.5 }}>
+                          {hasSkippedVisitDates(b.daySchedule || []) && (
+                            <>
+                              <span style={{ color: 'var(--gray)', fontSize: '11px', fontWeight: 600 }}>
+                                Selected: {getBookingDateLabel(b)}
+                              </span>
+                              <br />
+                            </>
+                          )}
                           <span style={{ fontWeight: 600 }}>{fmtDate(b.startDate)}</span>
                           <br /><span style={{ color: 'var(--gray)' }}>to</span><br />
                           <span style={{ fontWeight: 600 }}>{fmtDate(b.endDate)}</span>
@@ -615,6 +687,28 @@ export default function ScheduleView() {
                     {showDays ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </div>
 
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '10px 12px', background: '#fffef8', borderTop: '1px solid #eee8aa', flexWrap: 'wrap' }}>
+                    <label htmlFor="visit-date-to-add" style={{ fontSize: '11px', fontWeight: 700, color: '#555', margin: 0, whiteSpace: 'nowrap' }}>
+                      Add Visit Date
+                    </label>
+                    <input
+                      id="visit-date-to-add"
+                      type="date"
+                      value={visitDateToAdd}
+                      onChange={e => setVisitDateToAdd(e.target.value)}
+                      style={{ flex: 1, minWidth: '150px', padding: '7px 9px', fontSize: '13px', borderRadius: '8px', border: '1px solid #ddd' }}
+                    />
+                    <button
+                      type="button"
+                      className="btn btn-xs btn-ghost"
+                      disabled={!visitDateToAdd}
+                      onClick={handleAddVisitDate}
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      <CalendarPlus size={12} /> Add Date
+                    </button>
+                  </div>
+
                   {showDays && (
                     <div style={{ padding: '10px 12px', background: '#fffef8' }}>
                       {/* Apply-to-all: Service */}
@@ -655,8 +749,20 @@ export default function ScheduleView() {
                       <div style={{ maxHeight: '340px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         {daySchedule.map((day, idx) => (
                           <div key={day.date} style={{ background: '#fff', borderRadius: '8px', border: '1px solid #eee', padding: '8px 10px' }}>
-                            <div style={{ fontWeight: 700, fontSize: '11px', color: 'var(--gray)', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '.04em' }}>
-                              {fmtDayLabel(day.date)}
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '6px' }}>
+                              <div style={{ fontWeight: 700, fontSize: '11px', color: 'var(--gray)', textTransform: 'uppercase', letterSpacing: '.04em' }}>
+                                {fmtDayLabel(day.date)}
+                              </div>
+                              {daySchedule.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveVisitDate(day.date)}
+                                  title="Remove this visit date"
+                                  style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '3px 6px', fontSize: '10px', borderRadius: '14px', border: '1px solid #f5cece', background: '#fff0f0', color: 'var(--red)', cursor: 'pointer', fontFamily: 'var(--font-body)', fontWeight: 700, flexShrink: 0 }}
+                                >
+                                  <X size={11} /> Remove
+                                </button>
+                              )}
                             </div>
 
                             {/* Service selector — full width */}

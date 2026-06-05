@@ -32,5 +32,15 @@ service cloud.firestore {
     match /errands/{document=**} {
       allow read, write: if isAuth(); 
     }
+
+    // Own pets collection
+    match /ownPets/{document=**} {
+      allow read, write: if isAuth();
+    }
+
+    // Donations collection
+    match /donations/{document=**} {
+      allow read, write: if isAuth();
+    }
   }
 }

@@ -13,6 +13,7 @@ const LoginView          = lazy(() => import('./views/LoginView'));
 const DashboardView      = lazy(() => import('./views/DashboardView'));
 const ClientsView        = lazy(() => import('./views/ClientsView'));
 const ScheduleView       = lazy(() => import('./views/ScheduleView'));
+const OwnPetsView        = lazy(() => import('./views/OwnPetsView'));
 const KeysView           = lazy(() => import('./views/KeysView'));
 const InvoiceView        = lazy(() => import('./views/InvoiceView'));
 const InvoiceRecordsView = lazy(() => import('./views/InvoiceRecordsView'));
@@ -63,6 +64,7 @@ function AppContent({ onLogout }) {
       case 'dashboard':   return <DashboardView setActiveTab={setActiveTab} />;
       case 'clients':     return <ClientsView />;
       case 'schedule':    return <ScheduleView />;
+      case 'own-pets':    return <OwnPetsView />;
       case 'keys':        return <KeysView />;
       case 'invoices':    return <InvoiceView />;
       case 'records':     return <InvoiceRecordsView />;

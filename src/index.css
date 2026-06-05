@@ -566,6 +566,48 @@ tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
   margin-top: 12px;
 }
 
+.own-pets-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.own-pets-column {
+  min-width: 0;
+}
+
+.own-pet-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.own-pet-card {
+  margin-bottom: 0;
+}
+
+.own-pet-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+  padding: 12px;
+  background: #fafaf8;
+  border: 1px solid #ececdf;
+  border-radius: 12px;
+}
+
+.own-donation-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  background: #fafaf8;
+  border: 1px solid #ececdf;
+  border-radius: 12px;
+}
+
 @supports (content-visibility: auto) {
   .schedule-mobile-card,
   .inv-records-mobile .card,
@@ -725,6 +767,24 @@ tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
 
   .schedule-desktop-table {
     display: none;
+  }
+
+  .own-pets-layout {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .own-pets-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .own-pet-card-grid,
+  .own-pet-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .own-donation-row {
+    align-items: flex-start;
   }
 
   /* Android Keyboard Safety: Prevent fixed bottom nav from jumping above keyboard */

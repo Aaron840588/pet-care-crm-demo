@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   LayoutDashboard, Users, CalendarDays, KeyRound,
-  FileTerminal, FolderClosed, Settings, TrendingUp, LogOut, ClipboardList
+  FileTerminal, FolderClosed, Settings, TrendingUp, LogOut, ClipboardList, PawPrint
 } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setMobileOpen, onLogout }) {
@@ -12,6 +12,7 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setMobi
     { id: 'clients',  label: 'Clients',           icon: Users },
     { id: 'errands',  label: 'Errands & Pabili',  icon: ClipboardList },
     { id: 'schedule', label: 'Schedule',          icon: CalendarDays },
+    { id: 'own-pets', label: 'Own Pets',          icon: PawPrint },
     { id: 'keys',     label: 'Key Tracker',       icon: KeyRound },
     { section: 'Billing' },
     { id: 'invoices', label: 'Invoice Builder',   icon: FileTerminal },

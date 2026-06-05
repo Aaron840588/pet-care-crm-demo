@@ -3,6 +3,7 @@ import { useData } from '../store/DataContext';
 import { useToast } from '../components/Toast';
 import { KeyRound, ReceiptText, CalendarCheck2, Users, TrendingUp, Plus, Check, Trash2, ChevronLeft, ChevronRight, X, CheckCircle2 } from 'lucide-react';
 import { fmtDate, dateSortValue } from '../utils/dates';
+import { bookingHasVisitOnDate } from '../utils/scheduleLogic';
 
 const getLocalTodayStr = () => {
   const now = new Date();
@@ -39,23 +40,14 @@ function MiniCalendar({ bookings }) {
   // All dates in the current view month that have bookings
   const bookedDates = useMemo(() => {
     const set = new Set();
-    bookings.forEach(b => {
-      if (b.status === 'done') return;
-      // iterate from startDate to endDate
-      if (!b.startDate || !b.endDate) return;
-      const [sy, sm, sd] = b.startDate.split('-').map(Number);
-      const [ey, em, ed] = b.endDate.split('-').map(Number);
-      const start = new Date(sy, sm - 1, sd);
-      const end   = new Date(ey, em - 1, ed);
-      const cur   = new Date(start);
-      while (cur <= end) {
-        const y = cur.getFullYear();
-        const m = cur.getMonth();
-        const d = cur.getDate();
-        if (y === viewYear && m === viewMonth) {
-          set.add(d);
+    const daysInViewMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    bookings.forEach((booking) => {
+      if (booking.status === 'done') return;
+      for (let day = 1; day <= daysInViewMonth; day += 1) {
+        const date = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        if (bookingHasVisitOnDate(booking, date)) {
+          set.add(day);
         }
-        cur.setDate(cur.getDate() + 1);
       }
     });
     return set;
@@ -166,7 +158,7 @@ export default function DashboardView({ setActiveTab }) {
   const [paymentAmount, setPaymentAmount] = useState('');
 
   const todaysSchedule = useMemo(() =>
-    bookings.filter(b => b.startDate <= todayStr && b.endDate >= todayStr && b.status !== 'done'),
+    bookings.filter(b => bookingHasVisitOnDate(b, todayStr) && b.status !== 'done'),
     [bookings, todayStr]
   );
 

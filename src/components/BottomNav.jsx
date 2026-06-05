@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Users, CalendarDays, TrendingUp,
   KeyRound, FileTerminal, FolderClosed, Settings,
-  MoreHorizontal, X, ClipboardList, ShoppingCart
+  MoreHorizontal, X, ClipboardList, ShoppingCart, PawPrint
 } from 'lucide-react';
 
 // Primary 4 tabs always visible
@@ -16,6 +16,7 @@ const primary = [
 // "More" drawer contents
 const more = [
   { id: 'errands',     label: 'Errands & Pabili',   Icon: ShoppingCart },
+  { id: 'own-pets',    label: 'Own Pets',           Icon: PawPrint },
   { id: 'keys',        label: 'Key Tracker',        Icon: KeyRound },
   { id: 'invoices',    label: 'Invoice Builder',    Icon: FileTerminal },
   { id: 'records',     label: 'Invoice Records',    Icon: FolderClosed },
