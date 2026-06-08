@@ -272,19 +272,16 @@ export default function InvoiceView() {
   };
 
   // Helper: apply generation styles directly to DOM, render, then restore
-  const renderInvoicePng = useCallback(async () => {
-    const el = invoiceRef.current;
-    if (!el) return null;
-
-    const whiteCard = el.querySelector('.inv-white-card');
+  const buildInvoiceCaptureNode = useCallback(async (sourceEl) => {
     const bgDataUrl = await fetchBgBase64();
+    const captureEl = sourceEl.cloneNode(true);
+    const whiteCard = captureEl.querySelector('.inv-white-card');
 
-    // Save original styles
-    const origOuter = el.style.cssText;
-    const origCard = whiteCard ? whiteCard.style.cssText : '';
-
-    // Apply generation overrides directly to DOM
-    el.style.cssText = `
+    captureEl.setAttribute('aria-hidden', 'true');
+    captureEl.style.cssText = `
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
       display: block !important;
       position: absolute !important;
       left: -9999px !important;
@@ -294,41 +291,67 @@ export default function InvoiceView() {
       min-height: 520px !important;
       padding: 28px 14px !important;
       box-sizing: border-box !important;
-      background-color: #eef0d8;
+      background-color: #eef0d8 !important;
       background-size: cover !important;
       background-position: center !important;
       background-repeat: no-repeat !important;
       border-radius: 0 !important;
       margin: 0 !important;
       overflow: visible !important;
+      pointer-events: none !important;
+      z-index: -9999 !important;
+      opacity: 0.99 !important;
     `;
-    // Set background-image separately — base64 data URLs contain semicolons
-    // that break CSS parsing when embedded in cssText
-    el.style.backgroundImage = bgDataUrl ? `url(${bgDataUrl})` : 'none';
+    captureEl.style.backgroundImage = bgDataUrl ? `url(${bgDataUrl})` : 'none';
 
     if (whiteCard) {
       whiteCard.style.cssText = `
-        background: #fff;
-        border-radius: 16px;
+        background: #fff !important;
+        border-radius: 16px !important;
         width: 100% !important;
         max-width: 100% !important;
-        padding: 36px 28px 32px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+        padding: 36px 28px 32px !important;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.10) !important;
         box-sizing: border-box !important;
         margin: 0 !important;
         flex: none !important;
       `;
     }
 
+    document.body.appendChild(captureEl);
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    if (document.fonts?.ready) {
+      try {
+        await document.fonts.ready;
+      } catch {
+        // Best effort; html-to-image can still render with fallback fonts.
+      }
+    }
+    return captureEl;
+  }, []);
+
+  const renderInvoicePng = useCallback(async () => {
+    const el = invoiceRef.current;
+    if (!el) return null;
+
+    const captureEl = await buildInvoiceCaptureNode(el);
+
+    // Set background-image separately — base64 data URLs contain semicolons
+    // that break CSS parsing when embedded in cssText
     try {
-      const dataUrl = await toPng(el, { pixelRatio: 2, backgroundColor: '#eef0d8' });
+      const dataUrl = await toPng(captureEl, {
+        pixelRatio: 2,
+        backgroundColor: '#eef0d8',
+        cacheBust: true,
+        width: 640,
+        height: Math.ceil(captureEl.scrollHeight),
+      });
       return dataUrl;
     } finally {
-      // Restore original styles
-      el.style.cssText = origOuter;
-      if (whiteCard) whiteCard.style.cssText = origCard;
+      captureEl.remove();
     }
-  }, []);
+  }, [buildInvoiceCaptureNode]);
 
   // Download using html-to-image (pixel-perfect replication)
   const handleDownload = useCallback(async () => {

@@ -161,34 +161,80 @@ export default function ReportCardView() {
     } catch { return ''; }
   };
 
+  const buildReportCaptureNode = useCallback(async (sourceEl) => {
+    const bgDataUrl = await fetchBgBase64();
+    const captureEl = sourceEl.cloneNode(true);
+    const whiteCard = captureEl.querySelector('.rc-white-card');
+
+    captureEl.setAttribute('aria-hidden', 'true');
+    captureEl.style.cssText = `
+      position: absolute !important;
+      left: 0 !important;
+      top: 0 !important;
+      display: block !important;
+      width: 640px !important;
+      max-width: 640px !important;
+      min-height: 520px !important;
+      padding: 22px 18px !important;
+      box-sizing: border-box !important;
+      background-color: #d4e84a !important;
+      background-size: cover !important;
+      background-position: center !important;
+      background-repeat: no-repeat !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
+      overflow: visible !important;
+      pointer-events: none !important;
+      z-index: -9999 !important;
+      opacity: 0.99 !important;
+    `;
+    captureEl.style.backgroundImage = bgDataUrl ? `url(${bgDataUrl})` : 'none';
+
+    if (whiteCard) {
+      whiteCard.style.cssText = `
+        background: #fffef8 !important;
+        border-radius: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 28px 24px 24px !important;
+        box-shadow: 0 6px 30px rgba(0,0,0,0.18) !important;
+        box-sizing: border-box !important;
+        margin: 0 !important;
+      `;
+    }
+
+    document.body.appendChild(captureEl);
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    if (document.fonts?.ready) {
+      try {
+        await document.fonts.ready;
+      } catch {
+        // Best effort
+      }
+    }
+    return captureEl;
+  }, []);
+
   const renderReportPng = useCallback(async () => {
     const el = cardRef.current;
     if (!el) return null;
-    const whiteCard = el.querySelector('.rc-white-card');
-    const bgDataUrl = await fetchBgBase64();
-    const origOuter = el.style.cssText;
-    const origCard = whiteCard ? whiteCard.style.cssText : '';
-    el.style.cssText = `
-      display: block !important; position: absolute !important; left: -9999px !important; top: 0 !important;
-      width: 640px !important; max-width: 640px !important;
-      min-height: 520px !important; padding: 22px 18px !important; box-sizing: border-box !important;
-      background-color: #d4e84a; background-size: cover !important;
-      background-position: center !important; background-repeat: no-repeat !important;
-      border-radius: 0 !important; margin: 0 !important; overflow: visible !important;
-    `;
-    el.style.backgroundImage = bgDataUrl ? `url(${bgDataUrl})` : 'none';
-    if (whiteCard) whiteCard.style.cssText = `
-      background: #fffef8; border-radius: 12px; width: 100% !important; max-width: 100% !important;
-      padding: 28px 24px 24px; box-shadow: 0 6px 30px rgba(0,0,0,0.18);
-      box-sizing: border-box !important; margin: 0 !important;
-    `;
+
+    const captureEl = await buildReportCaptureNode(el);
+
     try {
-      return await toPng(el, { pixelRatio: 2, backgroundColor: '#d4e84a' });
+      const dataUrl = await toPng(captureEl, {
+        pixelRatio: 2,
+        backgroundColor: '#d4e84a',
+        cacheBust: true,
+        width: 640,
+        height: Math.ceil(captureEl.scrollHeight),
+      });
+      return dataUrl;
     } finally {
-      el.style.cssText = origOuter;
-      if (whiteCard) whiteCard.style.cssText = origCard;
+      captureEl.remove();
     }
-  }, []);
+  }, [buildReportCaptureNode]);
 
   const handleDownload = useCallback(async () => {
     setDownloading(true);

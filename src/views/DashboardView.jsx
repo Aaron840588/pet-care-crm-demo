@@ -1,10 +1,11 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useRef, useState, useMemo } from 'react';
 import { useData } from '../store/DataContext';
 import { useToast } from '../components/Toast';
 import { KeyRound, ReceiptText, CalendarCheck2, Users, TrendingUp, Plus, Check, Trash2, ChevronLeft, ChevronRight, X, CheckCircle2 } from 'lucide-react';
 import { fmtDate, dateSortValue } from '../utils/dates';
 import NumericInput from '../components/NumericInput';
 import { bookingHasVisitOnDate } from '../utils/scheduleLogic';
+import { getInvoiceBalance, getUnpaidInvoices, getUnpaidInvoiceTotal } from '../utils/dashboardLogic';
 
 const getLocalTodayStr = () => {
   const now = new Date();
@@ -142,6 +143,7 @@ function MiniCalendar({ bookings }) {
 export default function DashboardView({ setActiveTab }) {
   const { bookings, clients, invoices, reminders, errands, addReminder, toggleReminder, removeReminder, updateInvoice, updateBooking, updateErrand } = useData();
   const toast = useToast();
+  const unpaidInvoicesRef = useRef(null);
   const [newReminder, setNewReminder]       = useState('');
   const [markingDone, setMarkingDone]       = useState(null);
 
@@ -149,8 +151,8 @@ export default function DashboardView({ setActiveTab }) {
 
   const totalClients   = clients.length;
   const upcomingCount  = useMemo(() => bookings.filter(b => b.status === 'pending').length, [bookings]);
-  const unpaidInvoices = useMemo(() => invoices.filter(i => (i.total - i.paid) > 0), [invoices]);
-  const unpaidBalance  = useMemo(() => unpaidInvoices.reduce((sum, i) => sum + (i.total - i.paid), 0), [unpaidInvoices]);
+  const unpaidInvoices = useMemo(() => getUnpaidInvoices(invoices), [invoices]);
+  const unpaidBalance  = useMemo(() => getUnpaidInvoiceTotal(invoices), [invoices]);
   const keysPending    = useMemo(() => clients.filter(c => c.keyStatus === 'pending'), [clients]);
   const pendingErrands = useMemo(() => errands.filter(e => e.status === 'pending'), [errands]);
 
@@ -229,7 +231,7 @@ export default function DashboardView({ setActiveTab }) {
     if (adding <= 0) { toast('Enter a valid amount.', 'error'); return; }
     const paid    = Number(inv.paid  || 0);
     const total   = Number(inv.total || 0);
-    const balance = total - paid;
+    const balance = getInvoiceBalance(inv);
     // Amount that goes toward clearing the balance
     const towardBalance = Math.min(adding, balance);
     const newPaid       = paid + towardBalance;
@@ -258,6 +260,15 @@ export default function DashboardView({ setActiveTab }) {
     setPaymentModal(inv);
     setPaymentAmount('');
   };
+
+  const openUnpaidInvoices = useCallback(() => {
+    if (unpaidInvoicesRef.current) {
+      unpaidInvoicesRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      unpaidInvoicesRef.current.focus({ preventScroll: true });
+      return;
+    }
+    if (setActiveTab) setActiveTab('records');
+  }, [setActiveTab]);
 
   const openBookingWorkflow = useCallback((booking, workflow) => {
     if (!booking?.id || !setActiveTab) return;
@@ -313,12 +324,13 @@ export default function DashboardView({ setActiveTab }) {
         {[
           { icon: Users,          label: 'Clients',       val: totalClients,            sub: 'total registered',  color: '#4a90d9', bg: '#eef4fc' },
           { icon: CalendarCheck2, label: 'Upcoming',      val: upcomingCount,           sub: 'bookings queued',   color: '#e08c30', bg: '#fff8ee' },
-          { icon: TrendingUp,     label: 'Unpaid Balance',val: fmtMoney(unpaidBalance), sub: 'to collect',        color: '#d94f4f', bg: '#fff0f0' },
+          { icon: TrendingUp,     label: 'Unpaid Balance',val: fmtMoney(unpaidBalance), sub: 'tap to record',     color: '#d94f4f', bg: '#fff0f0', onClick: openUnpaidInvoices, ariaLabel: 'Open unpaid invoices' },
           { icon: KeyRound,       label: 'Keys Pending',  val: keysPending.length,      sub: 'not yet received',  color: '#9b59b6', bg: '#f5eeff' },
         ].map(item => {
           const Icon = item.icon;
+          const CardTag = item.onClick ? 'button' : 'div';
           return (
-            <div key={item.label} className="stat-card" style={{ background: '#fff', borderRadius: '14px', padding: '18px 20px', boxShadow: 'var(--shadow)', display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
+            <CardTag key={item.label} type={item.onClick ? 'button' : undefined} onClick={item.onClick} aria-label={item.ariaLabel} className="stat-card" style={{ background: '#fff', borderRadius: '14px', padding: '18px 20px', boxShadow: 'var(--shadow)', display: 'flex', alignItems: 'flex-start', gap: '14px', width: '100%', border: 'none', textAlign: 'left', fontFamily: 'var(--font-body)', color: 'var(--black)', cursor: item.onClick ? 'pointer' : 'default', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}>
               <div style={{ background: item.bg, borderRadius: '10px', padding: '10px', flexShrink: 0 }}>
                 <Icon size={20} color={item.color} />
               </div>
@@ -327,7 +339,7 @@ export default function DashboardView({ setActiveTab }) {
                 <div style={{ fontSize: '22px', fontWeight: 800, lineHeight: 1.1 }}>{item.val}</div>
                 <div style={{ fontSize: '11px', color: 'var(--gray)', marginTop: '2px' }}>{item.sub}</div>
               </div>
-            </div>
+            </CardTag>
           );
         })}
       </div>
@@ -616,7 +628,7 @@ export default function DashboardView({ setActiveTab }) {
         </div>
 
         {/* UNPAID INVOICES */}
-        <div className="card" style={{ margin: 0 }}>
+        <div className="card" ref={unpaidInvoicesRef} tabIndex="-1" style={{ margin: 0, scrollMarginTop: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '15px' }}>💸 Unpaid Invoices</div>
             {unpaidBalance > 0 && (
@@ -633,7 +645,7 @@ export default function DashboardView({ setActiveTab }) {
           ) : unpaidInvoices.map(inv => {
             const paid    = Number(inv.paid || 0);
             const total   = Number(inv.total || 0);
-            const balance = total - paid;
+            const balance = getInvoiceBalance(inv);
             return (
               <div key={inv.id} className="list-item" style={{ alignItems: 'flex-start' }}>
                 <div style={{ background: '#fff0f0', borderRadius: '10px', padding: '8px 10px', flexShrink: 0, marginTop: '2px' }}>
@@ -648,9 +660,9 @@ export default function DashboardView({ setActiveTab }) {
                         Paid {fmtMoney(paid)}
                       </span>
                     )}
-                    <span style={{ fontSize: '11px', background: '#fff0f0', color: 'var(--red)', fontWeight: 700, padding: '2px 8px', borderRadius: '8px', border: '1px solid #f0c0c0' }}>
+                    <button type="button" onClick={() => openPaymentModal(inv)} aria-label={`Record payment for ${inv.toName} balance ${fmtMoney(balance)}`} style={{ fontSize: '11px', background: '#fff0f0', color: 'var(--red)', fontWeight: 700, padding: '2px 8px', borderRadius: '8px', border: '1px solid #f0c0c0', cursor: 'pointer', fontFamily: 'var(--font-body)', minHeight: '28px', touchAction: 'manipulation' }}>
                       Balance {fmtMoney(balance)}
-                    </span>
+                    </button>
                     <span style={{ fontSize: '11px', color: '#aaa' }}>
                       of {fmtMoney(total)}
                     </span>
@@ -811,7 +823,7 @@ export default function DashboardView({ setActiveTab }) {
         const inv     = paymentModal;
         const paid    = Number(inv.paid  || 0);
         const total   = Number(inv.total || 0);
-        const balance = total - paid;
+        const balance = getInvoiceBalance(inv);
         const entered = parseFloat(paymentAmount) || 0;
         // How much of the entered amount goes towards the invoice balance
         const towardBalance = Math.min(entered, balance);
