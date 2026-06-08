@@ -608,6 +608,10 @@ tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
   border-radius: 12px;
 }
 
+.keys-view {
+  position: relative;
+}
+
 @supports (content-visibility: auto) {
   .schedule-mobile-card,
   .inv-records-mobile .card,
@@ -785,6 +789,10 @@ tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
 
   .own-donation-row {
     align-items: flex-start;
+  }
+
+  .keys-view {
+    padding-bottom: calc(96px + var(--safe-bottom));
   }
 
   /* Android Keyboard Safety: Prevent fixed bottom nav from jumping above keyboard */

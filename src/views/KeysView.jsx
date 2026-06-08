@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useData } from '../store/DataContext';
 import { useToast } from '../components/Toast';
 import { KeyRound, ShieldCheck, ChevronDown } from 'lucide-react';
 import { todayLocalStr } from '../utils/dates';
+import { KEY_STATUS_ORDER, getKeyStatusCounts, getOrderedKeyClients } from '../utils/keyTrackerLogic';
 
 // ── Status config ─────────────────────────────────────────────────────────────
 const STATUS_CYCLE = ['pending', 'received', 'returned', 'none'];
@@ -55,7 +56,7 @@ function StatusBadge({ status, onClick }) {
 function StatusDropdown({ current, onSet, onClose }) {
   return (
     <div style={{
-      position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 300,
+      position: 'absolute', top: 'calc(100% + 6px)', right: 0, zIndex: 700,
       background: '#fff', borderRadius: '14px', padding: '8px',
       boxShadow: '0 8px 32px rgba(0,0,0,0.18)', minWidth: '205px',
       border: '1px solid #eee',
@@ -105,6 +106,7 @@ function KeyCard({ c, onSetStatus, openDropdown, setOpenDropdown }) {
       margin: 0, position: 'relative', overflow: 'visible',
       borderTop: `4px solid ${meta.borderColor}`,
       padding: '20px',
+      zIndex: isOpen ? 680 : 1,
     }}>
       {/* Watermark icon */}
       <div style={{
@@ -125,7 +127,7 @@ function KeyCard({ c, onSetStatus, openDropdown, setOpenDropdown }) {
           <StatusBadge status={c.keyStatus} onClick={() => setOpenDropdown(isOpen ? null : c.id)} />
           {isOpen && (
             <>
-              <div style={{ position: 'fixed', inset: 0, zIndex: 299 }} onClick={() => setOpenDropdown(null)} />
+              <div style={{ position: 'fixed', inset: 0, zIndex: 640 }} onClick={() => setOpenDropdown(null)} />
               <StatusDropdown current={c.keyStatus} onSet={(s) => onSetStatus(c, s)} onClose={() => setOpenDropdown(null)} />
             </>
           )}
@@ -217,10 +219,12 @@ export default function KeysView() {
   const { clients, updateClient } = useData();
   const toast = useToast();
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [activeFilter, setActiveFilter] = useState(null);
 
   const clientsWithKeys = clients.filter(c => (c.keyStatus || 'none') !== 'none');
   const clientsNoKey    = clients.filter(c => !c.keyStatus || c.keyStatus === 'none');
-  const FILTER_ORDER    = ['pending', 'received', 'returned'];
+  const keyStatusCounts = useMemo(() => getKeyStatusCounts(clients), [clients]);
+  const orderedKeyClients = useMemo(() => getOrderedKeyClients(clients, activeFilter), [clients, activeFilter]);
 
   const setKeyStatus = useCallback(async (client, newStatus) => {
     try {
@@ -243,7 +247,7 @@ export default function KeysView() {
   }, [updateClient, toast]);
 
   return (
-    <>
+    <div className="keys-view">
       {/* Page header */}
       <div className="ph">
         <div>
@@ -252,18 +256,21 @@ export default function KeysView() {
         </div>
         <div className="ph-actions">
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            {['pending', 'received', 'returned'].map(s => {
+            {KEY_STATUS_ORDER.map(s => {
               const m   = STATUS_META[s];
-              const cnt = clients.filter(c => c.keyStatus === s).length;
+              const cnt = keyStatusCounts[s] || 0;
+              const selected = activeFilter === s;
               return (
-                <div key={s} style={{
+                <button key={s} type="button" aria-label={`Filter ${m.label} keys`} aria-pressed={selected} onClick={() => setActiveFilter(selected ? null : s)} style={{
                   display: 'inline-flex', alignItems: 'center', gap: '5px',
-                  background: m.bgColor, borderRadius: '20px',
+                  background: selected ? m.accentColor : m.bgColor, borderRadius: '20px',
                   padding: '5px 13px', fontSize: '12px', fontWeight: 700,
-                  boxShadow: `inset 0 0 0 1.5px ${m.borderColor}`, color: m.accentColor,
+                  boxShadow: `inset 0 0 0 1.5px ${m.borderColor}`, color: selected ? '#fff' : m.accentColor,
+                  border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)',
+                  minHeight: '40px', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent',
                 }}>
                   {m.emoji} {cnt} {m.label}
-                </div>
+                </button>
               );
             })}
           </div>
@@ -288,7 +295,7 @@ export default function KeysView() {
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '16px', marginBottom: '28px' }}>
-          {FILTER_ORDER.flatMap(s => clients.filter(c => c.keyStatus === s)).map(c => (
+          {orderedKeyClients.map(c => (
             <KeyCard
               key={c.id}
               c={c}
@@ -297,6 +304,11 @@ export default function KeysView() {
               setOpenDropdown={setOpenDropdown}
             />
           ))}
+          {orderedKeyClients.length === 0 && (
+            <div className="card" style={{ textAlign: 'center', padding: '28px 20px', color: 'var(--gray)' }}>
+              No {STATUS_META[activeFilter]?.label.toLowerCase()} keys right now.
+            </div>
+          )}
         </div>
       )}
 
@@ -343,6 +355,6 @@ export default function KeysView() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
