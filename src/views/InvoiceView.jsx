@@ -11,6 +11,7 @@ import { buildDateNote, groupImportedLineItems, buildSingleDayInvoiceLines } fro
 import { sortInvoiceImportBookings } from '../utils/bookingOrdering.mjs';
 import { escapeHtml } from '../utils/htmlEscape.mjs';
 import { fmtGcash, todayLocalStr, fmtDate } from '../utils/dates';
+import { assertPngDataUrlHasVisibleContent, waitForCaptureReady } from '../utils/imageExport';
 
 // ── Struck: renders a strikethrough that html-to-image can capture ───────────
 const Struck = ({ children, style }) => (
@@ -271,7 +272,7 @@ export default function InvoiceView() {
     }
   };
 
-  // Helper: apply generation styles directly to DOM, render, then restore
+  // Keep the capture node paintable; mobile browsers can skip negative-z/offscreen DOM.
   const buildInvoiceCaptureNode = useCallback(async (sourceEl) => {
     const bgDataUrl = await fetchBgBase64();
     const captureEl = sourceEl.cloneNode(true);
@@ -279,13 +280,10 @@ export default function InvoiceView() {
 
     captureEl.setAttribute('aria-hidden', 'true');
     captureEl.style.cssText = `
-      position: absolute !important;
+      position: fixed !important;
       left: 0 !important;
       top: 0 !important;
       display: block !important;
-      position: absolute !important;
-      left: -9999px !important;
-      top: 0 !important;
       width: 640px !important;
       max-width: 640px !important;
       min-height: 520px !important;
@@ -299,8 +297,10 @@ export default function InvoiceView() {
       margin: 0 !important;
       overflow: visible !important;
       pointer-events: none !important;
-      z-index: -9999 !important;
-      opacity: 0.99 !important;
+      z-index: 2147483647 !important;
+      opacity: 1 !important;
+      transform: none !important;
+      visibility: visible !important;
     `;
     captureEl.style.backgroundImage = bgDataUrl ? `url(${bgDataUrl})` : 'none';
 
@@ -319,15 +319,7 @@ export default function InvoiceView() {
     }
 
     document.body.appendChild(captureEl);
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    if (document.fonts?.ready) {
-      try {
-        await document.fonts.ready;
-      } catch {
-        // Best effort; html-to-image can still render with fallback fonts.
-      }
-    }
+    await waitForCaptureReady();
     return captureEl;
   }, []);
 
@@ -344,9 +336,11 @@ export default function InvoiceView() {
         pixelRatio: 2,
         backgroundColor: '#eef0d8',
         cacheBust: true,
+        skipFonts: true,
         width: 640,
         height: Math.ceil(captureEl.scrollHeight),
       });
+      await assertPngDataUrlHasVisibleContent(dataUrl, 'Invoice image');
       return dataUrl;
     } finally {
       captureEl.remove();

@@ -5,6 +5,7 @@ import { toPng } from 'html-to-image';
 import { Download, Share2, Loader, Image as ImageIcon } from 'lucide-react';
 import { todayLocalStr } from '../utils/dates';
 import { shareImageFile, downloadImage } from '../utils/share';
+import { assertPngDataUrlHasVisibleContent, waitForCaptureReady } from '../utils/imageExport';
 
 // ── Categories ───────────────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -168,7 +169,7 @@ export default function ReportCardView() {
 
     captureEl.setAttribute('aria-hidden', 'true');
     captureEl.style.cssText = `
-      position: absolute !important;
+      position: fixed !important;
       left: 0 !important;
       top: 0 !important;
       display: block !important;
@@ -185,8 +186,10 @@ export default function ReportCardView() {
       margin: 0 !important;
       overflow: visible !important;
       pointer-events: none !important;
-      z-index: -9999 !important;
-      opacity: 0.99 !important;
+      z-index: 2147483647 !important;
+      opacity: 1 !important;
+      transform: none !important;
+      visibility: visible !important;
     `;
     captureEl.style.backgroundImage = bgDataUrl ? `url(${bgDataUrl})` : 'none';
 
@@ -204,15 +207,7 @@ export default function ReportCardView() {
     }
 
     document.body.appendChild(captureEl);
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    if (document.fonts?.ready) {
-      try {
-        await document.fonts.ready;
-      } catch {
-        // Best effort
-      }
-    }
+    await waitForCaptureReady();
     return captureEl;
   }, []);
 
@@ -227,9 +222,11 @@ export default function ReportCardView() {
         pixelRatio: 2,
         backgroundColor: '#d4e84a',
         cacheBust: true,
+        skipFonts: true,
         width: 640,
         height: Math.ceil(captureEl.scrollHeight),
       });
+      await assertPngDataUrlHasVisibleContent(dataUrl, 'Report card image');
       return dataUrl;
     } finally {
       captureEl.remove();
