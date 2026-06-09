@@ -26,7 +26,7 @@ const Struck = ({ children, style }) => (
 );
 
 const PREVIEW_CARD_WIDTH = 460;
-const INVOICE_CAPTURE_WIDTH = 412;
+const INVOICE_CAPTURE_WIDTH = 440;
 
 export default function InvoiceView() {
   const { clients, bookings, addInvoice, errands = [], updateErrand } = useData();
@@ -609,8 +609,8 @@ export default function InvoiceView() {
 
         /* ── TOTALS ─────────────────────────────────────────────────────────── */
         .inv-total-line {
-          text-align: right; font-family: Inter, sans-serif;
-          font-size: 24px; font-weight: 800; color: #111;
+          text-align: right; font-family: 'Playfair Display', Georgia, serif;
+          font-size: 24px; font-weight: 900; color: #111;
           padding: 18px 0 14px; margin-top: 4px;
           border-top: 1.5px solid #111;
         }

@@ -1,5 +1,5 @@
 /* public/sw.js — Pet Sitting CRM Service Worker */
-const CACHE_NAME = 'petsitting-crm-v4';
+const CACHE_NAME = 'petsitting-crm-v5';
 const APP_SHELL = [
   '/',
   '/manifest.json',
