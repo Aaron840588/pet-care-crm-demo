@@ -25,8 +25,8 @@ const Struck = ({ children, style }) => (
   </span>
 );
 
-const PREVIEW_CARD_WIDTH = 412;
-const INVOICE_CAPTURE_WIDTH = 412;
+const PREVIEW_CARD_WIDTH = 375;
+const INVOICE_CAPTURE_WIDTH = 375;
 
 export default function InvoiceView() {
   const { clients, bookings, addInvoice, errands = [], updateErrand } = useData();
@@ -288,7 +288,7 @@ export default function InvoiceView() {
       width: ${INVOICE_CAPTURE_WIDTH}px !important;
       max-width: ${INVOICE_CAPTURE_WIDTH}px !important;
       min-height: 520px !important;
-      padding: 28px 14px !important;
+      padding: 16px 12px !important;
       box-sizing: border-box !important;
       background-color: #eef0d8 !important;
       background-size: cover !important;
@@ -311,7 +311,7 @@ export default function InvoiceView() {
         border-radius: 16px !important;
         width: 100% !important;
         max-width: 100% !important;
-        padding: 36px 28px 32px !important;
+        padding: 28px 20px 24px !important;
         box-shadow: 0 4px 24px rgba(0,0,0,0.10) !important;
         box-sizing: border-box !important;
         margin: 0 !important;
@@ -530,7 +530,7 @@ export default function InvoiceView() {
           border-radius: 100px;
           padding: 7px 18px;
           line-height: 1;
-          font-weight: 700; font-size: 13px;
+          font-weight: 700; font-size: 14px;
           color: #111; font-family: Inter, sans-serif;
           box-shadow: 0 1px 4px rgba(0,0,0,0.10);
           letter-spacing: 0.01em;
@@ -539,18 +539,18 @@ export default function InvoiceView() {
 
         /* ── INVOICE TO ────────────────────────────────────────────────────── */
         .inv-to-label {
-          font-size: 9px; font-weight: 800; font-family: Inter, sans-serif;
+          font-size: 10.5px; font-weight: 800; font-family: Inter, sans-serif;
           letter-spacing: 1.8px; text-transform: uppercase;
           color: #666; margin: 24px 0 6px;
           padding-bottom: 6px; border-bottom: 1px solid #efefef;
         }
         .inv-to-name {
           font-family: 'Playfair Display', Georgia, serif;
-          font-size: 15px; color: #111; margin-bottom: 3px; font-weight: 700;
+          font-size: 17px; color: #111; margin-bottom: 3px; font-weight: 700;
         }
         .inv-to-pets {
           font-family: Inter, sans-serif;
-          font-size: 12px; color: #777; margin-bottom: 20px; line-height: 1.5;
+          font-size: 13px; color: #777; margin-bottom: 20px; line-height: 1.5;
         }
 
         /* ── TABLE ─────────────────────────────────────────────────────────── */
@@ -563,7 +563,7 @@ export default function InvoiceView() {
         .inv-tbl-head td {
           background: #f5f5f3;
           color: #666;
-          font-weight: 700; font-size: 9px; letter-spacing: 1.6px;
+          font-weight: 700; font-size: 11px; letter-spacing: 1.6px;
           text-transform: uppercase; padding: 9px 8px;
           text-align: left;
           border-bottom: 1.5px solid #ddd;
@@ -573,7 +573,7 @@ export default function InvoiceView() {
         .inv-tbl-row td {
           padding: 14px 8px; text-align: left;
           border-bottom: 1px solid #f2f2f0;
-          font-size: 13px; color: #333; vertical-align: top;
+          font-size: 14px; color: #333; vertical-align: top;
         }
         .inv-tbl-row:last-child td { border-bottom: none; }
 
@@ -584,9 +584,9 @@ export default function InvoiceView() {
         .inv-col-amount  { width: 21%; text-align: right !important; }
 
         /* Service text hierarchy */
-        .inv-svc-name { font-size: 13px; font-weight: 600; line-height: 1.35; color: #111; }
-        .inv-svc-sub  { font-size: 10px; color: #666; margin-top: 2px; font-style: italic; }
-        .inv-day-note { font-size: 9.5px; color: #888; margin-top: 4px; line-height: 1.4; }
+        .inv-svc-name { font-size: 14px; font-weight: 600; line-height: 1.35; color: #111; }
+        .inv-svc-sub  { font-size: 11px; color: #666; margin-top: 2px; font-style: italic; }
+        .inv-day-note { font-size: 10.5px; color: #888; margin-top: 4px; line-height: 1.4; }
         .inv-svc-name, .inv-svc-sub, .inv-day-note, .inv-disc-lbl { overflow-wrap: anywhere; }
         .inv-day-count { font-weight: 700; color: #111; font-variant-numeric: tabular-nums; }
         .inv-col-rate, .inv-col-amount { white-space: nowrap; font-variant-numeric: tabular-nums; }
@@ -594,15 +594,15 @@ export default function InvoiceView() {
         /* Discount — de-emphasized */
         .inv-price-del {
           display: block; text-decoration: line-through;
-          color: #ccc; font-size: 9px; margin-bottom: 1px;
+          color: #ccc; font-size: 10px; margin-bottom: 1px;
         }
         .inv-disc-lbl {
-          font-size: 9px; color: #d06060; font-style: italic;
+          font-size: 10px; color: #d06060; font-style: italic;
           font-weight: 600; display: block; margin-top: 3px;
         }
         .inv-amt-del {
           display: block; text-decoration: line-through;
-          color: #ccc; font-size: 9px; margin-bottom: 1px;
+          color: #ccc; font-size: 10px; margin-bottom: 1px;
         }
         /* Final amounts are always bold and clearly visible */
         .inv-final-amt { font-weight: 700; color: #111; }
@@ -610,7 +610,7 @@ export default function InvoiceView() {
         /* ── TOTALS ─────────────────────────────────────────────────────────── */
         .inv-total-line {
           text-align: right; font-family: Inter, sans-serif;
-          font-size: 22px; font-weight: 800; color: #111;
+          font-size: 24px; font-weight: 800; color: #111;
           padding: 18px 0 14px; margin-top: 4px;
           border-top: 1.5px solid #111;
         }
@@ -621,40 +621,40 @@ export default function InvoiceView() {
           display: inline-flex; justify-content: space-between; align-items: center;
           background: #fafafa; border: 1px solid #eee;
           padding: 9px 14px; border-radius: 7px; width: 190px; box-sizing: border-box;
-          font-family: Inter, sans-serif; font-weight: 600; font-size: 12px; color: #555;
+          font-family: Inter, sans-serif; font-weight: 600; font-size: 13px; color: #555;
         }
         .inv-balance-row {
           display: inline-flex; justify-content: space-between; align-items: center;
           background: #111; padding: 10px 14px; border-radius: 7px; width: 190px; box-sizing: border-box;
-          font-family: Inter, sans-serif; font-weight: 700; font-size: 13px; color: #fff;
+          font-family: Inter, sans-serif; font-weight: 700; font-size: 14px; color: #fff;
         }
         .inv-tip-row {
           display: inline-flex; justify-content: space-between; align-items: center;
           background: #fffce8; border: 1px solid #e8d800;
           padding: 8px 14px; border-radius: 7px; width: 190px; box-sizing: border-box;
-          font-family: Inter, sans-serif; font-weight: 600; font-size: 12px; color: #666;
+          font-family: Inter, sans-serif; font-weight: 600; font-size: 13px; color: #666;
         }
 
         /* ── MOBILE ─────────────────────────────────────────────────────────── */
         @media (max-width: 768px) {
           .inv-preview-outer { padding: 16px 10px; }
           .inv-white-card { padding: 26px 16px 24px; border-radius: 14px; }
-          .inv-h1 { font-size: 34px; }
-          .inv-sub { font-size: 15px; }
-          .inv-gcash-pill { font-size: 11px; padding: 5px 14px; }
+          .inv-h1 { font-size: 36px; }
+          .inv-sub { font-size: 16px; }
+          .inv-gcash-pill { font-size: 12px; padding: 5px 14px; }
           .inv-to-label { margin: 18px 0 4px; }
-          .inv-to-name { font-size: 14px; }
-          .inv-to-pets { font-size: 11px; margin-bottom: 14px; }
+          .inv-to-name { font-size: 15px; }
+          .inv-to-pets { font-size: 12.5px; margin-bottom: 14px; }
           .inv-col-service { width: 44%; }
           .inv-col-days { width: 11%; }
           .inv-col-rate { width: 20%; }
           .inv-col-amount { width: 25%; }
-          .inv-tbl-row td { padding: 10px 6px; font-size: 11px; }
-          .inv-tbl-head td { padding: 8px 6px; font-size: 8px; letter-spacing: 1.1px; }
-          .inv-svc-name { font-size: 12px; }
-          .inv-svc-sub { font-size: 9px; }
-          .inv-day-note { font-size: 8.5px; }
-          .inv-total-line { font-size: 18px; padding: 14px 0 10px; }
+          .inv-tbl-row td { padding: 10px 6px; font-size: 12.5px; }
+          .inv-tbl-head td { padding: 8px 6px; font-size: 9.5px; letter-spacing: 1.1px; }
+          .inv-svc-name { font-size: 13px; }
+          .inv-svc-sub { font-size: 10.5px; }
+          .inv-day-note { font-size: 10px; }
+          .inv-total-line { font-size: 20px; padding: 14px 0 10px; }
           .inv-summary-boxes { align-items: stretch; }
           .inv-tip-row, .inv-paid-row, .inv-balance-row { width: 100%; }
         }
