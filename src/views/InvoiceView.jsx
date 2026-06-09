@@ -26,6 +26,7 @@ const Struck = ({ children, style }) => (
 );
 
 const PREVIEW_CARD_WIDTH = 460;
+const INVOICE_CAPTURE_WIDTH = 500;
 
 export default function InvoiceView() {
   const { clients, bookings, addInvoice, errands = [], updateErrand } = useData();
@@ -284,8 +285,8 @@ export default function InvoiceView() {
       left: 0 !important;
       top: 0 !important;
       display: block !important;
-      width: 640px !important;
-      max-width: 640px !important;
+      width: ${INVOICE_CAPTURE_WIDTH}px !important;
+      max-width: ${INVOICE_CAPTURE_WIDTH}px !important;
       min-height: 520px !important;
       padding: 28px 14px !important;
       box-sizing: border-box !important;
@@ -337,7 +338,7 @@ export default function InvoiceView() {
         backgroundColor: '#eef0d8',
         cacheBust: true,
         skipFonts: true,
-        width: 640,
+        width: INVOICE_CAPTURE_WIDTH,
         height: Math.ceil(captureEl.scrollHeight),
       });
       await assertPngDataUrlHasVisibleContent(dataUrl, 'Invoice image');
