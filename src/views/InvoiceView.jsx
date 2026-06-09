@@ -25,8 +25,8 @@ const Struck = ({ children, style }) => (
   </span>
 );
 
-const PREVIEW_CARD_WIDTH = 460;
-const INVOICE_CAPTURE_WIDTH = 500;
+const PREVIEW_CARD_WIDTH = 412;
+const INVOICE_CAPTURE_WIDTH = 412;
 
 export default function InvoiceView() {
   const { clients, bookings, addInvoice, errands = [], updateErrand } = useData();
