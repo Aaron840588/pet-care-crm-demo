@@ -231,5 +231,5 @@ const buildSingleDayInvoiceLines = (day) => {
   }));
 };
 
-const PREVIEW_CARD_WIDTH = 375;
+const PREVIEW_CARD_WIDTH = 460;
 export { applyDiscountAcrossLines, buildDateNote, buildMergedDateNote, groupImportedLineItems, buildSingleDayInvoiceLines };

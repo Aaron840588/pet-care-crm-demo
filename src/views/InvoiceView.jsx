@@ -25,8 +25,8 @@ const Struck = ({ children, style }) => (
   </span>
 );
 
-const PREVIEW_CARD_WIDTH = 375;
-const INVOICE_CAPTURE_WIDTH = 375;
+const PREVIEW_CARD_WIDTH = 460;
+const INVOICE_CAPTURE_WIDTH = 412;
 
 export default function InvoiceView() {
   const { clients, bookings, addInvoice, errands = [], updateErrand } = useData();
@@ -578,10 +578,10 @@ export default function InvoiceView() {
         .inv-tbl-row:last-child td { border-bottom: none; }
 
         /* Columns */
-        .inv-col-service { width: 52%; }
-        .inv-col-days    { width: 10%; text-align: center !important; }
-        .inv-col-rate    { width: 17%; text-align: right !important; }
-        .inv-col-amount  { width: 21%; text-align: right !important; }
+        .inv-col-service { width: 50%; }
+        .inv-col-days    { width: 12%; text-align: center !important; }
+        .inv-col-rate    { width: 18%; text-align: right !important; }
+        .inv-col-amount  { width: 20%; text-align: right !important; }
 
         /* Service text hierarchy */
         .inv-svc-name { font-size: 14px; font-weight: 600; line-height: 1.35; color: #111; }
@@ -645,10 +645,10 @@ export default function InvoiceView() {
           .inv-to-label { margin: 18px 0 4px; }
           .inv-to-name { font-size: 15px; }
           .inv-to-pets { font-size: 12.5px; margin-bottom: 14px; }
-          .inv-col-service { width: 44%; }
-          .inv-col-days { width: 11%; }
+          .inv-col-service { width: 46%; }
+          .inv-col-days { width: 12%; }
           .inv-col-rate { width: 20%; }
-          .inv-col-amount { width: 25%; }
+          .inv-col-amount { width: 22%; }
           .inv-tbl-row td { padding: 10px 6px; font-size: 12.5px; }
           .inv-tbl-head td { padding: 8px 6px; font-size: 9.5px; letter-spacing: 1.1px; }
           .inv-svc-name { font-size: 13px; }
