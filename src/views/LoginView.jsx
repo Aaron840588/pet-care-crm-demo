@@ -10,7 +10,7 @@ export default function LoginView({ onDemoLogin }) {
   const [loading, setLoading] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
 
-  const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+  const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
 
   const handleLogin = async (e) => {
     e.preventDefault();

@@ -142,7 +142,7 @@ function MiniCalendar({ bookings }) {
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 export default function DashboardView({ setActiveTab }) {
   const { bookings, clients, invoices, reminders, errands, addReminder, toggleReminder, removeReminder, updateInvoice, updateBooking, updateErrand } = useData();
-  const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+  const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
   const toast = useToast();
   const unpaidInvoicesRef = useRef(null);
   const [newReminder, setNewReminder]       = useState('');

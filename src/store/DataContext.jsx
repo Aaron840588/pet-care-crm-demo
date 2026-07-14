@@ -52,7 +52,7 @@ const loadLocal = (key, fallbackValue) => {
   }
 };
 
-const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
 
 // ── MOCK DATA FOR DEMO MODE ──────────────────────────────────────────────────
 const demoClients = [

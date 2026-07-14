@@ -9,7 +9,7 @@ export default function SettingsView() {
   const { exportData, importData, services, setServices, syncStatus } = useData();
   const toast = useToast();
   const fileInputRef = useRef(null);
-  const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+  const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
 
   // ── Service editor state ──────────────────────────────────────────────────
   const [editingId, setEditingId] = useState(null);

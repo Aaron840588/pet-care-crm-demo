@@ -33,7 +33,7 @@ function AppContent({ onLogout }) {
   const [isMobileOpen, setMobileOpen]       = useState(false);
   const [offlineDismissed, setOfflineDismissed] = useState(false);
   const { loading, syncStatus } = useData();
-  const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+  const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
 
   useEffect(() => {
     const media = window.matchMedia('(min-width: 769px)');
@@ -207,7 +207,7 @@ function AppContent({ onLogout }) {
 }
 
 export default function App() {
-  const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+  const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
 
   const [user, setUser] = useState(() => {
     if (isDemo) {
@@ -222,7 +222,7 @@ export default function App() {
   });
 
   useEffect(() => {
-    if (isDemo) {
+    if (isDemo || !auth) {
       return;
     }
 

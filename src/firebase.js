@@ -6,7 +6,7 @@ import {
 } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
-const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
 
 // Production configuration is loaded via environment variables to prevent hardcoded credentials.
 const firebaseConfig = {
