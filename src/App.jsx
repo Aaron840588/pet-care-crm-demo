@@ -207,17 +207,22 @@ function AppContent({ onLogout }) {
 }
 
 export default function App() {
-  const [user, setUser] = useState(null);
-  const [authLoading, setAuthLoading] = useState(true);
-
   const isDemo = import.meta.env.VITE_DEMO_MODE === 'true';
+
+  const [user, setUser] = useState(() => {
+    if (isDemo) {
+      const loggedIn = sessionStorage.getItem('crm_demo_logged_in') === 'true';
+      return loggedIn ? { uid: 'demo-user', email: 'hello@kats-petsitting.demo' } : null;
+    }
+    return null;
+  });
+
+  const [authLoading, setAuthLoading] = useState(() => {
+    return !isDemo;
+  });
 
   useEffect(() => {
     if (isDemo) {
-      setTimeout(() => {
-        setUser({ uid: 'demo-user', email: 'hello@kats-petsitting.demo' });
-        setAuthLoading(false);
-      }, 500);
       return;
     }
 
@@ -264,6 +269,7 @@ export default function App() {
 
   const handleLogout = async () => {
     if (isDemo) {
+      sessionStorage.removeItem('crm_demo_logged_in');
       setUser(null);
       return;
     }
@@ -291,7 +297,10 @@ export default function App() {
           <Loader size={32} color="var(--lime-dark)" style={{ animation: 'spin 1s linear infinite' }} />
         </div>
       }>
-        <LoginView />
+        <LoginView onDemoLogin={() => {
+          sessionStorage.setItem('crm_demo_logged_in', 'true');
+          setUser({ uid: 'demo-user', email: 'hello@kats-petsitting.demo' });
+        }} />
       </Suspense>
     );
   }

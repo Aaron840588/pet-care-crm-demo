@@ -1,6 +1,19 @@
 # Pet Care Operations CRM — Portfolio Demo
 
+### 🔗 **[Open Live Demo](https://pet-care-crm-demo.vercel.app)**
+
 A modern, offline-first, cloud-synced Progressive Web Application (PWA) designed for solo pet sitters and pet care service providers. This is a sanitized, fully isolated public portfolio demo copy. 
+
+---
+
+### 🗺️ **How to Access & Try the Demo**
+
+1. **Open the Live Demo**: Click the **[Open Live Demo](https://pet-care-crm-demo.vercel.app)** link above.
+2. **Launch the Demo**: On the landing page, click the prominent **"Launch Public Demo 🐾"** button. This will immediately authenticate you into a client-side in-memory session (no signup, email, or credentials required).
+3. **Explore the System**: Navigate the operations dashboard, create bookings, modify client and pet records, test the Invoice Builder, or generate Visit Report Cards.
+4. **Instant Reset**: This demo uses synthetic fictional data and operates entirely in browser memory. Simply refresh the page or click **"Reset Demo"** on the top banner to completely restore the default sample dataset.
+
+---
 
 When running in Demo Mode, the application operates entirely within browser memory (in-memory local state and `localStorage` for configurations) without initializing Firebase, making network connections to Firestore, or exposing any production databases or real-world client records.
 
