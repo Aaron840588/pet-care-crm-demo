@@ -388,20 +388,6 @@ export default function DashboardView({ setActiveTab }) {
         </div>
       )}
 
-      {/* MEMORIAL */}
-      <div className="memorial-wrapper">
-        <div className="memorial-inner">
-          <div className="memorial-img">
-            <img src="/kathleen-gonzales.webp" alt="Ribbon memorial" width="768" height="1024" loading="eager" />
-          </div>
-          <div className="memorial-text">
-            <div className="mt-label">In Loving Memory</div>
-            <div className="mt-title">I&apos;m so proud of you, Mommy.</div>
-            <p className="mt-sub">Always loved. Always remembered.</p>
-          </div>
-        </div>
-      </div>
-
       {/* STAT CARDS */}
       <div className="stats-row" style={{ marginBottom: '22px' }}>
         {[
