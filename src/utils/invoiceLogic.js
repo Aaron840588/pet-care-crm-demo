@@ -1,5 +1,11 @@
-import { fmtShort, dateSortValue } from './dates';
-import { calcDayDiscount, newLineItem, EXTRA_PET_RATE } from './calculations';
+import { fmtShort, dateSortValue } from './dates.js';
+import {
+  calcDayComponentAmounts,
+  calcDayDiscount,
+  capComponentDiscount,
+  newLineItem,
+  EXTRA_PET_RATE,
+} from './calculations.js';
 
 const applyDiscountAcrossLines = (lines, discountAmount, discountLabel) => {
   let remaining = Math.max(0, Number(discountAmount || 0));
@@ -139,8 +145,9 @@ const buildSingleDayInvoiceLines = (day) => {
   const disc = day.discounts; // new per-component discounts object
   const lines = [];
   const svcName = day.service?.split('|')[0] || '';
-  const svcPrice = Number(day.service?.split('|')[1] || 0);
-  const svcDisc = disc ? Number(disc.service?.amount || 0) : 0;
+  const componentAmounts = calcDayComponentAmounts(day);
+  const svcPrice = componentAmounts.service;
+  const svcDisc = disc ? capComponentDiscount(disc.service?.amount, svcPrice) : 0;
 
   lines.push({
     ...newLineItem(),
@@ -157,8 +164,8 @@ const buildSingleDayInvoiceLines = (day) => {
 
   if (Number(day.extraPets || 0) > 0) {
     const extraPets = Number(day.extraPets || 0);
-    const epRate = extraPets * EXTRA_PET_RATE;
-    const epDisc = disc ? Number(disc.extraPets?.amount || 0) : 0;
+    const epRate = componentAmounts.extraPets;
+    const epDisc = disc ? capComponentDiscount(disc.extraPets?.amount, epRate) : 0;
     lines.push({
       ...newLineItem(),
       customName: `Additional +${extraPets} Pet${extraPets !== 1 ? 's' : ''}`,
@@ -174,14 +181,15 @@ const buildSingleDayInvoiceLines = (day) => {
   }
 
   if (Number(day.specialNeeds || 0) > 0) {
-    const snDisc = disc ? Number(disc.specialNeeds?.amount || 0) : 0;
+    const specialNeedsAmount = componentAmounts.specialNeeds;
+    const snDisc = disc ? capComponentDiscount(disc.specialNeeds?.amount, specialNeedsAmount) : 0;
     lines.push({
       ...newLineItem(),
       customName: 'Special Needs',
       subtitle: day.specialNeedsNote ? `(${day.specialNeedsNote})` : '',
       days: 1,
       note,
-      customRate: String(Number(day.specialNeeds || 0)),
+      customRate: String(specialNeedsAmount),
       discountMode:  snDisc > 0 ? 'total_flat' : 'none',
       discountValue: snDisc,
       discountLabel: disc?.specialNeeds?.label || '',
@@ -190,13 +198,14 @@ const buildSingleDayInvoiceLines = (day) => {
   }
 
   if (Number(day.distance || 0) > 0) {
-    const distDisc = disc ? Number(disc.distance?.amount || 0) : 0;
+    const distanceAmount = componentAmounts.distance;
+    const distDisc = disc ? capComponentDiscount(disc.distance?.amount, distanceAmount) : 0;
     lines.push({
       ...newLineItem(),
       customName: 'Distance Charge',
       days: 1,
       note,
-      customRate: String(Number(day.distance || 0)),
+      customRate: String(distanceAmount),
       discountMode:  distDisc > 0 ? 'total_flat' : 'none',
       discountValue: distDisc,
       discountLabel: disc?.distance?.label || '',
@@ -205,13 +214,14 @@ const buildSingleDayInvoiceLines = (day) => {
   }
 
   if (Number(day.extraVisit || 0) > 0) {
-    const evDisc = disc ? Number(disc.extraVisit?.amount || 0) : 0;
+    const extraVisitAmount = componentAmounts.extraVisit;
+    const evDisc = disc ? capComponentDiscount(disc.extraVisit?.amount, extraVisitAmount) : 0;
     lines.push({
       ...newLineItem(),
       customName: 'Extra Visit',
       days: 1,
       note,
-      customRate: String(Number(day.extraVisit || 0)),
+      customRate: String(extraVisitAmount),
       discountMode:  evDisc > 0 ? 'total_flat' : 'none',
       discountValue: evDisc,
       discountLabel: disc?.extraVisit?.label || '',

@@ -48,21 +48,22 @@ export default function InvoiceView() {
   const [lineItems, setLineItems]         = useState([newLineItem()]);
   const [importBookingId, setImportBookingId] = useState('');
 
-  // Auto-fill name + pets when client changes
-  useEffect(() => {
-    if (!data.clientId) return;
-    const c = clients.find(x => x.id === data.clientId);
-    if (c) setData(p => ({
-      ...p,
-      toName: c.name,
-      pets: c.pets ? c.pets.map(pp => typeof pp === 'string' ? pp : pp.name).join(', ') : '',
+  const handleClientChange = useCallback((clientId) => {
+    const client = clients.find((item) => item.id === clientId);
+    setData((current) => ({
+      ...current,
+      clientId,
+      toName: client?.name || '',
+      pets: client?.pets
+        ? client.pets.map((pet) => typeof pet === 'string' ? pet : pet.name).join(', ')
+        : '',
     }));
-  }, [data.clientId, clients]);
+  }, [clients]);
 
   
   const unbilledErrands = useMemo(() => {
     if (!data.clientId) return [];
-    return errands.filter(e => e.clientId === data.clientId && e.amount > 0 && !e.isBilled && e.status !== 'done');
+    return errands.filter(e => e.clientId === data.clientId && Number(e.amount) > 0 && !e.isBilled);
   }, [data.clientId, errands]);
 
   const handleImportErrands = useCallback(() => {
@@ -70,6 +71,7 @@ export default function InvoiceView() {
     const newLines = unbilledErrands.map(e => ({
       ...newLineItem(),
       customName: e.title || 'Errands / Pabili',
+      subtitle: e.status === 'done' ? 'Completed errand' : 'Pending errand',
       customRate: '', // Rate left empty for Errands per user request
       days: 1,
       _errandId: e.id,
@@ -191,14 +193,19 @@ export default function InvoiceView() {
     const bookingExists = bookings.some((booking) => booking.id === bookingId);
     if (!bookingExists) return;
 
-    bookingHandoffRef.current = true;
-    try {
-      sessionStorage.removeItem('kats_invoice_booking_id');
-    } catch {
-      // Ignore storage access errors.
-    }
-    importFromBooking(bookingId);
-    toast('Invoice draft started from today\'s booking.');
+    const timeoutId = window.setTimeout(() => {
+      if (bookingHandoffRef.current) return;
+      bookingHandoffRef.current = true;
+      try {
+        sessionStorage.removeItem('kats_invoice_booking_id');
+      } catch {
+        // Ignore storage access errors.
+      }
+      importFromBooking(bookingId);
+      toast('Invoice draft started from today\'s booking.');
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [bookings, importFromBooking, toast]);
 
   const setLine = useCallback(
@@ -238,18 +245,21 @@ export default function InvoiceView() {
         lineItems:       lineItems.map((item) => ({ ...item })),
       });
       
-      // Sync Billed Errands
-      for (const item of lineItems) {
-        if (item._errandId) {
-          try {
-            await updateErrand(item._errandId, { isBilled: true });
-          } catch (e) {
-            console.error("Failed to mark errand as billed", e);
-          }
-        }
-      }
+      const errandIds = [...new Set(lineItems.map((item) => item._errandId).filter(Boolean))];
+      const errandUpdateResults = await Promise.allSettled(
+        errandIds.map((errandId) => updateErrand(errandId, { isBilled: true })),
+      );
+      const failedErrandUpdates = errandUpdateResults.filter((result) => result.status === 'rejected');
 
-      toast('✅ Invoice saved to records!');
+      if (failedErrandUpdates.length > 0) {
+        failedErrandUpdates.forEach((result) => console.error('Failed to mark errand as billed', result.reason));
+        toast(
+          `Invoice saved, but ${failedErrandUpdates.length} errand${failedErrandUpdates.length === 1 ? '' : 's'} could not be marked as billed.`,
+          'warning',
+        );
+      } else {
+        toast('✅ Invoice saved to records!');
+      }
     } catch (err) {
       console.error(err);
       toast('❌ Failed to save. Check your connection.', 'error');
@@ -720,7 +730,7 @@ export default function InvoiceView() {
                 )}
                 {unbilledErrands.length > 0 && (
                   <button className="btn btn-dark btn-sm" onClick={handleImportErrands}>
-                    Import {unbilledErrands.length} items (₱{unbilledErrands.reduce((sum, e) => sum + e.amount, 0)})
+                    Import {unbilledErrands.length} items (₱{unbilledErrands.reduce((sum, e) => sum + Number(e.amount || 0), 0)})
                   </button>
                 )}
               </div>
@@ -734,7 +744,7 @@ export default function InvoiceView() {
           <div className="form-row">
             <div className="fg">
               <label>Client</label>
-              <select value={data.clientId} onChange={e => setData({ ...data, clientId: e.target.value })}>
+              <select value={data.clientId} onChange={e => handleClientChange(e.target.value)}>
                 <option value="">— Select client —</option>
                 {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
@@ -780,19 +790,19 @@ export default function InvoiceView() {
                   <span style={{ fontWeight: 700, fontSize: '11px', color: 'var(--gray)', textTransform: 'uppercase', letterSpacing: '.04em' }}>Line {idx + 1}</span>
                   <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
                     {idx > 0 && (
-                      <button type="button" className="btn btn-xs btn-ghost" style={{ minHeight: '32px', padding: '3px 7px' }}
+                      <button type="button" className="btn btn-xs btn-ghost" aria-label={`Move line ${idx + 1} up`} title="Move line up" style={{ minWidth: '44px', minHeight: '44px', padding: '3px 7px' }}
                         onClick={() => setLineItems(p => { const a = [...p]; [a[idx-1], a[idx]] = [a[idx], a[idx-1]]; return a; })}>
                         ▲
                       </button>
                     )}
                     {idx < lineItems.length - 1 && (
-                      <button type="button" className="btn btn-xs btn-ghost" style={{ minHeight: '32px', padding: '3px 7px' }}
+                      <button type="button" className="btn btn-xs btn-ghost" aria-label={`Move line ${idx + 1} down`} title="Move line down" style={{ minWidth: '44px', minHeight: '44px', padding: '3px 7px' }}
                         onClick={() => setLineItems(p => { const a = [...p]; [a[idx], a[idx+1]] = [a[idx+1], a[idx]]; return a; })}>
                         ▼
                       </button>
                     )}
                     {lineItems.length > 1 && (
-                      <button type="button" className="btn btn-xs btn-danger" onClick={() => setLineItems(p => p.filter(x => x.id !== li.id))}>
+                      <button type="button" className="btn btn-xs btn-danger" aria-label={`Delete line ${idx + 1}`} title="Delete line" style={{ minWidth: '44px', minHeight: '44px' }} onClick={() => setLineItems(p => p.filter(x => x.id !== li.id))}>
                         <Trash2 size={11} />
                       </button>
                     )}

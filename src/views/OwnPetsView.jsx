@@ -362,10 +362,10 @@ export default function OwnPetsView() {
 
                   {pet.notes && <div style={{ color: 'var(--gray)', fontSize: '12px', lineHeight: 1.5, marginTop: '12px' }}>{pet.notes}</div>}
                   <div className="schedule-card-actions">
-                    <button type="button" className="btn btn-sm btn-ghost" onClick={() => editPet(pet)}>
+                    <button type="button" className="btn btn-sm btn-ghost" aria-label={`Edit details for ${pet.name}`} onClick={() => editPet(pet)}>
                       <Pencil size={13} /> Edit
                     </button>
-                    <button type="button" className="btn btn-sm btn-danger" onClick={() => removeOwnPet(pet.id)}>
+                    <button type="button" className="btn btn-sm btn-danger" aria-label={`Delete ${pet.name}`} onClick={() => removeOwnPet(pet.id)}>
                       <Trash2 size={13} /> Delete
                     </button>
                   </div>
@@ -459,7 +459,7 @@ export default function OwnPetsView() {
                     </div>
                     <div style={{ textAlign: 'right', flexShrink: 0 }}>
                       <div style={{ fontWeight: 900, fontSize: '16px' }}>{money(donation.amount)}</div>
-                      <button type="button" className="btn btn-xs btn-danger" onClick={() => removeDonation(donation.id)}>
+                      <button type="button" className="btn btn-xs btn-danger" aria-label={`Delete donation from ${donation.donorName || 'unknown donor'}`} title="Delete donation" onClick={() => removeDonation(donation.id)}>
                         <Trash2 size={11} />
                       </button>
                     </div>

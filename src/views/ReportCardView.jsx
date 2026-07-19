@@ -6,6 +6,7 @@ import { Download, Share2, Loader, Image as ImageIcon } from 'lucide-react';
 import { todayLocalStr } from '../utils/dates';
 import { shareImageFile, downloadImage } from '../utils/share';
 import { assertPngDataUrlHasVisibleContent, waitForCaptureReady } from '../utils/imageExport';
+import { formatVisitDate, safeFilenamePart } from '../utils/reportCardLogic.js';
 
 // ── Categories ───────────────────────────────────────────────────────────────
 const CATEGORIES = [
@@ -31,6 +32,36 @@ const TASKS = [
   { id: 'otherTask', label: 'Other', emoji: '📌' },
 ];
 
+const PHOTO_LIMIT = 4;
+const PHOTO_MAX_EDGE = 800;
+
+const processPhoto = (file) => new Promise((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onerror = () => reject(new Error(`Unable to read ${file.name || 'photo'}.`));
+  reader.onload = (event) => {
+    const image = new Image();
+    image.onerror = () => reject(new Error(`Unable to process ${file.name || 'photo'}.`));
+    image.onload = () => {
+      const scale = Math.min(1, PHOTO_MAX_EDGE / image.width, PHOTO_MAX_EDGE / image.height);
+      const width = Math.max(1, Math.round(image.width * scale));
+      const height = Math.max(1, Math.round(image.height * scale));
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      if (!context) {
+        reject(new Error('Photo processing is unavailable in this browser.'));
+        return;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      context.drawImage(image, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    image.src = event.target.result;
+  };
+  reader.readAsDataURL(file);
+});
+
 export default function ReportCardView() {
   const { clients, bookings } = useData();
   const toast = useToast();
@@ -45,6 +76,7 @@ export default function ReportCardView() {
   });
   const [downloading, setDownloading] = useState(false);
   const [photos, setPhotos] = useState([]);
+  const [processingPhotos, setProcessingPhotos] = useState(false);
 
   const fld = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
@@ -72,46 +104,59 @@ export default function ReportCardView() {
       .join(', ');
     const todayVisit = booking.daySchedule?.find((day) => day.date === todayLocalStr());
 
-    bookingHandoffRef.current = true;
-    try {
-      sessionStorage.removeItem('kats_report_booking_id');
-    } catch {
-      // Ignore storage access errors.
-    }
+    const timeoutId = window.setTimeout(() => {
+      if (bookingHandoffRef.current) return;
+      bookingHandoffRef.current = true;
+      try {
+        sessionStorage.removeItem('kats_report_booking_id');
+      } catch {
+        // Ignore storage access errors.
+      }
 
-    setForm((prev) => ({
-      ...prev,
-      clientId: booking.clientId || prev.clientId,
-      petNames: petNames || prev.petNames,
-      visitDate: todayVisit?.date || booking.startDate || prev.visitDate,
-      sitterName: prev.sitterName || 'Kat',
-    }));
-    toast('Report card started from today\'s booking.');
+      setForm((prev) => ({
+        ...prev,
+        clientId: booking.clientId || prev.clientId,
+        petNames: petNames || prev.petNames,
+        visitDate: todayVisit?.date || booking.startDate || prev.visitDate,
+        sitterName: prev.sitterName || 'Kat',
+      }));
+      toast('Report card started from today\'s booking.');
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [bookings, clients, toast]);
 
   // ── Photo handling ────────────────────────────────────────────────────────
-  const handlePhotoSelect = (e) => {
+  const handlePhotoSelect = async (e) => {
     const files = Array.from(e.target.files);
-    if (!files.length) return;
-    if (photos.length + files.length > 4) { toast('Maximum 4 photos.', 'error'); return; }
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = ev => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX = 800;
-          let w = img.width, h = img.height;
-          if (w > MAX) { h = Math.floor(h * MAX / w); w = MAX; }
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          setPhotos(prev => [...prev, canvas.toDataURL('image/jpeg', 0.85)]);
-        };
-        img.src = ev.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
     e.target.value = '';
+    if (!files.length) return;
+    const availableSlots = Math.max(0, PHOTO_LIMIT - photos.length);
+    if (availableSlots === 0) {
+      toast(`Maximum ${PHOTO_LIMIT} photos.`, 'error');
+      return;
+    }
+
+    const selectedFiles = files.slice(0, availableSlots);
+    if (files.length > availableSlots) {
+      toast(`Only the first ${availableSlots} photo${availableSlots === 1 ? '' : 's'} were added.`, 'warning');
+    }
+
+    setProcessingPhotos(true);
+    try {
+      const results = await Promise.allSettled(selectedFiles.map(processPhoto));
+      const processedPhotos = results
+        .filter((result) => result.status === 'fulfilled')
+        .map((result) => result.value);
+      setPhotos((current) => [...current, ...processedPhotos].slice(0, PHOTO_LIMIT));
+      const failures = results.filter((result) => result.status === 'rejected');
+      if (failures.length > 0) {
+        failures.forEach((result) => console.error('Failed to process selected photo', result.reason));
+        toast(`${failures.length} photo${failures.length === 1 ? '' : 's'} could not be processed.`, 'error');
+      }
+    } finally {
+      setProcessingPhotos(false);
+    }
   };
   const removePhoto = idx => setPhotos(p => p.filter((_, i) => i !== idx));
 
@@ -150,7 +195,6 @@ export default function ReportCardView() {
     });
   };
 
-  const fmtDate = ds => ds ? new Date(ds + 'T00:00:00').toLocaleDateString('en-PH', { dateStyle: 'medium' }) : '—';
   const checkedTasks = form.checkedTasks || {};
 
   // ── PNG generation ────────────────────────────────────────────────────────
@@ -238,7 +282,9 @@ export default function ReportCardView() {
     try {
       const dataUrl = await renderReportPng();
       if (!dataUrl) return;
-      downloadImage(dataUrl, `ReportCard_${selectedClient?.name || form.petNames || 'Visit'}_${form.visitDate}.png`);
+      const subject = safeFilenamePart(selectedClient?.name || form.petNames, 'Visit');
+      const visitDate = safeFilenamePart(form.visitDate, 'Undated');
+      downloadImage(dataUrl, `ReportCard_${subject}_${visitDate}.png`);
       toast('✅ Report card saved!');
     } catch { toast('Download failed.', 'error'); }
     finally { setDownloading(false); }
@@ -249,7 +295,9 @@ export default function ReportCardView() {
     try {
       const dataUrl = await renderReportPng();
       if (!dataUrl) return;
-      const name = `ReportCard_${selectedClient?.name || form.petNames || 'Visit'}_${form.visitDate}.png`;
+      const subject = safeFilenamePart(selectedClient?.name || form.petNames, 'Visit');
+      const visitDate = safeFilenamePart(form.visitDate, 'Undated');
+      const name = `ReportCard_${subject}_${visitDate}.png`;
       const result = await shareImageFile(dataUrl, name);
       if (result === 'shared') toast('✅ Shared!');
       else { downloadImage(dataUrl, name); toast('Saved instead.'); }
@@ -351,21 +399,21 @@ export default function ReportCardView() {
 
           {/* Photos */}
           <div className="fg" style={{ marginBottom: '16px' }}>
-            <label>Upload Photos — 1st = Pet Profile, 2nd+ = Mood Photos (Max 4)</label>
-            <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#f8f8f8', border: '1px solid #ddd', borderRadius: '8px', padding: '8px 14px', cursor: photos.length >= 4 ? 'not-allowed' : 'pointer', fontSize: '13px', fontWeight: 600, color: '#444', marginTop: '4px', opacity: photos.length >= 4 ? 0.6 : 1 }}>
-              <ImageIcon size={16} /> {photos.length >= 4 ? 'Max Reached' : `Choose Photos… (${photos.length}/4)`}
-              <input type="file" accept="image/*" multiple onChange={handlePhotoSelect} style={{ display: 'none' }} disabled={photos.length >= 4} />
+            <label htmlFor="report-card-photos">Upload Photos — 1st = Pet Profile, 2nd+ = Mood Photos (Max {PHOTO_LIMIT})</label>
+            <label htmlFor="report-card-photos" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: '#f8f8f8', border: '1px solid #ddd', borderRadius: '8px', padding: '8px 14px', cursor: photos.length >= PHOTO_LIMIT || processingPhotos ? 'not-allowed' : 'pointer', fontSize: '13px', fontWeight: 600, color: '#444', marginTop: '4px', opacity: photos.length >= PHOTO_LIMIT || processingPhotos ? 0.6 : 1 }}>
+              <ImageIcon size={16} /> {processingPhotos ? 'Processing…' : photos.length >= PHOTO_LIMIT ? 'Max Reached' : `Choose Photos… (${photos.length}/${PHOTO_LIMIT})`}
+              <input id="report-card-photos" type="file" accept="image/*" multiple onChange={handlePhotoSelect} style={{ display: 'none' }} disabled={photos.length >= PHOTO_LIMIT || processingPhotos} />
             </label>
             {photos.length > 0 && (
-              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '10px' }}>
+              <div style={{ display: 'flex', gap: '24px', rowGap: '28px', flexWrap: 'wrap', marginTop: '14px' }}>
                 {photos.map((p, idx) => (
                   <div key={idx} style={{ position: 'relative' }}>
                     <div style={{ position: 'absolute', top: '-8px', left: '-4px', background: idx === 0 ? '#7a9a20' : '#888', color: '#fff', fontSize: '8px', fontWeight: 800, padding: '1px 5px', borderRadius: '4px', zIndex: 1 }}>{idx === 0 ? 'PROFILE' : `MOOD ${idx}`}</div>
-                    <img src={p} style={{ width: '90px', height: '90px', objectFit: 'cover', borderRadius: '8px', border: idx === 0 ? '2px solid #7a9a20' : '1px solid #ccc', display: 'block' }} alt="" />
-                    <button onClick={() => removePhoto(idx)} style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#e74c3c', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '12px', zIndex: 2 }}>×</button>
+                    <img src={p} style={{ width: '108px', height: '108px', objectFit: 'cover', borderRadius: '8px', border: idx === 0 ? '2px solid #7a9a20' : '1px solid #ccc', display: 'block' }} alt={idx === 0 ? 'Pet profile photo preview' : `Mood photo ${idx} preview`} />
+                    <button type="button" aria-label={idx === 0 ? 'Remove pet profile photo' : `Remove mood photo ${idx}`} title="Remove photo" onClick={() => removePhoto(idx)} style={{ position: 'absolute', top: '-14px', right: '-14px', background: '#e74c3c', color: '#fff', border: 'none', borderRadius: '50%', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', fontSize: '18px', zIndex: 2 }}>×</button>
                     <div style={{ position: 'absolute', bottom: '2px', left: '0', right: '0', display: 'flex', justifyContent: 'center', gap: '8px' }}>
-                      {idx > 0 && <button type="button" onClick={() => movePhoto(idx, -1)} style={{ background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '22px', height: '22px', cursor: 'pointer', fontSize: '10px' }}>&lt;</button>}
-                      {idx < photos.length - 1 && <button type="button" onClick={() => movePhoto(idx, 1)} style={{ background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', width: '22px', height: '22px', cursor: 'pointer', fontSize: '10px' }}>&gt;</button>}
+                      {idx > 0 && <button type="button" aria-label={`Move ${idx === 1 ? 'mood photo 1' : `mood photo ${idx}`} left`} title="Move photo left" onClick={() => movePhoto(idx, -1)} style={{ background: 'rgba(0,0,0,0.68)', color: 'white', border: 'none', borderRadius: '50%', width: '44px', height: '44px', cursor: 'pointer', fontSize: '16px' }}>&lt;</button>}
+                      {idx < photos.length - 1 && <button type="button" aria-label={`Move ${idx === 0 ? 'pet profile photo' : `mood photo ${idx}`} right`} title="Move photo right" onClick={() => movePhoto(idx, 1)} style={{ background: 'rgba(0,0,0,0.68)', color: 'white', border: 'none', borderRadius: '50%', width: '44px', height: '44px', cursor: 'pointer', fontSize: '16px' }}>&gt;</button>}
                     </div>
                   </div>
                 ))}
@@ -500,9 +548,9 @@ export default function ReportCardView() {
                   <div style={{ fontWeight: 800, fontSize: '18px', color: '#111', marginBottom: '4px' }}>
                     {form.petNames || <span style={{ color: '#ccc' }}>Pet Name</span>}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#aaa', marginBottom: '8px' }}>{fmtDate(form.visitDate)}</div>
+                  <div style={{ fontSize: '11px', color: '#aaa', marginBottom: '8px' }}>{formatVisitDate(form.visitDate)}</div>
                   <div style={{ fontSize: '11px', color: '#777', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                    <div>Visit Date: {fmtDate(form.visitDate)}</div>
+                    <div>Visit Date: {formatVisitDate(form.visitDate)}</div>
                     <div>Sitter: {form.sitterName}</div>
                     {selectedClient?.name && <div style={{ color: '#bbb' }}>Owner: {selectedClient.name}</div>}
                   </div>

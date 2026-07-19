@@ -69,15 +69,20 @@ export default function PetBioModal({ client, onClose }) {
     }));
   };
 
-  const copyMedications = (pet) => {
+  const copyMedications = async (pet) => {
     let txt = `MEDICATIONS FOR ${pet.name?.toUpperCase() || 'PET'}:\n`;
     (pet.medications || []).forEach((m, i) => {
       const parts = [m.name, m.frequency, m.dose, m.instructions].filter(Boolean);
       txt += `${i + 1}. ${parts.join(' — ')}\n`;
     });
     if (pet.medicationSequence) txt += `\nSEQUENCE: ${pet.medicationSequence}`;
-    navigator.clipboard.writeText(txt);
-    toast('📋 Copied medication schedule!', 'success');
+    try {
+      await navigator.clipboard.writeText(txt);
+      toast('📋 Copied medication schedule!', 'success');
+    } catch (error) {
+      console.error('Could not copy medication schedule:', error);
+      toast('Clipboard access was blocked. Copy the schedule manually.', 'error');
+    }
   };
 
   const addPet = () => {

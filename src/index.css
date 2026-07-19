@@ -70,9 +70,9 @@ body {
 .sb-brand { padding: 24px 22px 20px; border-bottom: 1px solid #2e2e2e; }
 .sb-brand .logo { font-family: var(--font-display); font-size: 20px; color: var(--lime); font-weight: 700; line-height: 1.2; }
 .sb-brand .logo span { font-style: italic; font-weight: 400; }
-.sb-brand .sub { font-size: 11px; color: #666; margin-top: 3px; letter-spacing: .03em; }
+.sb-brand .sub { font-size: 11px; color: #8c8c8c; margin-top: 3px; letter-spacing: .03em; }
 .nav { padding: 14px 0; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.nav-section { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #444; padding: 14px 22px 6px; font-weight: 700; }
+.nav-section { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #8c8c8c; padding: 14px 22px 6px; font-weight: 700; }
 .nav-item {
   display: flex; align-items: center; gap: 10px; padding: 12px 22px;
   color: #999; cursor: pointer; font-size: 13px; font-weight: 500;
@@ -94,7 +94,7 @@ body {
 .nav-item:hover { color: #fff; background: #222; }
 .nav-item.active { color: var(--lime); background: #1a1a1a; border-left-color: var(--lime); }
 .nav-item:focus-visible { outline: 2px solid var(--lime); outline-offset: -2px; color: #fff; background: #222; }
-.sb-footer { padding: 16px 22px; border-top: 1px solid #222; font-size: 11px; color: #444; line-height: 1.6; }
+.sb-footer { padding: 16px 22px; border-top: 1px solid #222; font-size: 11px; color: #8c8c8c; line-height: 1.6; }
 
 /* ── SYNC PILL ─────────────────────────────────────────────────────────────── */
 .sync-pill {
@@ -422,7 +422,7 @@ tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
 .bn-item {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 3px; padding: 10px 4px; flex: 1;
-  color: #666; background: none; border: none; cursor: pointer;
+  color: #aaa; background: none; border: none; cursor: pointer;
   font-family: var(--font-body); font-size: 10px; font-weight: 600;
   transition: color .12s;
   touch-action: manipulation; -webkit-tap-highlight-color: transparent;
@@ -653,8 +653,16 @@ tbody td { padding: 13px 14px; font-size: 13px; vertical-align: middle; }
 /* Mobile (768px and below) */
 @media (max-width: 768px) {
   /* Hide desktop sidebar, show bottom nav */
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); }
+  .sidebar {
+    visibility: hidden;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), visibility 0s linear 0.28s;
+  }
+  .sidebar.open {
+    visibility: visible;
+    transform: translateX(0);
+    transition-delay: 0s;
+  }
   .main-wrapper { margin-left: 0; }
   .bottom-nav { display: flex; }
   .sync-pill { display: none; }

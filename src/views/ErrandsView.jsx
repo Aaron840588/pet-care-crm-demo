@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { useData } from '../store/DataContext';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { useToast } from '../components/Toast';
 import { CheckCircle2, Circle, Plus, Trash2, CheckSquare, Edit, X } from 'lucide-react';
 import NumericInput from '../components/NumericInput';
 
 export default function ErrandsView() {
   const { errands, clients, addErrand, updateErrand, deleteErrand } = useData();
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState('pending');
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [errandToDelete, setErrandToDelete] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [updatingId, setUpdatingId] = useState(null);
   
   const [form, setForm] = useState(() => ({
     title: '',
@@ -49,13 +53,13 @@ export default function ErrandsView() {
     setFormOpen(true);
   };
 
-  const handleSave = () => {
-    if (!form.title.trim() && form.items.every(i => !i.title.trim())) return; // Must have some title
+  const handleSave = async () => {
+    if (!form.title.trim() && form.items.every(i => !String(i.title ?? '').trim())) return; // Must have some title
     
     // Clean up empty lines
-    const validItems = form.items.filter(i => i.title.trim() || Number(i.amount) > 0).map(i => ({
-      title: i.title.trim() || 'Untitled Item',
-      note: i.note.trim() || '',
+    const validItems = form.items.filter(i => String(i.title ?? '').trim() || Number(i.amount) > 0).map(i => ({
+      title: String(i.title ?? '').trim() || 'Untitled Item',
+      note: String(i.note ?? '').trim(),
       amount: i.amount ? Number(i.amount) : 0
     }));
 
@@ -69,22 +73,49 @@ export default function ErrandsView() {
       items: validItems,
     };
 
-    if (editingId) {
-      updateErrand(editingId, payload);
-    } else {
-      addErrand({
-        ...payload,
-        status: 'pending'
-      });
-    }
+    setSaving(true);
+    try {
+      if (editingId) {
+        await updateErrand(editingId, payload);
+      } else {
+        await addErrand({
+          ...payload,
+          status: 'pending'
+        });
+      }
 
-    setFormOpen(false);
+      setFormOpen(false);
+      toast(editingId ? 'Errand updated.' : 'Errand saved.', 'success');
+    } catch (error) {
+      console.error('Failed to save errand', error);
+      toast('Unable to save this errand right now.', 'error');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const confirmDeleteErrand = async () => {
     if (!errandToDelete) return;
-    await deleteErrand(errandToDelete.id);
-    setErrandToDelete(null);
+    try {
+      await deleteErrand(errandToDelete.id);
+      setErrandToDelete(null);
+      toast('Errand deleted.', 'info');
+    } catch (error) {
+      console.error('Failed to delete errand', error);
+      toast('Unable to delete this errand right now.', 'error');
+    }
+  };
+
+  const handleStatusToggle = async (errand) => {
+    setUpdatingId(errand.id);
+    try {
+      await updateErrand(errand.id, { status: errand.status === 'done' ? 'pending' : 'done' });
+    } catch (error) {
+      console.error('Failed to update errand status', error);
+      toast('Unable to update this errand right now.', 'error');
+    } finally {
+      setUpdatingId(null);
+    }
   };
 
   const updateItem = (id, field, val) => {
@@ -250,8 +281,8 @@ export default function ErrandsView() {
           </div>
 
           <div style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap-reverse' }}>
-            <button type="button" className="btn btn-dark" onClick={handleSave} style={{ flex: '1 1 auto', paddingLeft: '30px', paddingRight: '30px', minHeight: '48px' }}>
-              {editingId ? 'Update Record' : 'Save Errand'}
+            <button type="button" className="btn btn-dark" onClick={handleSave} disabled={saving} style={{ flex: '1 1 auto', paddingLeft: '30px', paddingRight: '30px', minHeight: '48px' }}>
+              {saving ? 'Saving…' : editingId ? 'Update Record' : 'Save Errand'}
             </button>
             <div style={{ fontSize: '16px', fontWeight: 700, color: '#333', marginLeft: 'auto', background: '#f5f7fa', padding: '8px 16px', borderRadius: '12px', border: '1.5px solid #e0e6ed' }}>
               Total: ₱{form.items.reduce((sum, it) => sum + (Number(it.amount) || 0), 0).toLocaleString()}
@@ -285,7 +316,8 @@ export default function ErrandsView() {
                     <div style={{ display: 'flex', alignItems: 'center', padding: '16px 20px', background: errand.status === 'done' ? '#fcfcfc' : '#fff' }}>
                       <button
                         type="button"
-                        onClick={() => updateErrand(errand.id, { status: errand.status === 'done' ? 'pending' : 'done' })}
+                        onClick={() => handleStatusToggle(errand)}
+                        disabled={updatingId === errand.id}
                         aria-label={errand.status === 'done' ? `Mark ${errand.title} pending` : `Mark ${errand.title} done`}
                         title={errand.status === 'done' ? 'Mark Pending' : 'Mark Done'}
                         style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, paddingRight: '16px', color: errand.status === 'done' ? 'var(--green)' : '#ddd', display: 'flex' }}

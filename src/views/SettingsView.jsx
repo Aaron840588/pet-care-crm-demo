@@ -21,6 +21,7 @@ export default function SettingsView() {
   const [newPrice, setNewPrice] = useState('');
   const [newSub, setNewSub] = useState('up to 2 pets');
   const [serviceToDelete, setServiceToDelete] = useState(null);
+  const [exportConfirmOpen, setExportConfirmOpen] = useState(false);
 
   const startEdit = (svc) => {
     setEditingId(svc.id);
@@ -100,20 +101,26 @@ export default function SettingsView() {
         {/* ── SYNC STATUS ── */}
         <div className="card" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '14px', padding: '18px 22px' }}>
           <div style={{
-            background: syncStatus === 'online' ? '#e6f7ed' : '#fff4e0',
+            background: !isDemo && syncStatus === 'online' ? '#e6f7ed' : '#fff4e0',
             borderRadius: '10px', padding: '10px', flexShrink: 0
           }}>
-            {syncStatus === 'online'
+            {!isDemo && syncStatus === 'online'
               ? <Wifi size={22} color="var(--green)" />
               : <WifiOff size={22} color="var(--orange)" />
             }
           </div>
           <div>
             <div style={{ fontWeight: 700, fontSize: '14px' }}>
-              {syncStatus === 'online' ? '🟢 Live — Syncing to Cloud' : '🟡 Offline — Changes saved locally'}
+              {isDemo
+                ? '🟡 Demo Sandbox — In-memory, not synced'
+                : syncStatus === 'online'
+                ? '🟢 Live — Syncing to Cloud'
+                : '🟡 Offline — Changes saved locally'}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--gray)', marginTop: '2px' }}>
-              {syncStatus === 'online'
+              {isDemo
+                ? 'Changes stay in this browser session and reset when the page reloads.'
+                : syncStatus === 'online'
                 ? 'Any device opening this app will see the same data.'
                 : 'Data will auto-sync to all devices when internet returns.'}
             </div>
@@ -252,10 +259,12 @@ export default function SettingsView() {
             📦 Data Backup
           </div>
           <p style={{ fontSize: '13px', color: 'var(--gray)', lineHeight: 1.6, marginBottom: '20px' }}>
-            Your data lives in the cloud (Firebase). As an extra safety net, you can export a local copy as a <code>.json</code> file and restore it at any time.
+            {isDemo
+              ? <>Export the current fictional sandbox records as a local <code>.json</code> file.</>
+              : <>Export a local <code>.json</code> backup. It can contain contact, address, pet-health, key, billing, and payment-reference data, so store it securely.</>}
           </p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <button className="btn btn-lime" style={{ flex: 1, justifyContent: 'center', minWidth: '140px' }} onClick={exportData}>
+            <button type="button" className="btn btn-lime" style={{ flex: 1, justifyContent: 'center', minWidth: '140px' }} onClick={() => setExportConfirmOpen(true)}>
               <Download size={18} /> Export Backup
             </button>
             <button
@@ -286,6 +295,22 @@ export default function SettingsView() {
           confirmLabel="Delete Service"
           onConfirm={confirmDeleteService}
           onCancel={() => setServiceToDelete(null)}
+        />
+      )}
+
+      {exportConfirmOpen && (
+        <ConfirmDialog
+          title="Export this backup?"
+          description={isDemo
+            ? 'The download contains only the fictional records in this browser session.'
+            : 'The plaintext download can contain personal, pet-health, key, billing, and payment-reference data. Keep it private and delete copies you no longer need.'}
+          confirmLabel="Export Backup"
+          tone="neutral"
+          onCancel={() => setExportConfirmOpen(false)}
+          onConfirm={() => {
+            setExportConfirmOpen(false);
+            exportData();
+          }}
         />
       )}
     </>

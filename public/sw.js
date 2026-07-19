@@ -11,7 +11,7 @@ const APP_SHELL = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).catch(() => undefined)
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
   );
   self.skipWaiting();
 });
@@ -62,7 +62,14 @@ self.addEventListener('fetch', (event) => {
 
 /* ── Push notification handler ─────────────────────────────── */
 self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : {};
+  let data = {};
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch {
+      data = { body: event.data.text() };
+    }
+  }
   const title = data.title || '🐾 Kat\'s Pet Sitting';
   const options = {
     body:    data.body  || 'You have a visit today!',
@@ -78,15 +85,19 @@ self.addEventListener('push', (event) => {
 /* ── Notification click — open/focus app ───────────────────── */
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+  const targetUrl = new URL(event.notification.data?.url || '/', self.location.origin).href;
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(async (clients) => {
       for (const client of clients) {
         if (client.url && 'focus' in client) {
+          if ('navigate' in client && client.url !== targetUrl) {
+            await client.navigate(targetUrl);
+          }
           return client.focus();
         }
       }
       if (self.clients.openWindow) {
-        return self.clients.openWindow(event.notification.data?.url || '/');
+        return self.clients.openWindow(targetUrl);
       }
     })
   );
@@ -96,12 +107,14 @@ self.addEventListener('notificationclick', (event) => {
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SHOW_NOTIFICATION') {
     const { title, body, tag } = event.data;
-    self.registration.showNotification(title || '🐾 Kat\'s Pet Sitting', {
-      body:  body  || 'Reminder: you have a visit today!',
-      icon:  '/pwa-icon-192.png',
-      badge: '/pwa-icon-192.png',
-      tag:   tag   || 'petsitting-local',
-      renotify: true,
-    });
+    event.waitUntil(
+      self.registration.showNotification(title || '🐾 Kat\'s Pet Sitting', {
+        body:  body  || 'Reminder: you have a visit today!',
+        icon:  '/pwa-icon-192.png',
+        badge: '/pwa-icon-192.png',
+        tag:   tag   || 'petsitting-local',
+        renotify: true,
+      })
+    );
   }
 });

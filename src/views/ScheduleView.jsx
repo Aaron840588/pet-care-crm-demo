@@ -443,18 +443,19 @@ export default function ScheduleView() {
                 )}
 
                 <div className="schedule-card-actions">
-                  <button type="button" className="btn btn-sm btn-ghost" onClick={() => setViewBooking(b)}>
+                  <button type="button" className="btn btn-sm btn-ghost" aria-label={`View details of booking for ${b.clientName}`} onClick={() => setViewBooking(b)}>
                     <Eye size={13} /> View
                   </button>
-                  <button type="button" className="btn btn-sm btn-ghost" onClick={() => openEdit(b)}>
+                  <button type="button" className="btn btn-sm btn-ghost" aria-label={`Edit booking for ${b.clientName}`} onClick={() => openEdit(b)}>
                     <Pencil size={13} /> Edit
                   </button>
-                  <button type="button" className="btn btn-sm btn-ghost" onClick={() => cloneBooking(b)}>
+                  <button type="button" className="btn btn-sm btn-ghost" aria-label={`Clone booking for ${b.clientName}`} onClick={() => cloneBooking(b)}>
                     <Copy size={13} /> Clone
                   </button>
                   <button
                     type="button"
                     className="btn btn-sm btn-ghost"
+                    aria-label={`Export ${b.clientName} booking to calendar`}
                     title="Export to Google / Apple Calendar"
                     onClick={() => {
                       const matchedClient = clients.find(c => c.id === b.clientId);
@@ -463,7 +464,7 @@ export default function ScheduleView() {
                   >
                     <CalendarPlus size={13} /> Calendar
                   </button>
-                  <button type="button" className="btn btn-sm btn-danger" onClick={() => setConfirmId(b.id)}>
+                  <button type="button" className="btn btn-sm btn-danger" aria-label={`Delete booking for ${b.clientName}`} onClick={() => setConfirmId(b.id)}>
                     <Trash2 size={13} /> Delete
                   </button>
                 </div>
@@ -561,13 +562,13 @@ export default function ScheduleView() {
                         </td>
                         <td>
                           <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                            <button className="btn btn-xs btn-ghost" onClick={() => setViewBooking(b)}>
+                            <button className="btn btn-xs btn-ghost" aria-label={`View details of booking for ${b.clientName}`} onClick={() => setViewBooking(b)}>
                               <Eye size={11} /> View
                             </button>
-                            <button className="btn btn-xs btn-ghost" onClick={() => openEdit(b)}>
+                            <button className="btn btn-xs btn-ghost" aria-label={`Edit booking for ${b.clientName}`} onClick={() => openEdit(b)}>
                               <Pencil size={11} /> Edit
                             </button>
-                            <button className="btn btn-xs btn-ghost" onClick={() => cloneBooking(b)}>
+                            <button className="btn btn-xs btn-ghost" aria-label={`Clone booking for ${b.clientName}`} onClick={() => cloneBooking(b)}>
                               <Copy size={11} /> Clone
                             </button>
                             <a
@@ -577,12 +578,13 @@ export default function ScheduleView() {
                                 downloadICS(b);
                               }}
                               className="btn btn-xs btn-ghost"
+                              aria-label={`Export ${b.clientName} booking to calendar`}
                               title="Export to Calendar"
                               style={{ textDecoration: 'none' }}
                             >
                               <CalendarPlus size={11} /> Calendar
                             </a>
-                            <button className="btn btn-xs btn-danger" onClick={() => setConfirmId(b.id)}>
+                            <button className="btn btn-xs btn-danger" aria-label={`Delete booking for ${b.clientName}`} title="Delete booking" onClick={() => setConfirmId(b.id)}>
                               <Trash2 size={11} />
                             </button>
                           </div>

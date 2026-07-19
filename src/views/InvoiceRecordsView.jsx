@@ -191,10 +191,10 @@ export default function InvoiceRecordsView() {
                 </div>
 
                 <div style={{ display: 'flex', gap: '6px', marginTop: '10px', flexWrap: 'wrap' }}>
-                  <button type="button" className="btn btn-xs btn-ghost" style={{ flex: 1, justifyContent: 'center' }} onClick={() => startEdit(invoice)}>
+                  <button type="button" className="btn btn-xs btn-ghost" aria-label={`Edit invoice for ${invoice.toName}`} style={{ flex: 1, justifyContent: 'center' }} onClick={() => startEdit(invoice)}>
                     <Pencil size={13} /> Edit
                   </button>
-                  <button type="button" className="btn btn-xs btn-danger" onClick={() => setInvoiceToDelete(invoice)}>
+                  <button type="button" className="btn btn-xs btn-danger" aria-label={`Delete invoice for ${invoice.toName}`} onClick={() => setInvoiceToDelete(invoice)}>
                     Delete
                   </button>
                 </div>
@@ -266,10 +266,10 @@ export default function InvoiceRecordsView() {
                           </td>
                           <td>
                             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                              <button type="button" className="btn btn-xs btn-ghost" onClick={() => startEdit(invoice)} title="Edit invoice record">
+                              <button type="button" className="btn btn-xs btn-ghost" aria-label={`Edit invoice for ${invoice.toName}`} onClick={() => startEdit(invoice)} title="Edit invoice record">
                                 <Pencil size={12} /> Edit
                               </button>
-                              <button type="button" className="btn btn-xs btn-danger" onClick={() => setInvoiceToDelete(invoice)}>Del</button>
+                              <button type="button" className="btn btn-xs btn-danger" aria-label={`Delete invoice for ${invoice.toName}`} onClick={() => setInvoiceToDelete(invoice)}>Del</button>
                             </div>
                           </td>
                         </tr>

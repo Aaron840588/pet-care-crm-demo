@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import BottomNav from './components/BottomNav';
 import { ToastProvider } from './components/Toast';
 import ErrorBoundary from './components/ErrorBoundary';
+import ConfirmDialog from './components/ConfirmDialog';
 import { Wifi, WifiOff, Loader, X, LogOut } from 'lucide-react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from './firebase';
@@ -32,6 +33,7 @@ function AppContent({ onLogout }) {
   const [activeTab, setActiveTab]           = useState('dashboard');
   const [isMobileOpen, setMobileOpen]       = useState(false);
   const [offlineDismissed, setOfflineDismissed] = useState(false);
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const { loading, syncStatus } = useData();
   const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
 
@@ -96,8 +98,8 @@ function AppContent({ onLogout }) {
     );
   }
 
-  const syncBg    = syncStatus === 'online' ? '#e6f7ed' : syncStatus === 'offline' ? '#fff4e0' : '#f0f0f0';
-  const syncColor = syncStatus === 'online' ? 'var(--green)' : syncStatus === 'offline' ? 'var(--orange)' : 'var(--gray)';
+  const syncBg    = isDemo ? '#fff3cd' : syncStatus === 'online' ? '#e6f7ed' : syncStatus === 'offline' ? '#fff3cd' : '#f0f0f0';
+  const syncColor = isDemo ? '#856404' : syncStatus === 'online' ? '#155724' : syncStatus === 'offline' ? '#856404' : '#4e4e4e';
   const showOfflineBanner = syncStatus === 'offline' && !offlineDismissed;
 
   return (
@@ -129,14 +131,10 @@ function AppContent({ onLogout }) {
             borderBottom: '1px solid var(--lime-dark)',
             fontFamily: 'var(--font-body)'
           }}>
-            <span>📢 <strong>Public Demo</strong> — All information is fictional and resets when the page reloads.</span>
+            <span>📢 <strong>Public Demo</strong> — All records are fictional and reset when the page reloads.</span>
             <button
-              onClick={() => {
-                if (window.confirm("Are you sure you want to reset the demo data? This will restore the original sample dataset.")) {
-                  localStorage.clear();
-                  window.location.reload();
-                }
-              }}
+              type="button"
+              onClick={() => setResetConfirmOpen(true)}
               style={{
                 background: 'var(--lime-dark)',
                 color: '#111',
@@ -155,6 +153,20 @@ function AppContent({ onLogout }) {
               Reset Demo
             </button>
           </div>
+        )}
+
+        {resetConfirmOpen && (
+          <ConfirmDialog
+            title="Reset the public demo?"
+            description="This reloads the fictional sample records and removes any service changes made during this demo session."
+            confirmLabel="Reset Demo"
+            tone="neutral"
+            onCancel={() => setResetConfirmOpen(false)}
+            onConfirm={() => {
+              localStorage.removeItem('kats_services');
+              window.location.reload();
+            }}
+          />
         )}
 
         {/* Offline Banner */}
@@ -187,7 +199,9 @@ function AppContent({ onLogout }) {
 
       {/* Desktop sync status pill — hidden on mobile */}
       <div className="sync-pill" style={{ background: syncBg, color: syncColor }}>
-        {syncStatus === 'online'
+        {isDemo
+          ? <><WifiOff size={11} /> Demo Sandbox</>
+          : syncStatus === 'online'
           ? <><Wifi size={11} /> Live Sync</>
           : syncStatus === 'offline'
           ? <><WifiOff size={11} /> Offline</>
@@ -233,7 +247,7 @@ export default function App() {
     return () => unsubscribe();
   }, [isDemo]);
 
-  // ── Register Service Worker + Schedule notifications ─────────────────────────
+  // ── Register the service worker and show a daily prompt when the app opens ──
   useEffect(() => {
     if (isDemo) return; // Disable service worker and notifications in demo mode
     if (!('serviceWorker' in navigator)) return;
@@ -242,7 +256,7 @@ export default function App() {
       .then((reg) => {
         console.log('[SW] Registered:', reg.scope);
 
-        // Schedule today's visit reminder only after the user has already granted permission.
+        // Show one daily prompt on app open only after the user has granted permission.
         if ('Notification' in window && Notification.permission === 'granted') {
           const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
           const lastNotified = localStorage.getItem('crm_last_notified');
@@ -255,7 +269,7 @@ export default function App() {
                 swReg.active?.postMessage({
                   type: 'SHOW_NOTIFICATION',
                   title: "🐾 Today's Pet Visits",
-                  body: 'Good morning! Check your schedule for today\'s visits.',
+                  body: 'Check your schedule for today\'s visits.',
                   tag: `daily-${today}`,
                 });
                 localStorage.setItem('crm_last_notified', today);
@@ -284,7 +298,7 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div style={{ height: '100dvh', width: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--bg-main)' }}>
+      <div style={{ height: '100dvh', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--bg-main)' }}>
         <Loader size={32} color="var(--lime-dark)" style={{ animation: 'spin 1s linear infinite' }} />
       </div>
     );
@@ -293,7 +307,7 @@ export default function App() {
   if (!user) {
     return (
       <Suspense fallback={
-        <div style={{ height: '100dvh', width: '100vw', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--bg-main)' }}>
+        <div style={{ height: '100dvh', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'var(--bg-main)' }}>
           <Loader size={32} color="var(--lime-dark)" style={{ animation: 'spin 1s linear infinite' }} />
         </div>
       }>

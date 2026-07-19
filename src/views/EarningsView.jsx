@@ -8,8 +8,13 @@ import { getDateParts } from '../utils/dates';
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-const fmtMoney = (n) => `₱${Number(n || 0).toLocaleString('en-PH')}`;
-const curb = (n) => Math.max(0, n || 0);
+const toAmount = (value) => {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, number) : 0;
+};
+
+const normalizeName = (value) => String(value ?? '').trim().toLocaleLowerCase('en-PH');
+const fmtMoney = (value) => `₱${toAmount(value).toLocaleString('en-PH', { maximumFractionDigits: 2 })}`;
 
 export default function EarningsView() {
   const { invoices, clients } = useData();
@@ -33,9 +38,9 @@ export default function EarningsView() {
 
   const monthlyData = last6.map(({ year, month, label }) => {
     const invs = getMonthInvoices(year, month);
-    const total = invs.reduce((s, i) => s + (i.total || 0), 0);
-    const paidOnly = invs.reduce((s, i) => s + (i.paid || 0), 0);
-    const tip = invs.reduce((s, i) => s + (i.tip || 0), 0);
+    const total = invs.reduce((s, i) => s + toAmount(i.total), 0);
+    const paidOnly = invs.reduce((s, i) => s + toAmount(i.paid), 0);
+    const tip = invs.reduce((s, i) => s + toAmount(i.tip), 0);
     const collected = paidOnly + tip;
     return { label, year, month, total, collected, count: invs.length };
   });
@@ -44,37 +49,43 @@ export default function EarningsView() {
 
   // Selected month detail
   const selInvoices = getMonthInvoices(selectedYear, selectedMonth);
-  const selTotal = selInvoices.reduce((s, i) => s + (i.total || 0), 0);
-  const selPaidOnly = selInvoices.reduce((s, i) => s + (i.paid || 0), 0);
-  const selTip = selInvoices.reduce((s, i) => s + (i.tip || 0), 0);
+  const selTotal = selInvoices.reduce((s, i) => s + toAmount(i.total), 0);
+  const selPaidOnly = selInvoices.reduce((s, i) => s + toAmount(i.paid), 0);
+  const selTip = selInvoices.reduce((s, i) => s + toAmount(i.tip), 0);
   const selCollected = selPaidOnly + selTip;
   const selOutstanding = Math.max(0, selTotal - selPaidOnly);
 
   // All-time stats
-  const allTotal = invoices.reduce((s, i) => s + (i.total || 0), 0);
-  const allPaidOnly = invoices.reduce((s, i) => s + (i.paid || 0), 0);
-  const allTip = invoices.reduce((s, i) => s + (i.tip || 0), 0);
+  const allTotal = invoices.reduce((s, i) => s + toAmount(i.total), 0);
+  const allPaidOnly = invoices.reduce((s, i) => s + toAmount(i.paid), 0);
+  const allTip = invoices.reduce((s, i) => s + toAmount(i.tip), 0);
   const allCollected = allPaidOnly + allTip;
   const allOutstanding = Math.max(0, allTotal - allPaidOnly);
 
   // U10: match by clientId (stored on invoice) if available, else fallback to name match
-  const clientTotals = useMemo(() =>
-    clients.map(c => {
+  const clientTotals = useMemo(() => {
+    const fallbackClientIdByName = new Map();
+    clients.forEach((client) => {
+      const name = normalizeName(client.name);
+      if (name && !fallbackClientIdByName.has(name)) fallbackClientIdByName.set(name, client.id);
+    });
+
+    return clients.map(c => {
       const cInvs = invoices.filter(i =>
-        (i.clientId && i.clientId === c.id) || // preferred: ID match
-        (i.toName && i.toName.toLowerCase().trim() === c.name.toLowerCase().trim()) // fallback: name
+        i.clientId
+          ? i.clientId === c.id
+          : fallbackClientIdByName.get(normalizeName(i.toName)) === c.id
       );
       return {
         id:    c.id,
         name:  c.name,
-        total: cInvs.reduce((s, i) => s + (i.total || 0), 0),
-        paid:  cInvs.reduce((s, i) => s + (i.paid  || 0), 0),
-        tip:   cInvs.reduce((s, i) => s + (i.tip || 0), 0),
+        total: cInvs.reduce((s, i) => s + toAmount(i.total), 0),
+        paid:  cInvs.reduce((s, i) => s + toAmount(i.paid), 0),
+        tip:   cInvs.reduce((s, i) => s + toAmount(i.tip), 0),
         count: cInvs.length,
       };
-    }).filter(c => c.count > 0).sort((a, b) => b.total - a.total).slice(0, 5),
-    [clients, invoices]
-  );
+    }).filter(c => c.count > 0).sort((a, b) => b.total - a.total).slice(0, 5);
+  }, [clients, invoices]);
   const topClientTotal = Math.max(clientTotals[0]?.total || 0, 1);
 
   // Month-over-month change
@@ -98,7 +109,7 @@ export default function EarningsView() {
           { label: 'Total Collected', val: fmtMoney(allCollected), sub: 'payments + tips', color: '#3fa85f', bg: '#e6f7ed' },
           { label: 'Total Tips 💝', val: fmtMoney(allTip), sub: 'extra earned', color: '#d4a373', bg: '#faeedd' },
           { label: 'Outstanding', val: fmtMoney(allOutstanding), sub: 'still to collect', color: '#d94f4f', bg: '#fff0f0' },
-          { label: 'This Month', val: fmtMoney(curb(selTotal)), sub: MONTHS[selectedMonth] + ' ' + selectedYear, color: '#9b59b6', bg: '#f5eeff' },
+          { label: 'This Month', val: fmtMoney(selTotal), sub: MONTHS[selectedMonth] + ' ' + selectedYear, color: '#9b59b6', bg: '#f5eeff' },
         ].map(({ label, val, sub, color, bg }) => (
           <div key={label} style={{ background: '#fff', borderRadius: '14px', padding: '18px 20px', boxShadow: 'var(--shadow)', display: 'flex', alignItems: 'flex-start', gap: '14px' }}>
             <div style={{ background: bg, borderRadius: '10px', padding: '10px', flexShrink: 0 }}>
@@ -211,7 +222,7 @@ export default function EarningsView() {
                 <div style={{ marginTop: '14px' }}>
                   <div style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--gray)', marginBottom: '8px' }}>Invoices this month</div>
                   {selInvoices.map(inv => {
-                    const bal = inv.total - inv.paid;
+                    const bal = Math.max(0, toAmount(inv.total) - toAmount(inv.paid));
                     return (
                       <div key={inv.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', fontSize: '12px', borderBottom: '1px solid #f8f8f8' }}>
                         <div>

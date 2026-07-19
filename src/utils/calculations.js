@@ -14,25 +14,41 @@ export const DISC_MODES = [
 ];
 
 // ── Per-day booking total helpers ─────────────────────────────────────────────
+const toNonNegativeNumber = (value) => {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, number) : 0;
+};
+
+export const capComponentDiscount = (discount, componentAmount) => (
+  Math.min(toNonNegativeNumber(discount), toNonNegativeNumber(componentAmount))
+);
+
+export const calcDayComponentAmounts = (day) => ({
+  service: toNonNegativeNumber(day.service?.split('|')[1]),
+  extraPets: toNonNegativeNumber(day.extraPets) * EXTRA_PET_RATE,
+  specialNeeds: toNonNegativeNumber(day.specialNeeds),
+  distance: toNonNegativeNumber(day.distance),
+  extraVisit: toNonNegativeNumber(day.extraVisit),
+});
+
 export const calcDaySubtotal = (day) => {
-  const svcPrice = Number(day.service?.split('|')[1] || 0);
-  return (
-    svcPrice +
-    (Number(day.extraPets  || 0) * EXTRA_PET_RATE) +
-    Number(day.specialNeeds || 0) +
-    Number(day.distance     || 0) +
-    Number(day.extraVisit   || 0)
-  );
+  const amounts = calcDayComponentAmounts(day);
+  return Object.values(amounts).reduce((sum, amount) => sum + amount, 0);
 };
 
 export const calcDayDiscount = (day) => {
   // New per-component discounts object
   if (day.discounts) {
-    const total = Object.values(day.discounts).reduce((s, d) => s + Number(d?.amount || 0), 0);
-    return Math.min(calcDaySubtotal(day), Math.max(0, total));
+    const amounts = calcDayComponentAmounts(day);
+    return Object.entries(amounts).reduce(
+      (sum, [component, amount]) => (
+        sum + capComponentDiscount(day.discounts?.[component]?.amount, amount)
+      ),
+      0,
+    );
   }
   // Legacy single flat discount
-  return Math.min(calcDaySubtotal(day), Math.max(0, Number(day.dayDiscount || 0)));
+  return capComponentDiscount(day.dayDiscount, calcDaySubtotal(day));
 };
 
 export const calcDayTotal = (day) => Math.max(0, calcDaySubtotal(day) - calcDayDiscount(day));
@@ -40,14 +56,14 @@ export const calcDayTotal = (day) => Math.max(0, calcDaySubtotal(day) - calcDayD
 // ── Invoice line item calculation ─────────────────────────────────────────────
 export const calcLine = (item) => {
   if (item.isErrand || String(item.customName || '').toLowerCase().includes('errand')) {
-    const amt = Number(item.amount || 0);
+    const amt = toNonNegativeNumber(item.amount);
     return { rate: '', baseAmount: amt, discountAmount: 0, finalAmount: amt, displayRate: '' };
   }
 
-  const rate       = item.customRate !== '' && item.customRate !== null ? Number(item.customRate) : 0;
+  const rate       = item.customRate !== '' && item.customRate !== null ? toNonNegativeNumber(item.customRate) : 0;
   const days       = Math.max(1, Number(item.days) || 1);
   const baseAmount = rate * days;
-  const val        = Number(item.discountValue || 0);
+  const val        = toNonNegativeNumber(item.discountValue);
 
   let discountAmount = 0;
   if (item.discountMode === 'rate_flat')     discountAmount = Math.min(val * days, baseAmount);
@@ -66,13 +82,14 @@ export const calcLine = (item) => {
 // ── Booking-level discount applied to gross total ─────────────────────────────
 export const applyDiscount = (gross, numDays, discount) => {
   const mode = discount?.mode || 'none';
-  const val  = Number(discount?.value || 0);
+  const total = toNonNegativeNumber(gross);
+  const val  = toNonNegativeNumber(discount?.value);
   const days = Math.max(1, numDays);
-  if (mode === 'rate_flat')     return Math.max(0, gross - val * days);
-  if (mode === 'rate_percent')  return Math.max(0, gross * (1 - Math.min(val, 100) / 100));
-  if (mode === 'total_flat')    return Math.max(0, gross - val);
-  if (mode === 'total_percent') return Math.max(0, gross * (1 - Math.min(val, 100) / 100));
-  return gross;
+  if (mode === 'rate_flat')     return Math.max(0, total - val * days);
+  if (mode === 'rate_percent')  return Math.max(0, total * (1 - Math.min(val, 100) / 100));
+  if (mode === 'total_flat')    return Math.max(0, total - val);
+  if (mode === 'total_percent') return Math.max(0, total * (1 - Math.min(val, 100) / 100));
+  return total;
 };
 
 // ── New line item factory (CQ4: more unique ID) ───────────────────────────────

@@ -214,7 +214,9 @@ export function DataProvider({ children }) {
   const [errands, setErrands] = useState([]);
   const [ownPets, setOwnPets] = useState([]);
   const [donations, setDonations] = useState([]);
-  const [services, setServicesState] = useState(() => sanitizeServices(loadLocal('kats_services', initialServices)));
+  const [services, setServicesState] = useState(() =>
+    sanitizeServices(isDemo ? initialServices : loadLocal('kats_services', initialServices))
+  );
   const [loading, setLoading] = useState(true);
   const [syncStatus, setSyncStatus] = useState('connecting');
 
@@ -303,6 +305,8 @@ export function DataProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    if (isDemo) return;
+
     try {
       localStorage.setItem('kats_services', JSON.stringify(services));
     } catch {

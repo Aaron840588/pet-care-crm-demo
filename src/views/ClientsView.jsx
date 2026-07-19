@@ -266,9 +266,9 @@ export default function ClientsView() {
                   <span style={{fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', color: '#555'}}>Key Status:</span> {getKeyBadge(c.keyStatus)}
                 </div>
                 <div className="cc-actions">
-                  <button type="button" className="btn btn-xs" style={{ background: '#e8f4ff', color: '#2060c0', border: '1px solid #c0d8f0' }} onClick={() => setPetBioClient(c)}>🐾 Pet Bios{c.pets?.some(p => p.vetName || p.allergies || p.feedingTime) ? ` ✓` : ''}</button>
-                  <button type="button" className="btn btn-xs btn-ghost" onClick={() => openEdit(c)}>Edit</button>
-                  <button type="button" className="btn btn-xs btn-danger" onClick={() => setClientToDelete(c)}>Delete</button>
+                  <button type="button" className="btn btn-xs" aria-label={`View pet bios for client ${c.name}`} style={{ background: '#e8f4ff', color: '#2060c0', border: '1px solid #c0d8f0' }} onClick={() => setPetBioClient(c)}>🐾 Pet Bios{c.pets?.some(p => p.vetName || p.allergies || p.feedingTime) ? ` ✓` : ''}</button>
+                  <button type="button" className="btn btn-xs btn-ghost" aria-label={`Edit profile for client ${c.name}`} onClick={() => openEdit(c)}>Edit</button>
+                  <button type="button" className="btn btn-xs btn-danger" aria-label={`Delete profile for client ${c.name}`} onClick={() => setClientToDelete(c)}>Delete</button>
                 </div>
              </div>
           ))

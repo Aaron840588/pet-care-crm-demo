@@ -2,9 +2,9 @@ const sharp = require('sharp');
 const fs = require('fs');
 
 async function generate() {
-  const inputFile = 'public/logo.png';
+  const inputFile = 'public/logo.svg';
   if (!fs.existsSync(inputFile)) {
-    console.log("Please save your logo as public/logo.png first.");
+    console.log("Please save your logo as public/logo.svg first.");
     return;
   }
 

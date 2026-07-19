@@ -1,4 +1,4 @@
-$sourcePath = Read-Host "Enter the full path to your logo image (e.g. C:\Users\Downloads\logo.png)"
+$sourcePath = Read-Host "Enter the full path to your SVG logo (e.g. C:\Users\Downloads\logo.svg)"
 $sourcePath = $sourcePath.Trim('"')
 
 if (!(Test-Path $sourcePath)) {
@@ -6,8 +6,8 @@ if (!(Test-Path $sourcePath)) {
     exit
 }
 
-Write-Host "Copying logo to public/logo.png..."
-Copy-Item $sourcePath "public/logo.png" -Force
+Write-Host "Copying logo to public/logo.svg..."
+Copy-Item $sourcePath "public/logo.svg" -Force
 
 Write-Host "Generating PWA icons..."
 node generate-icons.cjs

@@ -32,7 +32,7 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setMobi
     <div className={`sidebar ${isMobileOpen ? 'open' : ''}`}>
       <div className="sb-brand">
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <img src="/logo.png" alt="Pet Care CRM" style={{ width: '42px', height: '42px', objectFit: 'contain', flexShrink: 0, borderRadius: '8px' }} />
+          <img src="/logo.svg" alt="Pet Care CRM" style={{ width: '42px', height: '42px', objectFit: 'contain', flexShrink: 0, borderRadius: '8px' }} />
           <div style={{ minWidth: 0, flex: 1 }}>
             <div className="logo" style={{ fontSize: '17px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Pet Care <span>Operations</span></div>
             <div className="sub" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Portfolio Demo 🐾</div>

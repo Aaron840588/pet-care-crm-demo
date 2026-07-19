@@ -1,11 +1,31 @@
 import React from 'react';
 import { X, CalendarPlus, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import { fmtDate, fmtDayLabel } from '../../utils/dates';
-import { calcDayDiscount } from '../../utils/calculations';
+import { applyDiscount, calcDayDiscount, calcDaySubtotal, calcDayTotal } from '../../utils/calculations';
 
 
 
 const getDiscountTotal = (schedule = []) => schedule.reduce((sum, day) => sum + calcDayDiscount(day), 0);
+
+const getBookingTotal = (booking) => {
+  const storedTotal = [booking.total, booking.finalTotal]
+    .filter((value) => value !== null && value !== undefined && value !== '')
+    .map(Number)
+    .find(Number.isFinite);
+
+  if (storedTotal !== undefined) return Math.max(0, storedTotal);
+
+  const schedule = booking.daySchedule || [];
+  if (schedule.length === 0) return 0;
+
+  const hasPerDayDiscounts = schedule.some((day) => calcDayDiscount(day) > 0);
+  if (hasPerDayDiscounts) {
+    return schedule.reduce((sum, day) => sum + calcDayTotal(day), 0);
+  }
+
+  const gross = schedule.reduce((sum, day) => sum + calcDaySubtotal(day), 0);
+  return applyDiscount(gross, schedule.length, booking.discount);
+};
 
 
 
@@ -17,6 +37,7 @@ export default function ViewBookingModal({ viewBooking, setViewBooking, clients 
   const dayDiscountTotal = getDiscountTotal(vb.daySchedule || []);
   const hasLegacyDiscount = vb.discount?.mode && vb.discount.mode !== 'none' && Number(vb.discount.value) > 0;
   const hasDiscount = dayDiscountTotal > 0 || hasLegacyDiscount;
+  const bookingTotal = getBookingTotal(vb);
   const statusLabel = vb.status === 'tentative'
     ? 'Needs confirmation'
     : vb.status === 'active'
@@ -34,6 +55,8 @@ export default function ViewBookingModal({ viewBooking, setViewBooking, clients 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 700 }}>🐾 Visit Details</div>
           <button
+            type="button"
+            aria-label="Close visit details"
             onClick={() => setViewBooking(null)}
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--gray)', padding: '6px' }}
           >
@@ -73,7 +96,7 @@ export default function ViewBookingModal({ viewBooking, setViewBooking, clients 
             <div style={{ background: '#fafafa', borderRadius: '10px', padding: '12px' }}>
               <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#888', marginBottom: '4px' }}>Total Due</div>
               <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--green)' }}>
-                ₱{Number(vb.finalTotal || 0).toLocaleString()}
+                ₱{bookingTotal.toLocaleString('en-PH', { maximumFractionDigits: 2 })}
                 {hasDiscount && <span style={{ fontSize: '11px', color: 'var(--red)', display: 'block', fontWeight: 600 }}>Includes Discount</span>}
               </div>
             </div>

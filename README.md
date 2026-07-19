@@ -2,7 +2,7 @@
 
 ### 🔗 **[Open Live Demo](https://pet-care-crm-demo.vercel.app)**
 
-A modern, offline-first, cloud-synced Progressive Web Application (PWA) designed for solo pet sitters and pet care service providers. This is a sanitized, fully isolated public portfolio demo copy. 
+A responsive React prototype for client records, scheduling, key handovers, billing, errands, and visit reports for a solo pet-care operator. This repository is a sanitized public portfolio demo.
 
 ---
 
@@ -11,15 +11,15 @@ A modern, offline-first, cloud-synced Progressive Web Application (PWA) designed
 1. **Open the Live Demo**: Click the **[Open Live Demo](https://pet-care-crm-demo.vercel.app)** link above.
 2. **Launch the Demo**: On the landing page, click the prominent **"Launch Public Demo 🐾"** button. This will immediately authenticate you into a client-side in-memory session (no signup, email, or credentials required).
 3. **Explore the System**: Navigate the operations dashboard, create bookings, modify client and pet records, test the Invoice Builder, or generate Visit Report Cards.
-4. **Instant Reset**: This demo uses synthetic fictional data and operates entirely in browser memory. Simply refresh the page or click **"Reset Demo"** on the top banner to completely restore the default sample dataset.
+4. **Instant Reset**: The demo uses fictional data in browser memory. Refresh the page or choose **"Reset Demo"** to restore the sample records.
 
 ---
 
-When running in Demo Mode, the application operates entirely within browser memory (in-memory local state and `localStorage` for configurations) without initializing Firebase, making network connections to Firestore, or exposing any production databases or real-world client records.
+In demo mode, the application uses in-memory state and bypasses Firebase initialization. It does not connect to Firestore or expose production records.
 
 ## Project Overview
 
-Pet Care Operations CRM is a specialized business management dashboard for pet sitters to coordinate client communications, visiting schedules, pet profiles, errand check-offs, invoice generation, and custom report cards. The original production app integrates with Firebase Firestore for real-time sync and offline persistence; this demo is configured with a high-fidelity client-side sandbox to let visitors test-drive all operations with zero production database exposure.
+Pet Care Operations CRM is a personal workflow prototype for coordinating client and pet records, visits, keys, errands, invoices, and report cards. Non-demo deployments can use Firebase Authentication and Firestore; this public build uses synthetic records in an isolated client-side sandbox.
 
 ## Key Features
 
@@ -45,17 +45,14 @@ This application utilizes a structured provider-consumer context pattern (`DataC
 
 ## Screenshots
 
-*(Placeholder section. Images will render once generated in host platforms)*
-- **Dashboard View**: `verification-screens/desktop-dashboard.png`
-- **Clients & Pets**: `qa/android-pwa-before/04-clients.png`
-- **Invoice Records**: `qa/android-pwa-before/11-invoice-records.png`
+Historical QA captures are intentionally excluded from the public repository because they can contain test contact or payment details. The live demo uses the sanitized records described below.
 
 ## Demo-Mode Privacy & Security
 
 - **Strict Network Isolation**: When `VITE_DEMO_MODE=true`, the Firebase SDK configuration is cleared, and no connections are established with the Firestore DB, Firebase Storage, or Auth.
 - **Synthetic Data**: All names, contact details, Philippine mobile numbers, and personal notes are completely fictional (e.g., Demo Client A, Pepper Rescue Cat, Mochi, 0917-000-0000).
 - **Payment Safety**: QR code payment creation is disabled and replaced by non-payable placeholders. Generated invoices are explicitly watermarked with **DEMO ONLY — DO NOT PAY**.
-- **Local Sandbox Reset**: A visible **Reset Demo** button on the top banner allows you to clear custom services from local storage and restart with a clean sample dataset.
+- **Local Sandbox Reset**: A visible **Reset Demo** button restores the in-memory sample dataset.
 - **Notifications Disabled**: Browser service-worker notifications and push reminders are bypassed in demo mode.
 
 ---

@@ -27,3 +27,6 @@ dist-ssr
 
 .vercel
 test-results/
+playwright-report/
+qa/
+verification-screens/

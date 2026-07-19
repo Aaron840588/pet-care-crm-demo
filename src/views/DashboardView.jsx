@@ -1,14 +1,19 @@
-import React, { useCallback, useRef, useState, useMemo } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { useData } from '../store/DataContext';
 import { useToast } from '../components/Toast';
 import { KeyRound, ReceiptText, CalendarCheck2, Users, TrendingUp, Plus, Check, Trash2, ChevronLeft, ChevronRight, X, CheckCircle2 } from 'lucide-react';
 import { fmtDate, dateSortValue } from '../utils/dates';
 import NumericInput from '../components/NumericInput';
 import { bookingHasVisitOnDate } from '../utils/scheduleLogic';
-import { getInvoiceBalance, getUnpaidInvoices, getUnpaidInvoiceTotal } from '../utils/dashboardLogic';
+import {
+  completeVisitForDate,
+  getInvoiceBalance,
+  getNextVisitMinutes,
+  getUnpaidInvoices,
+  getUnpaidInvoiceTotal,
+} from '../utils/dashboardLogic';
 
-const getLocalTodayStr = () => {
-  const now = new Date();
+const getLocalTodayStr = (now = new Date()) => {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 };
 
@@ -80,11 +85,11 @@ function MiniCalendar({ bookings }) {
     <div>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-        <button type="button" onClick={prevMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
+        <button type="button" aria-label="Previous month" onClick={prevMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
           <ChevronLeft size={16} color="#555" />
         </button>
         <span style={{ fontWeight: 700, fontSize: '13px', color: '#111' }}>{monthName}</span>
-        <button type="button" onClick={nextMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
+        <button type="button" aria-label="Next month" onClick={nextMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
           <ChevronRight size={16} color="#555" />
         </button>
       </div>
@@ -144,11 +149,17 @@ export default function DashboardView({ setActiveTab }) {
   const { bookings, clients, invoices, reminders, errands, addReminder, toggleReminder, removeReminder, updateInvoice, updateBooking, updateErrand } = useData();
   const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
   const toast = useToast();
-  const unpaidInvoicesRef = useRef(null);
   const [newReminder, setNewReminder]       = useState('');
   const [markingDone, setMarkingDone]       = useState(null);
+  const [clock, setClock] = useState(() => new Date());
 
-  const todayStr = useMemo(() => getLocalTodayStr(), []);
+  useEffect(() => {
+    const timer = window.setInterval(() => setClock(new Date()), 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const todayStr = getLocalTodayStr(clock);
+  const currentMinutes = clock.getHours() * 60 + clock.getMinutes();
 
   const totalClients   = clients.length;
   const upcomingCount  = useMemo(() => bookings.filter(b => b.status === 'pending').length, [bookings]);
@@ -162,7 +173,10 @@ export default function DashboardView({ setActiveTab }) {
   const [paymentAmount, setPaymentAmount] = useState('');
 
   const todaysSchedule = useMemo(() =>
-    bookings.filter(b => bookingHasVisitOnDate(b, todayStr) && b.status !== 'done'),
+    bookings.filter((b) => {
+      const todayEntry = b.daySchedule?.find((day) => day?.date === todayStr);
+      return bookingHasVisitOnDate(b, todayStr) && b.status !== 'done' && !todayEntry?.completed;
+    }),
     [bookings, todayStr]
   );
 
@@ -170,12 +184,17 @@ export default function DashboardView({ setActiveTab }) {
     [...todaysSchedule].sort((a, b) => {
       const aEntry = a.daySchedule?.find(d => d.date === todayStr);
       const bEntry = b.daySchedule?.find(d => d.date === todayStr);
-      return (aEntry?.time || a.timeText || '').localeCompare(bEntry?.time || b.timeText || '');
+      const aMinutes = getNextVisitMinutes(aEntry?.time || a.timeText, currentMinutes);
+      const bMinutes = getNextVisitMinutes(bEntry?.time || b.timeText, currentMinutes);
+      return (aMinutes ?? Number.MAX_SAFE_INTEGER) - (bMinutes ?? Number.MAX_SAFE_INTEGER);
     }),
-    [todaysSchedule, todayStr]
+    [todaysSchedule, todayStr, currentMinutes]
   );
 
-  const nextVisit = sortedTodaysSchedule[0] || null;
+  const nextVisit = sortedTodaysSchedule.find((booking) => {
+    const todayEntry = booking.daySchedule?.find((day) => day?.date === todayStr);
+    return getNextVisitMinutes(todayEntry?.time || booking.timeText, currentMinutes) !== null;
+  }) || null;
 
   const upcoming = useMemo(() =>
     bookings
@@ -193,22 +212,28 @@ export default function DashboardView({ setActiveTab }) {
     [bookings]
   );
 
-  const todayFull = new Date().toLocaleDateString('en-PH', {
+  const todayFull = clock.toLocaleDateString('en-PH', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
   });
 
   const handleMarkBookingDone = useCallback(async (b) => {
     setMarkingDone(b.id);
     try {
-      await updateBooking(b.id, { status: 'done' });
-      toast(`✔️ ${b.clientName} marked as done!`);
+      const completion = completeVisitForDate(b, todayStr);
+      if (!completion.changed) return;
+      await updateBooking(b.id, completion.updates);
+      toast(
+        completion.allComplete
+          ? `✔️ ${b.clientName} booking marked as done!`
+          : `✔️ Today's visit for ${b.clientName} marked as done!`,
+      );
     } catch (e) {
       console.error(e);
       toast('Could not update. Try again.', 'error');
     } finally {
       setMarkingDone(null);
     }
-  }, [updateBooking, toast]);
+  }, [todayStr, updateBooking, toast]);
 
   const [confirmingTentative, setConfirmingTentative] = useState(null);
 
@@ -263,9 +288,10 @@ export default function DashboardView({ setActiveTab }) {
   };
 
   const openUnpaidInvoices = useCallback(() => {
-    if (unpaidInvoicesRef.current) {
-      unpaidInvoicesRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      unpaidInvoicesRef.current.focus({ preventScroll: true });
+    const unpaidInvoicesSection = document.getElementById('unpaid-invoices');
+    if (unpaidInvoicesSection) {
+      unpaidInvoicesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      unpaidInvoicesSection.focus({ preventScroll: true });
       return;
     }
     if (setActiveTab) setActiveTab('records');
@@ -455,6 +481,8 @@ export default function DashboardView({ setActiveTab }) {
               return (
                 <div key={errand.id} className="card" style={{ padding: '14px', display: 'flex', alignItems: 'flex-start', gap: '12px', background: '#fffcfc' }}>
                   <button 
+                    type="button"
+                    aria-label={`Mark ${errand.title} done`}
                     onClick={() => updateErrand(errand.id, { status: 'done' })}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', color: '#ccc' }}
                   >
@@ -685,7 +713,7 @@ export default function DashboardView({ setActiveTab }) {
         </div>
 
         {/* UNPAID INVOICES */}
-        <div className="card" ref={unpaidInvoicesRef} tabIndex="-1" style={{ margin: 0, scrollMarginTop: '16px' }}>
+        <div id="unpaid-invoices" className="card" tabIndex="-1" style={{ margin: 0, scrollMarginTop: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '15px' }}>💸 Unpaid Invoices</div>
             {unpaidBalance > 0 && (
@@ -777,7 +805,7 @@ export default function DashboardView({ setActiveTab }) {
                     border: `1.5px solid ${r.done ? '#eee' : 'var(--lime)'}`,
                     transition: 'all .15s',
                   }}>
-                    <button type="button" onClick={() => toggleReminder(r.id, r.done)} style={{
+                    <button type="button" aria-label={r.done ? `Mark ${r.text} incomplete` : `Mark ${r.text} complete`} onClick={() => toggleReminder(r.id, r.done)} style={{
                       width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0,
                       cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                       background: r.done ? 'var(--green)' : 'transparent',
@@ -892,7 +920,7 @@ export default function DashboardView({ setActiveTab }) {
             <div className="modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '18px' }}>
                 <div className="modal-title" style={{ margin: 0 }}>Record Payment</div>
-                <button type="button" onClick={() => { setPaymentModal(null); setPaymentAmount(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--gray)', padding: '6px' }}>
+                <button type="button" aria-label="Close payment dialog" onClick={() => { setPaymentModal(null); setPaymentAmount(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--gray)', padding: '6px' }}>
                   <X size={20} />
                 </button>
               </div>

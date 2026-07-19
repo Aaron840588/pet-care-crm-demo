@@ -26,7 +26,7 @@ export function ToastProvider({ children }) {
     <ToastContext.Provider value={addToast}>
       {children}
       {toasts.length > 0 && (
-        <div style={{
+        <div role="status" aria-live="polite" aria-atomic="true" style={{
           position: 'fixed',
           bottom: 'calc(74px + var(--safe-bottom))',
           left: '50%',
