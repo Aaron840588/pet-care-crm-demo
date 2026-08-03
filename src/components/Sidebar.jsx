@@ -28,6 +28,8 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setMobi
     setMobileOpen(false);
   };
 
+  const isDemo = import.meta.env.VITE_DEMO_MODE === 'true' || (typeof window !== 'undefined' && window.location.hostname.includes('demo'));
+
   return (
     <div className={`sidebar ${isMobileOpen ? 'open' : ''}`}>
       <div className="sb-brand">
@@ -70,11 +72,13 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setMobi
         </button>
       </nav>
 
-      <div className="sb-footer">
-        Kat's Pet-sitting Services<br />
-        Los Baños, Laguna<br />
-        GCash: 0917 000 0000
-      </div>
+      {!isDemo && (
+        <div className="sb-footer">
+          Kat's Pet-sitting Services<br />
+          Los Baños, Laguna<br />
+          GCash: 0917 000 0000
+        </div>
+      )}
     </div>
   );
 }
