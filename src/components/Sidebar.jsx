@@ -75,8 +75,8 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setMobi
       {!isDemo && (
         <div className="sb-footer">
           Kat's Pet-sitting Services<br />
-          Los Baños, Laguna<br />
-          GCash: 0917 000 0000
+          San Antonio, Los Baños, Laguna<br />
+          GCash: 09952664451
         </div>
       )}
     </div>

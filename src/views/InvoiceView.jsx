@@ -33,11 +33,11 @@ export default function InvoiceView() {
   const toast  = useToast();
   const invoiceRef = useRef(null);
   const bookingHandoffRef = useRef(false);
-  const [saving, setSaving] = useState(false);
-  const [confirmResetOpen, setConfirmResetOpen] = useState(false);
+  const isDemo = import.meta.env.VITE_DEMO_MODE === 'true' || (typeof window !== 'undefined' && window.location.hostname.includes('demo'));
+  const defaultGcash = isDemo ? '09170000000' : '09952664451';
 
   const [data, setData] = useState({
-    gcash:    '09170000000',
+    gcash:    defaultGcash,
     clientId: '',
     toName:   '',
     pets:     '',
@@ -439,13 +439,13 @@ export default function InvoiceView() {
       setConfirmResetOpen(true);
       return;
     }
-    setData({ gcash: '09170000000', clientId: '', toName: '', pets: '', paid: 0, tip: 0 });
+    setData({ gcash: defaultGcash, clientId: '', toName: '', pets: '', paid: 0, tip: 0 });
     setLineItems([newLineItem()]);
     setImportBookingId('');
   }, [lineItems]);
 
   const confirmReset = useCallback(() => {
-    setData({ gcash: '09170000000', clientId: '', toName: '', pets: '', paid: 0, tip: 0 });
+    setData({ gcash: defaultGcash, clientId: '', toName: '', pets: '', paid: 0, tip: 0 });
     setLineItems([newLineItem()]);
     setImportBookingId('');
     setConfirmResetOpen(false);
