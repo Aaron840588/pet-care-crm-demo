@@ -411,7 +411,7 @@ export default function ScheduleView() {
                 className={`card schedule-mobile-card ${b.status === 'tentative' ? 'schedule-card-tentative' : ''}`}
                 style={{ marginBottom: '12px', borderTop: b.status === 'tentative' ? '4px solid #d6bf5f' : '4px solid var(--lime)' }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '10px', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontWeight: 800, fontSize: '16px', lineHeight: 1.2 }}>{b.clientName}</div>
                     <div style={{ fontSize: '12px', color: 'var(--gray)', marginTop: '4px' }}>
