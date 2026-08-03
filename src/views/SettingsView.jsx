@@ -267,8 +267,8 @@ export default function SettingsView() {
         {/* ── APP INFO ── */}
         <div style={{ textAlign: 'center', padding: '10px', color: 'var(--gray)', fontSize: '11px', lineHeight: 1.6 }}>
           Kat's Pet-sitting CRM 🐾<br/>
-          San Antonio, Los Baños, Laguna<br/>
-          GCash: 09952664451
+          Los Baños, Laguna<br/>
+          GCash: 0917 000 0000
         </div>
 
       </div>

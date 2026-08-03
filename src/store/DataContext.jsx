@@ -148,7 +148,7 @@ const demoInvoices = [
     id: 'i1',
     clientId: 'c1',
     dateSaved: todayLocalStr(),
-    gcash: '09952664451',
+    gcash: '09170000000',
     toName: 'Ate Maria',
     pets: 'Buster, Luna',
     baseServiceName: 'Basic Visit',
