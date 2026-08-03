@@ -59,19 +59,27 @@ body {
 /* ── SIDEBAR (desktop) ─────────────────────────────────────────────────────── */
 .sidebar {
   width: 230px;
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
   background: var(--black);
-  position: fixed; top: 0; left: 0; z-index: 100;
-  display: flex; flex-direction: column; padding-bottom: 20px;
+  position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+  display: flex; flex-direction: column;
+  overflow: hidden;
   /* GPU layer for smooth animation */
   will-change: transform;
   transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.sb-brand { padding: 24px 22px 20px; border-bottom: 1px solid #2e2e2e; }
+.sb-brand { padding: 24px 22px 20px; border-bottom: 1px solid #2e2e2e; flex-shrink: 0; }
 .sb-brand .logo { font-family: var(--font-display); font-size: 20px; color: var(--lime); font-weight: 700; line-height: 1.2; }
 .sb-brand .logo span { font-style: italic; font-weight: 400; }
 .sb-brand .sub { font-size: 11px; color: #666; margin-top: 3px; letter-spacing: .03em; }
-.nav { padding: 14px 0; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.nav { padding: 14px 0; flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.nav::-webkit-scrollbar { width: 5px; }
+.nav::-webkit-scrollbar-track { background: transparent; }
+.nav::-webkit-scrollbar-thumb { background: #333333; border-radius: 4px; }
+.nav::-webkit-scrollbar-thumb:hover { background: #555555; }
 .nav-section { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: #444; padding: 14px 22px 6px; font-weight: 700; }
 .nav-item {
   display: flex; align-items: center; gap: 10px; padding: 12px 22px;
@@ -94,7 +102,7 @@ body {
 .nav-item:hover { color: #fff; background: #222; }
 .nav-item.active { color: var(--lime); background: #1a1a1a; border-left-color: var(--lime); }
 .nav-item:focus-visible { outline: 2px solid var(--lime); outline-offset: -2px; color: #fff; background: #222; }
-.sb-footer { padding: 16px 22px; border-top: 1px solid #222; font-size: 11px; color: #444; line-height: 1.6; }
+.sb-footer { padding: 14px 22px; border-top: 1px solid #222; font-size: 11px; color: #444; line-height: 1.5; flex-shrink: 0; }
 
 /* ── SYNC PILL ─────────────────────────────────────────────────────────────── */
 .sync-pill {

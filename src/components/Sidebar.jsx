@@ -58,7 +58,7 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setMobi
             )
         )}
         
-        <div className="nav-section" style={{ marginTop: 'auto' }}>Account</div>
+        <div className="nav-section">Account</div>
         <button
           type="button"
           className="nav-item"
