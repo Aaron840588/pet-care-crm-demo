@@ -275,10 +275,32 @@ export default function ScheduleView() {
     }
   }, [formData, daySchedule, clients, editingId, addBooking, updateBooking, getDefaultService, toast]);
 
-  const cycleStatus = useCallback((booking) => {
-    const next = STATUS_FLOW[booking.status] || 'pending';
-    updateBooking(booking.id, { status: next });
-  }, [updateBooking]);
+  const renderStatusSelect = useCallback((booking) => (
+    <div className="status-select-wrapper" onClick={(e) => e.stopPropagation()}>
+      <select
+        className={`badge b-${booking.status || 'pending'} status-select`}
+        value={booking.status || 'pending'}
+        onChange={(e) => updateBooking(booking.id, { status: e.target.value })}
+        aria-label="Change booking status"
+      >
+        <option value="active">● Active</option>
+        <option value="pending">● Upcoming</option>
+        <option value="tentative">✏️ Needs confirmation</option>
+        <option value="done">✓ Done</option>
+      </select>
+      <ChevronDown
+        size={11}
+        style={{
+          position: 'absolute',
+          right: '7px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          pointerEvents: 'none',
+          opacity: 0.65,
+        }}
+      />
+    </div>
+  ), [updateBooking]);
 
   // M4/B17: inline confirm for delete (replaces window.confirm)
   const handleDeleteConfirm = useCallback(async () => {
@@ -293,12 +315,6 @@ export default function ScheduleView() {
     }
   }, [confirmId, removeBooking, toast]);
 
-  const getStatusBadge = (status) => {
-    if (status === 'active')  return <span className="badge b-active"  style={{ cursor: 'pointer' }}>● Active</span>;
-    if (status === 'pending') return <span className="badge b-pending" style={{ cursor: 'pointer' }}>● Upcoming</span>;
-    if (status === 'tentative') return <span className="badge b-tentative" style={{ cursor: 'pointer' }}><Pencil size={11} /> Needs confirmation</span>;
-    return <span className="badge b-done" style={{ cursor: 'pointer' }}>✓ Done</span>;
-  };
 
   const appendTimeText = (text) => {
     const current = formData.timeText ? formData.timeText.trim() + ', ' : '';
@@ -317,11 +333,15 @@ export default function ScheduleView() {
       : `${fmtDate(booking.startDate)} to ${fmtDate(booking.endDate)}`;
   }, []);
 
-  // P2: memoize filtered + sorted bookings
+  // P2: memoize filtered + sorted bookings (Newest to Oldest)
   const filteredBookings = useMemo(() =>
     bookings
       .filter(b => filter === 'all' || b.status === filter)
-      .sort((a, b) => dateSortValue(a.startDate) - dateSortValue(b.startDate)),
+      .sort((a, b) => {
+        const diff = dateSortValue(b.startDate) - dateSortValue(a.startDate);
+        if (diff !== 0) return diff;
+        return dateSortValue(b.endDate) - dateSortValue(a.endDate);
+      }),
     [bookings, filter]
   );
 
@@ -358,7 +378,7 @@ export default function ScheduleView() {
       <div className="ph">
         <div>
           <h2>Schedule</h2>
-          <p>All bookings — tap a status badge to cycle it.</p>
+          <p>All bookings — select a status from the dropdown to update.</p>
         </div>
         <div className="ph-actions">
           <button className="btn btn-lime" onClick={openAdd}>+ Add Booking</button>
@@ -398,14 +418,7 @@ export default function ScheduleView() {
                       {uniqueServices ? uniqueServices.join(' + ') : getServiceLabel(b)}
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    style={{ background: 'none', border: 'none', padding: 0, flexShrink: 0 }}
-                    onClick={() => cycleStatus(b)}
-                    title="Tap to change status"
-                  >
-                    {getStatusBadge(b.status)}
-                  </button>
+                  {renderStatusSelect(b)}
                 </div>
 
                 <div className="schedule-card-summary">
@@ -556,8 +569,8 @@ export default function ScheduleView() {
                           ₱{b.total}
                           {hasDiscount && <div style={{ fontSize: '10px', color: 'var(--green)', fontWeight: 600 }}>discounted</div>}
                         </td>
-                        <td onClick={() => cycleStatus(b)} title="Tap to change status" style={{ cursor: 'pointer' }}>
-                          {getStatusBadge(b.status)}
+                        <td>
+                          {renderStatusSelect(b)}
                         </td>
                         <td>
                           <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
