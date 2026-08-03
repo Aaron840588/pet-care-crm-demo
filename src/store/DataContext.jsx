@@ -508,7 +508,7 @@ export function DataProvider({ children }) {
       donations, addDonation, updateDonation, removeDonation,
       services, setServices: setServicesState,
       exportData, importData,
-      loading, syncStatus,
+      loading, syncStatus, isDemo,
     }}
     >
       {children}

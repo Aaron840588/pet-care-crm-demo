@@ -141,7 +141,7 @@ function MiniCalendar({ bookings }) {
 
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 export default function DashboardView({ setActiveTab }) {
-  const { bookings, clients, invoices, reminders, errands, addReminder, toggleReminder, removeReminder, updateInvoice, updateBooking, updateErrand } = useData();
+  const { bookings, clients, invoices, reminders, errands, isDemo, addReminder, toggleReminder, removeReminder, updateInvoice, updateBooking, updateErrand } = useData();
   const toast = useToast();
   const unpaidInvoicesRef = useRef(null);
   const [newReminder, setNewReminder]       = useState('');
@@ -304,6 +304,22 @@ export default function DashboardView({ setActiveTab }) {
           <div className="hs-sub">sitting{todaysSchedule.length !== 1 ? 's' : ''}</div>
         </div>
       </div>
+
+      {/* MEMORIAL */}
+      {!isDemo && (
+        <div className="memorial-wrapper">
+          <div className="memorial-inner">
+            <div className="memorial-img">
+              <img src="/kathleen-gonzales.webp" alt="Ribbon memorial" width="768" height="1024" loading="eager" />
+            </div>
+            <div className="memorial-text">
+              <div className="mt-label">In Loving Memory</div>
+              <div className="mt-title">I&apos;m so proud of you, Mommy.</div>
+              <p className="mt-sub">Always loved. Always remembered.</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* STAT CARDS */}
       <div className="stats-row" style={{ marginBottom: '22px' }}>
