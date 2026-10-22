@@ -79,7 +79,7 @@ export default function LoginView() {
           fontSize: '14px',
           marginBottom: '32px'
         }}>
-          Kat's Pet-Sitting Services CRM
+          Pet Care Operations CRM
         </p>
 
         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

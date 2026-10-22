@@ -34,7 +34,7 @@ export default function InvoiceView() {
   const invoiceRef = useRef(null);
   const bookingHandoffRef = useRef(false);
   const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
-  const defaultGcash = isDemo ? '09170000000' : '09952664451';
+  const defaultGcash = isDemo ? '09170000000' : '';
 
   const [data, setData] = useState({
     gcash:    defaultGcash,
@@ -968,7 +968,7 @@ export default function InvoiceView() {
             {/* HEADER */}
             <div style={{ textAlign: 'center' }}>
               <div className="inv-h1">INVOICE</div>
-              <div className="inv-sub">{isDemo ? 'Pet Care Operations — Demo only, do not pay' : "Kat's Pet-sitting Services"}</div>
+              <div className="inv-sub">{isDemo ? 'Pet Care Operations — Demo only, do not pay' : "Pet Care Operations"}</div>
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: '6px' }}>
                 <div className="inv-gcash-pill">Gcash: {fmtGcash(data.gcash)}</div>
               </div>

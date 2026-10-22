@@ -441,7 +441,7 @@ export function DataProvider({ children }) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `Kat_CRM_Backup_${todayLocalStr()}.json`;
+    link.download = `Pet_Care_Backup_${todayLocalStr()}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

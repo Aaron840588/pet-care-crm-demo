@@ -88,9 +88,9 @@ function AppContent({ onLogout }) {
           <Loader size={36} color="var(--black)" style={{ animation: 'spin 1s linear infinite' }} />
         </div>
         <div style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 700 }}>
-          Kat's CRM 🐾
+          Pet Care Demo 🐾
         </div>
-        <p style={{ color: 'var(--gray)', fontSize: '13px' }}>Connecting to the cloud…</p>
+        <p style={{ color: 'var(--gray)', fontSize: '13px' }}>Preparing the app…</p>
       </div>
     );
   }

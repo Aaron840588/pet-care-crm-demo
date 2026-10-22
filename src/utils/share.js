@@ -27,7 +27,7 @@ export async function shareImageFile(dataUrl, filename) {
       await navigator.share({
         files: [file],
         title: filename.replace(/_/g, ' ').replace('.png', ''),
-        text: '🐾 From Kat\'s Pet-Sitting Services',
+        text: '🐾 From Pet Care Operations Demo',
       });
       return 'shared';
     } catch (err) {

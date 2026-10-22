@@ -1,14 +1,17 @@
 {
-  "name": "Kat's Pet-sitting CRM",
-  "short_name": "Kat's CRM",
-  "description": "Manage clients, bookings, invoices and keys for Kat's Pet-sitting business.",
+  "name": "Pet Care Operations Demo",
+  "short_name": "Pet Care Demo",
+  "description": "A public portfolio sandbox using fictional pet-care records.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#fcff63",
   "theme_color": "#fcff63",
   "orientation": "portrait",
-  "categories": ["business", "productivity"],
+  "categories": [
+    "business",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "/pwa-icon-192.png",

@@ -4,7 +4,7 @@ import { X, Plus, Trash2, PawPrint, Phone, Utensils, AlertTriangle, FileText, Pi
 import { useData } from '../store/DataContext';
 import { useToast } from './Toast';
 
-const PET_TYPES = ['Dog', 'Cat'];
+const PET_TYPES = ['Dog', 'Cat', 'Rabbit', 'Bird'];
 
 const PET_COLORS = ['#c0392b', '#2980b9', '#27ae60', '#8e44ad', '#e67e22', '#16a085', '#d35400'];
 
@@ -28,7 +28,7 @@ export default function PetBioModal({ client, onClose }) {
   const toast = useToast();
   const [pets, setPets] = useState(() => {
     if (client.pets?.length > 0) {
-      return client.pets.map(p => ({ ...p, id: p.id || uuidv4() }));
+      return client.pets.map(p => ({ ...p, id: p.id || uuidv4(), type: p.type || ((p.icon || 'dog')[0].toUpperCase() + (p.icon || 'dog').slice(1)) }));
     }
     return [emptyPet()];
   });
@@ -36,7 +36,7 @@ export default function PetBioModal({ client, onClose }) {
   const [expandedId, setExpandedId] = useState(pets[0]?.id || null);
 
   const updatePet = (id, field, value) => {
-    setPets(prev => prev.map(p => p.id === id ? { ...p, [field]: value } : p));
+    setPets(prev => prev.map(p => p.id === id ? { ...p, [field]: value, ...(field === 'type' ? { icon: value.toLowerCase() } : {}) } : p));
   };
 
   const addMedication = (petId) => {

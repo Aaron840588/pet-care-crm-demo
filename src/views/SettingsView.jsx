@@ -252,13 +252,13 @@ export default function SettingsView() {
             📦 Data Backup
           </div>
           <p style={{ fontSize: '13px', color: 'var(--gray)', lineHeight: 1.6, marginBottom: '20px' }}>
-            {isDemo ? 'Export fictional demo records as JSON, or import a sample backup for this session. Imported data resets on refresh. Do not use personal or client information.' : 'Export a local JSON backup of your cloud records, or restore a previous backup.'}
+            {isDemo ? 'Export fictional demo records as JSON. Backup import is disabled in the public sandbox. Do not use personal or client information.' : 'Export a local JSON backup of your cloud records, or restore a previous backup.'}
           </p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button className="btn btn-lime" style={{ flex: 1, justifyContent: 'center', minWidth: '140px' }} onClick={exportData}>
               <Download size={18} /> Export Backup
             </button>
-            <button className="btn btn-ghost" style={{ flex: 1, justifyContent: 'center', minWidth: '140px' }} onClick={() => fileInputRef.current.click()}>
+            <button className="btn btn-ghost" style={{ flex: 1, justifyContent: 'center', minWidth: '140px' }} disabled={isDemo} title={isDemo ? "Backup import is unavailable in the public sandbox" : undefined} onClick={() => fileInputRef.current.click()}>
               <Upload size={18} /> Import Backup
             </button>
           </div>
@@ -267,9 +267,9 @@ export default function SettingsView() {
 
         {/* ── APP INFO ── */}
         <div style={{ textAlign: 'center', padding: '10px', color: 'var(--gray)', fontSize: '11px', lineHeight: 1.6 }}>
-          {isDemo ? 'Pet Care Operations — Demo' : "Kat's Pet-sitting CRM"}<br/>
-          {isDemo ? 'Los Baños, Laguna' : 'San Antonio, Los Baños, Laguna'}<br/>
-          GCash: {isDemo ? '0917 000 0000' : '09952664451'}
+          {isDemo ? 'Pet Care Operations — Demo' : "Pet Care Operations Demo"}<br/>
+          Public portfolio sandbox<br/>
+          GCash: {isDemo ? 'Demo only — do not pay' : 'Not configured'}
         </div>
 
       </div>

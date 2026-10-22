@@ -31,3 +31,8 @@ repomix-output.xml
 .playwright-cli/
 
 
+
+# Keep historical captures and cloud-import material out of this public demo.
+qa/
+verification-screens/
+playwright-report/
