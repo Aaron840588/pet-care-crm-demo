@@ -15,6 +15,9 @@ Demo mode is the default. It does not initialize Firebase, register push notific
 
 ## Validation
 
+The October 22 local run passed 16 Node tests and 16 desktop/mobile browser tests, lint, build, the public-source guard and the dependency audit. See `RELEASE_NOTES.md` for publication scope.
+
+
 ```sh
 npm run lint
 npm test
@@ -32,6 +35,6 @@ The deployed demo can differ from a review branch. Project workflow design, AI-a
 
 ## Public-source privacy
 
-Private cloud import scripts, production configuration and historical screenshots were removed from this review branch after the privacy audit. Previously committed credentials remain in Git history: revoke the exposed API key and change the exposed Firebase login password in their provider consoles. Removing files does not invalidate credentials or erase past commits. The Firebase web configuration is a public client identifier, but it is no longer hardcoded into this demo.
+Private cloud import scripts, production configuration and historical screenshots were removed from the current source after the privacy audit. Previously committed credentials remain in Git history: revoke the exposed API key and change the exposed Firebase login password in their provider consoles. Removing files does not invalidate credentials or erase past commits. The Firebase web configuration is a public client identifier, but it is no longer hardcoded into this demo.
 
 Never enter personal/client information into the public sandbox or import private backups. The included Firestore rules deny all reads and writes for an isolated demo project; they are not private production rules.
