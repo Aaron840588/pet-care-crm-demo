@@ -4,7 +4,7 @@ A React application for exploring pet-care scheduling, client records, invoices,
 
 ## Run locally
 
-Requires Node.js 22 or later.
+Requires Node.js 24 (matching package.json and CI).
 
 ```sh
 npm ci
