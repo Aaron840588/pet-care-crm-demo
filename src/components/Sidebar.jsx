@@ -28,15 +28,15 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setMobi
     setMobileOpen(false);
   };
 
-  const isDemo = import.meta.env.VITE_DEMO_MODE === 'true' || (typeof window !== 'undefined' && window.location.hostname.includes('demo'));
+  const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
 
   return (
     <div className={`sidebar ${isMobileOpen ? 'open' : ''}`}>
       <div className="sb-brand">
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <img src="/logo.png" alt="Kat's Pet-sitting" style={{ width: '42px', height: '42px', objectFit: 'contain', flexShrink: 0, borderRadius: '8px' }} />
+          <img src="/logo.png" alt="Pet Care Operations" style={{ width: '42px', height: '42px', objectFit: 'contain', flexShrink: 0, borderRadius: '8px' }} />
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div className="logo" style={{ fontSize: '17px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Kat's <span>Pet-sitting</span></div>
+            <div className="logo" style={{ fontSize: '17px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Pet Care <span>Operations</span></div>
             <div className="sub" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>Business Manager 🐾</div>
           </div>
         </div>
@@ -74,9 +74,9 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setMobi
 
       {!isDemo && (
         <div className="sb-footer">
-          Kat's Pet-sitting Services<br />
+          Pet Care Operations Services<br />
           San Antonio, Los Baños, Laguna<br />
-          GCash: 09952664451
+          Demo only — no payments
         </div>
       )}
     </div>

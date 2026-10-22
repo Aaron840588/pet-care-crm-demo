@@ -15,7 +15,8 @@ const firebaseConfig = {
   appId:             "1:631159403990:web:2a720c8a8eb34d0187a077",
 };
 
-const app = initializeApp(firebaseConfig);
+const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
+const app = isDemo ? null : initializeApp(firebaseConfig);
 
 /**
  * O4: Enable IndexedDB offline persistence (Firebase 12 API)
@@ -23,10 +24,10 @@ const app = initializeApp(firebaseConfig);
  * - persistentMultipleTabManager: safe for multi-tab usage
  * - Falls back silently if IndexedDB unavailable (private browsing)
  */
-export const db = initializeFirestore(app, {
+export const db = isDemo ? null : initializeFirestore(app, {
   localCache: persistentLocalCache({
     tabManager: persistentMultipleTabManager(),
   }),
 });
 
-export const auth = getAuth(app);
+export const auth = isDemo ? null : getAuth(app);

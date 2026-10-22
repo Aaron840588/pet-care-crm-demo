@@ -163,7 +163,7 @@ export default function App() {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
 
-  const isDemo = import.meta.env.VITE_DEMO_MODE === 'true' || (typeof window !== 'undefined' && window.location.hostname.includes('demo'));
+  const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
 
   useEffect(() => {
     if (isDemo) {
@@ -183,7 +183,7 @@ export default function App() {
 
   // ── Register Service Worker + Schedule notifications ─────────────────────────
   useEffect(() => {
-    if (!('serviceWorker' in navigator)) return;
+    if (isDemo || !('serviceWorker' in navigator)) return;
 
     navigator.serviceWorker.register('/sw.js', { scope: '/' })
       .then((reg) => {
@@ -212,9 +212,10 @@ export default function App() {
         }
       })
       .catch((err) => console.warn('[SW] Registration failed:', err));
-  }, []);
+  }, [isDemo]);
 
   const handleLogout = async () => {
+    if (isDemo) { window.location.reload(); return; }
     try {
       await signOut(auth);
     } catch (err) {
@@ -246,6 +247,7 @@ export default function App() {
     <ErrorBoundary>
       <DataProvider>
         <ToastProvider>
+          {isDemo && <div role="note" style={{ padding: "12px 20px", background: "#f0fce8", color: "#173d12" }}>Public demo — fictional records only. All changes reset on refresh. <button type="button" onClick={() => window.location.reload()}>Reset demo</button></div>}
           <AppContent onLogout={handleLogout} />
         </ToastProvider>
       </DataProvider>

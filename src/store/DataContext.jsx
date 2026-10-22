@@ -52,13 +52,13 @@ const loadLocal = (key, fallbackValue) => {
   }
 };
 
-const isDemo = import.meta.env.VITE_DEMO_MODE === 'true' || (typeof window !== 'undefined' && window.location.hostname.includes('demo'));
+const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
 
 // ── MOCK DATA FOR DEMO MODE ──────────────────────────────────────────────────
 const demoClients = [
   {
     id: 'c1',
-    name: 'Ate Maria',
+    name: 'Demo Client A',
     contact: '0917-000-0001',
     pets: [{ id: 'p1', name: 'Buster', type: 'Dog', feedingTime: 'After morning visit' }, { id: 'p2', name: 'Luna', type: 'Cat' }],
     address: 'BGC, Taguig',
@@ -88,7 +88,7 @@ const demoBookings = [
   {
     id: 'b1',
     clientId: 'c1',
-    clientName: 'Ate Maria',
+    clientName: 'Demo Client A',
     startDate: todayLocalStr(),
     endDate: todayLocalStr(),
     status: 'active',
@@ -149,7 +149,7 @@ const demoInvoices = [
     clientId: 'c1',
     dateSaved: todayLocalStr(),
     gcash: '09170000000',
-    toName: 'Ate Maria',
+    toName: 'Demo Client A',
     pets: 'Buster, Luna',
     baseServiceName: 'Basic Visit',
     total: 200,
@@ -214,7 +214,7 @@ export function DataProvider({ children }) {
   const [errands, setErrands] = useState([]);
   const [ownPets, setOwnPets] = useState([]);
   const [donations, setDonations] = useState([]);
-  const [services, setServicesState] = useState(() => sanitizeServices(loadLocal('kats_services', initialServices)));
+  const [services, setServicesState] = useState(() => sanitizeServices(isDemo ? initialServices : loadLocal('kats_services', initialServices)));
   const [loading, setLoading] = useState(true);
   const [syncStatus, setSyncStatus] = useState('connecting');
 
@@ -303,6 +303,7 @@ export function DataProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    if (isDemo) return;
     try {
       localStorage.setItem('kats_services', JSON.stringify(services));
     } catch {

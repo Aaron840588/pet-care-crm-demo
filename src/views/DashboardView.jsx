@@ -15,6 +15,7 @@ const getLocalTodayStr = () => {
 const getSessionLabel = (timeText) => {
   if (!timeText) return null;
   const t = timeText.toLowerCase();
+  if (/\b(am|pm)\b/i.test(timeText)) return null;
   if ((t.includes('2x') || t.includes('twice')) || (t.includes('am') && t.includes('pm'))) return 'AM + PM';
   if (t.includes('am') || t.includes('morning'))   return 'AM';
   if (t.includes('pm') || t.includes('afternoon') || t.includes('evening')) return 'PM';
@@ -80,11 +81,11 @@ function MiniCalendar({ bookings }) {
     <div>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-        <button type="button" onClick={prevMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
+        <button type="button" aria-label="Previous month" onClick={prevMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
           <ChevronLeft size={16} color="#555" />
         </button>
         <span style={{ fontWeight: 700, fontSize: '13px', color: '#111' }}>{monthName}</span>
-        <button type="button" onClick={nextMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
+        <button type="button" aria-label="Next month" onClick={nextMonth} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px', borderRadius: '6px', display: 'flex', alignItems: 'center' }}>
           <ChevronRight size={16} color="#555" />
         </button>
       </div>
@@ -326,13 +327,13 @@ export default function DashboardView({ setActiveTab }) {
         {[
           { icon: Users,          label: 'Clients',       val: totalClients,            sub: 'total registered',  color: '#4a90d9', bg: '#eef4fc' },
           { icon: CalendarCheck2, label: 'Upcoming',      val: upcomingCount,           sub: 'bookings queued',   color: '#e08c30', bg: '#fff8ee' },
-          { icon: TrendingUp,     label: 'Unpaid Balance',val: fmtMoney(unpaidBalance), sub: 'tap to record',     color: '#d94f4f', bg: '#fff0f0', onClick: openUnpaidInvoices, ariaLabel: 'Open unpaid invoices' },
+          { icon: TrendingUp,     label: 'Unpaid Balance',val: fmtMoney(unpaidBalance), sub: 'tap to record',     color: '#d94f4f', bg: '#fff0f0', action: true, ariaLabel: 'Open unpaid invoices' },
           { icon: KeyRound,       label: 'Keys Pending',  val: keysPending.length,      sub: 'not yet received',  color: '#9b59b6', bg: '#f5eeff' },
         ].map(item => {
           const Icon = item.icon;
-          const CardTag = item.onClick ? 'button' : 'div';
+          const CardTag = item.action ? 'button' : 'div';
           return (
-            <CardTag key={item.label} type={item.onClick ? 'button' : undefined} onClick={item.onClick} aria-label={item.ariaLabel} className="stat-card" style={{ background: '#fff', borderRadius: '14px', padding: '18px 20px', boxShadow: 'var(--shadow)', display: 'flex', alignItems: 'flex-start', gap: '14px', width: '100%', border: 'none', textAlign: 'left', fontFamily: 'var(--font-body)', color: 'var(--black)', cursor: item.onClick ? 'pointer' : 'default', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}>
+            <CardTag key={item.label} type={item.action ? 'button' : undefined} onClick={item.action ? openUnpaidInvoices : undefined} aria-label={item.ariaLabel} className="stat-card" style={{ background: '#fff', borderRadius: '14px', padding: '18px 20px', boxShadow: 'var(--shadow)', display: 'flex', alignItems: 'flex-start', gap: '14px', width: '100%', border: 'none', textAlign: 'left', fontFamily: 'var(--font-body)', color: 'var(--black)', cursor: item.action ? 'pointer' : 'default', touchAction: 'manipulation', WebkitTapHighlightColor: 'transparent' }}>
               <div style={{ background: item.bg, borderRadius: '10px', padding: '10px', flexShrink: 0 }}>
                 <Icon size={20} color={item.color} />
               </div>
