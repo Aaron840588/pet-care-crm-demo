@@ -34,6 +34,7 @@ export default function ViewBookingModal({ viewBooking, setViewBooking, clients 
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
           <div style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 700 }}>🐾 Visit Details</div>
           <button
+            type="button" aria-label="Close visit details"
             onClick={() => setViewBooking(null)}
             style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--gray)', padding: '6px' }}
           >

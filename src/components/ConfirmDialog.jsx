@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 
 export default function ConfirmDialog({
   title,
@@ -9,8 +9,23 @@ export default function ConfirmDialog({
   onConfirm,
   onCancel,
 }) {
+  const dialogRef = useRef(null);
+  const titleId = useId();
+  const descriptionId = useId();
   useEffect(() => {
+    const previousFocus = document.activeElement;
+    const dialog = dialogRef.current;
+    dialog?.querySelector('button')?.focus();
     const handleKeyDown = (event) => {
+      if (event.key === 'Tab') {
+        const controls = dialog?.querySelectorAll('button:not(:disabled)');
+        if (controls?.length) {
+          const first = controls[0];
+          const last = controls[controls.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+        }
+      }
       if (event.key === 'Escape') {
         onCancel();
       }
@@ -23,6 +38,7 @@ export default function ConfirmDialog({
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener('keydown', handleKeyDown);
+      if (previousFocus?.isConnected) previousFocus.focus();
     };
   }, [onCancel]);
 
@@ -31,14 +47,19 @@ export default function ConfirmDialog({
   return (
     <div className="overlay open" onClick={onCancel}>
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={descriptionId}
         className="modal confirm-modal"
         style={{ maxWidth: '420px', borderRadius: '20px' }}
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="modal-title" style={{ marginBottom: '10px' }}>
+        <div id={titleId} className="modal-title" style={{ marginBottom: '10px' }}>
           {title}
         </div>
-        <p
+        <p id={descriptionId}
           style={{
             color: 'var(--gray)',
             fontSize: '13px',

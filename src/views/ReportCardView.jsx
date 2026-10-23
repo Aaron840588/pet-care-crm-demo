@@ -39,7 +39,7 @@ export default function ReportCardView() {
 
   const [form, setForm] = useState({
     clientId: '', petNames: '',
-    visitDate: todayLocalStr(), sitterName: 'Kat',
+    visitDate: todayLocalStr(), sitterName: import.meta.env.VITE_DEMO_MODE !== 'false' ? 'Demo Operations Team' : 'Kat',
     energy: '', social: '', appetite: '', potty: '', condition: '',
     checkedTasks: {}, observations: '', mood: '', message: '',
   });
@@ -79,12 +79,14 @@ export default function ReportCardView() {
       // Ignore storage access errors.
     }
 
+    // Consume the external sessionStorage handoff once, after client records load.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setForm((prev) => ({
       ...prev,
       clientId: booking.clientId || prev.clientId,
       petNames: petNames || prev.petNames,
       visitDate: todayVisit?.date || booking.startDate || prev.visitDate,
-      sitterName: prev.sitterName || 'Kat',
+      sitterName: prev.sitterName || 'Demo Operations Team',
     }));
     toast('Report card started from today\'s booking.');
   }, [bookings, clients, toast]);
@@ -479,7 +481,7 @@ export default function ReportCardView() {
                   ♡ PET CHECK-UP REPORT ♡
                 </div>
                 <div style={{ fontFamily: '"Playfair Display", Georgia, serif', fontSize: '13px', fontStyle: 'italic', color: '#777', marginTop: '4px' }}>
-                  Kat&apos;s Pet-Sitting Services
+                  {import.meta.env.VITE_DEMO_MODE !== 'false' ? 'Pet Care Operations — Demo' : "Kat's Pet-Sitting Services"}
                 </div>
               </div>
 

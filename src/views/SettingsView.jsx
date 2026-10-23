@@ -9,7 +9,7 @@ export default function SettingsView() {
   const { exportData, importData, services, setServices, syncStatus } = useData();
   const toast = useToast();
   const fileInputRef = useRef(null);
-  const isDemo = import.meta.env.VITE_DEMO_MODE === 'true' || (typeof window !== 'undefined' && window.location.hostname.includes('demo'));
+  const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
 
   // ── Service editor state ──────────────────────────────────────────────────
   const [editingId, setEditingId] = useState(null);
@@ -110,10 +110,10 @@ export default function SettingsView() {
           </div>
           <div>
             <div style={{ fontWeight: 700, fontSize: '14px' }}>
-              {syncStatus === 'online' ? '🟢 Live — Syncing to Cloud' : '🟡 Offline — Changes saved locally'}
+              {isDemo ? 'Demo sandbox — not connected to cloud storage' : syncStatus === 'online' ? '🟢 Live — Syncing to Cloud' : '🟡 Offline — Changes saved locally'}
             </div>
             <div style={{ fontSize: '12px', color: 'var(--gray)', marginTop: '2px' }}>
-              {syncStatus === 'online'
+              {isDemo ? 'All demo changes, including services, reset when the page reloads.' : syncStatus === 'online'
                 ? 'Any device opening this app will see the same data.'
                 : 'Data will auto-sync to all devices when internet returns.'}
             </div>
@@ -252,13 +252,13 @@ export default function SettingsView() {
             📦 Data Backup
           </div>
           <p style={{ fontSize: '13px', color: 'var(--gray)', lineHeight: 1.6, marginBottom: '20px' }}>
-            Your data lives in the cloud (Firebase). As an extra safety net, you can export a local copy as a <code>.json</code> file and restore it at any time.
+            {isDemo ? 'Export fictional demo records as JSON. Backup import is disabled in the public sandbox. Do not use personal or client information.' : 'Export a local JSON backup of your cloud records, or restore a previous backup.'}
           </p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <button className="btn btn-lime" style={{ flex: 1, justifyContent: 'center', minWidth: '140px' }} onClick={exportData}>
               <Download size={18} /> Export Backup
             </button>
-            <button className="btn btn-ghost" style={{ flex: 1, justifyContent: 'center', minWidth: '140px' }} onClick={() => fileInputRef.current.click()}>
+            <button className="btn btn-ghost" style={{ flex: 1, justifyContent: 'center', minWidth: '140px' }} disabled={isDemo} title={isDemo ? "Backup import is unavailable in the public sandbox" : undefined} onClick={() => fileInputRef.current.click()}>
               <Upload size={18} /> Import Backup
             </button>
           </div>
@@ -267,9 +267,9 @@ export default function SettingsView() {
 
         {/* ── APP INFO ── */}
         <div style={{ textAlign: 'center', padding: '10px', color: 'var(--gray)', fontSize: '11px', lineHeight: 1.6 }}>
-          Kat's Pet-sitting CRM 🐾<br/>
-          {isDemo ? 'Los Baños, Laguna' : 'San Antonio, Los Baños, Laguna'}<br/>
-          GCash: {isDemo ? '0917 000 0000' : '09952664451'}
+          {isDemo ? 'Pet Care Operations — Demo' : "Pet Care Operations Demo"}<br/>
+          Public portfolio sandbox<br/>
+          GCash: {isDemo ? 'Demo only — do not pay' : 'Not configured'}
         </div>
 
       </div>

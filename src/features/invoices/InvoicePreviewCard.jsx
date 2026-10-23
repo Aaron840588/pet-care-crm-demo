@@ -21,7 +21,7 @@ export default function InvoicePreviewCard({ invoiceRef, data, lineItems, lineCa
         {/* HEADER */}
         <div style={{ textAlign: 'center' }}>
           <div className="inv-h1">INVOICE</div>
-          <div className="inv-sub">Kat's Pet-sitting Services</div>
+          <div className="inv-sub">Pet Care Operations</div>
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '6px' }}>
             <div className="inv-gcash-pill">Gcash: {fmtGcash(data.gcash)}</div>
           </div>

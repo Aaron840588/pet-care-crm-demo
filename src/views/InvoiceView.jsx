@@ -33,8 +33,8 @@ export default function InvoiceView() {
   const toast  = useToast();
   const invoiceRef = useRef(null);
   const bookingHandoffRef = useRef(false);
-  const isDemo = import.meta.env.VITE_DEMO_MODE === 'true' || (typeof window !== 'undefined' && window.location.hostname.includes('demo'));
-  const defaultGcash = isDemo ? '09170000000' : '09952664451';
+  const isDemo = import.meta.env.VITE_DEMO_MODE !== 'false';
+  const defaultGcash = isDemo ? '09170000000' : '';
 
   const [data, setData] = useState({
     gcash:    defaultGcash,
@@ -47,19 +47,17 @@ export default function InvoiceView() {
 
   const [lineItems, setLineItems]         = useState([newLineItem()]);
   const [importBookingId, setImportBookingId] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [confirmResetOpen, setConfirmResetOpen] = useState(false);
 
-  // Auto-fill name + pets when client changes
-  useEffect(() => {
-    if (!data.clientId) return;
-    const c = clients.find(x => x.id === data.clientId);
-    if (c) setData(p => ({
-      ...p,
-      toName: c.name,
-      pets: c.pets ? c.pets.map(pp => typeof pp === 'string' ? pp : pp.name).join(', ') : '',
+  const selectClient = (clientId) => {
+    const client = clients.find((item) => item.id === clientId);
+    setData((previous) => ({ ...previous, clientId,
+      toName: client?.name || '',
+      pets: client?.pets?.map((pet) => typeof pet === 'string' ? pet : pet.name).join(', ') || '',
     }));
-  }, [data.clientId, clients]);
+  };
 
-  
   const unbilledErrands = useMemo(() => {
     if (!data.clientId) return [];
     return errands.filter(e => e.clientId === data.clientId && e.amount > 0 && !e.isBilled && e.status !== 'done');
@@ -197,6 +195,8 @@ export default function InvoiceView() {
     } catch {
       // Ignore storage access errors.
     }
+    // Consume an external sessionStorage handoff once after records become available.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     importFromBooking(bookingId);
     toast('Invoice draft started from today\'s booking.');
   }, [bookings, importFromBooking, toast]);
@@ -442,14 +442,14 @@ export default function InvoiceView() {
     setData({ gcash: defaultGcash, clientId: '', toName: '', pets: '', paid: 0, tip: 0 });
     setLineItems([newLineItem()]);
     setImportBookingId('');
-  }, [lineItems]);
+  }, [lineItems, defaultGcash]);
 
   const confirmReset = useCallback(() => {
     setData({ gcash: defaultGcash, clientId: '', toName: '', pets: '', paid: 0, tip: 0 });
     setLineItems([newLineItem()]);
     setImportBookingId('');
     setConfirmResetOpen(false);
-  }, []);
+  }, [defaultGcash]);
 
   const sortedImportBookings = useMemo(
     () => sortInvoiceImportBookings(bookings),
@@ -734,7 +734,7 @@ export default function InvoiceView() {
           <div className="form-row">
             <div className="fg">
               <label>Client</label>
-              <select value={data.clientId} onChange={e => setData({ ...data, clientId: e.target.value })}>
+              <select value={data.clientId} onChange={e => selectClient(e.target.value)}>
                 <option value="">— Select client —</option>
                 {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
@@ -968,7 +968,7 @@ export default function InvoiceView() {
             {/* HEADER */}
             <div style={{ textAlign: 'center' }}>
               <div className="inv-h1">INVOICE</div>
-              <div className="inv-sub">Kat's Pet-sitting Services</div>
+              <div className="inv-sub">{isDemo ? 'Pet Care Operations — Demo only, do not pay' : "Pet Care Operations"}</div>
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: '6px' }}>
                 <div className="inv-gcash-pill">Gcash: {fmtGcash(data.gcash)}</div>
               </div>
