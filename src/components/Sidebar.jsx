@@ -68,7 +68,7 @@ export default function Sidebar({ activeTab, setActiveTab, isMobileOpen, setMobi
           style={{ color: '#d06060' }}
         >
           <div className="ic"><LogOut size={16} color="#d06060" /></div>
-          Sign Out
+          {isDemo ? 'Restart sample session' : 'Sign Out'}
         </button>
       </nav>
 
