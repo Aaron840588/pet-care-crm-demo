@@ -295,7 +295,7 @@ export default function DashboardView({ setActiveTab }) {
             🐾 Pet-sitting Dashboard
           </div>
           <h2 className="hc-title">
-            Good day, Kat!
+            Good day!
           </h2>
           <p className="hc-date">{todayFull}</p>
         </div>

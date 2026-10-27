@@ -11,7 +11,7 @@ import {
   query,
   orderBy,
   limit,
-} from 'firebase/firestore';
+} from '../firebase';
 import { db } from '../firebase';
 import { todayLocalStr } from '../utils/dates';
 

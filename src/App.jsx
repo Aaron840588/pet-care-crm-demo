@@ -5,8 +5,7 @@ import BottomNav from './components/BottomNav';
 import { ToastProvider } from './components/Toast';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Wifi, WifiOff, Loader, X, LogOut } from 'lucide-react';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from './firebase';
+import { auth, onAuthStateChanged, signOut } from './firebase';
 
 // ── LAZY LOAD all views — keeps initial bundle small ──────────────────────────
 const LoginView          = lazy(() => import('./views/LoginView'));
@@ -141,7 +140,7 @@ function AppContent({ onLogout }) {
       {/* Desktop sync status pill — hidden on mobile */}
       <div className="sync-pill" style={{ background: syncBg, color: syncColor }}>
         {syncStatus === 'online'
-          ? <><Wifi size={11} /> Live Sync</>
+          ? <><Wifi size={11} /> {import.meta.env.VITE_DEMO_MODE !== 'false' ? 'Sample session' : 'Live Sync'}</>
           : syncStatus === 'offline'
           ? <><WifiOff size={11} /> Offline</>
           : <><Loader size={11} /> Connecting…</>
@@ -168,7 +167,7 @@ export default function App() {
   useEffect(() => {
     if (isDemo) {
       setTimeout(() => {
-        setUser({ uid: 'demo-user', email: 'hello@kats-petsitting.demo' });
+        setUser({ uid: 'demo-user', email: 'sample@example.invalid' });
         setAuthLoading(false);
       }, 500);
       return;
