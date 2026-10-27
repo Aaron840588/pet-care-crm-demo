@@ -15,7 +15,7 @@ Demo mode is the default. It does not initialize Firebase, register push notific
 
 ## Validation
 
-The October 22 local run passed 16 Node tests and 16 desktop/mobile browser tests, lint, build, the public-source guard and the dependency audit. See `RELEASE_NOTES.md` for publication scope.
+The October 27 release passed 16 Node tests and 16 desktop/mobile browser tests, lint, build, the public-source guard and the dependency audit. See `RELEASE_2026-10-27.md` and `RELEASE_NOTES.md` for publication scope.
 
 
 ```sh
@@ -27,7 +27,7 @@ npm run test:e2e
 npm audit
 ```
 
-The browser suite runs against the production preview and covers desktop/mobile navigation, client/pet/booking/errand workflows, invoice/report PNG and backup JSON downloads, session reset and absence of Firebase/Gemini requests during the tested flows. It does not establish production readiness or validate every device permission flow. The production build currently reports a large JavaScript chunk; further route splitting is a performance improvement to consider.
+The browser suite runs against the production preview and covers desktop/mobile navigation, client/pet/booking/errand workflows, invoice/report PNG and backup JSON downloads, session reset and absence of Firebase/Gemini requests during the tested flows. Real-device printing, native sharing and private cloud mode require separate validation. The public bundle omits the Firebase SDK; its main JavaScript is approximately 210 KB before compression, down from 689 KB.
 
 [Public demo](https://pet-care-crm-demo.vercel.app) · [Portfolio](https://aarontagapan.vercel.app)
 
